@@ -17,13 +17,20 @@ import (
 )
 
 type Config struct {
-	Port        string   `yaml:"port"`
-	SECRET_KEY  string   `yaml:"SECRET_KEY"`
-	AdminPWD    string   `yaml:"AdminPWD"`
-	GlobalToken string   `yaml:"GlobalToken"`
-	Username    string   `yaml:"Username"`
-	Password    string   `yaml:"Password"`
-	Database    Database `yaml:"Database"`
+	Port        string      `yaml:"port"`
+	SECRET_KEY  string      `yaml:"SECRET_KEY"`
+	AdminPWD    string      `yaml:"AdminPWD"`
+	GlobalToken string      `yaml:"GlobalToken"`
+	Username    string      `yaml:"Username"`
+	Password    string      `yaml:"Password"`
+	Database    Database    `yaml:"Database"`
+	UsersApi    UsersApi    `yaml:"UsersApi"`
+	Redis       RedisConfig `yaml:"Redis"`
+}
+
+type UsersApi struct {
+	Port       string `yaml:"port"`
+	SECRET_KEY string `yaml:"SECRET_KEY"`
 }
 
 type Database struct {
@@ -31,6 +38,12 @@ type Database struct {
 	DBHost string `yaml:"DBHost"`
 	DBProt string `yaml:"DBProt"`
 	DBName string `yaml:"DBName"`
+}
+
+type RedisConfig struct {
+	Host     string `yaml:"Host"`
+	Password string `yaml:"Password"`
+	DB       int    `yaml:"DB"`
 }
 
 // GetCurrentPath Get Current Path

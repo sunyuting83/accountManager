@@ -1,7 +1,7 @@
 package controller
 
 import (
-	BadgerDB "colaAPI/badger"
+	Redis "colaAPI/Redis"
 	"colaAPI/database"
 	"net/http"
 
@@ -30,7 +30,7 @@ func DeleteProjects(c *gin.Context) {
 		return
 	}
 	Projects.DeleteOne(form.ID)
-	BadgerDB.Delete([]byte(Projects.Key))
+	Redis.Delete(Projects.Key)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  0,
 		"message": "成功删除后台",

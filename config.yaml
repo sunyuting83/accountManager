@@ -9,3 +9,10 @@ Database:
   DBHost: 192.168.1.90
   DBProt: 5432
   DBName: acc_manage
+UsersApi:
+  port: 13003
+  SECRET_KEY: s9oV39FEtQ4A2cHN3AU2dRFDpegaEVgL
+Redis:
+  Host: 127.0.0.1:6379
+  DB: 1
+  Password: 3SuLc0VvzLJm

@@ -1,6 +1,7 @@
 package main
 
 import (
+	Redis "colaAPI/Redis"
 	BadgerDB "colaAPI/badger"
 	orm "colaAPI/database"
 	"colaAPI/router"
@@ -26,10 +27,12 @@ func main() {
 	}
 	pwd := utils.MD5(strings.Join([]string{confYaml.AdminPWD, confYaml.SECRET_KEY}, ""))
 	orm.InitDB(pwd, confYaml)
+	Redis.InitRedis(confYaml.Redis.Host, confYaml.Redis.Password, confYaml.Redis.DB)
 	// gin.SetMode(gin.ReleaseMode)
 	gin.SetMode(gin.DebugMode)
 	defer orm.Eloquent.Close()
 	defer BadgerDB.BadgerDB.Close()
+	defer Redis.MyRedis.Close()
 	app := router.InitRouter(confYaml.SECRET_KEY, CurrentPath)
 
 	app.Run(strings.Join([]string{":", confYaml.Port}, ""))

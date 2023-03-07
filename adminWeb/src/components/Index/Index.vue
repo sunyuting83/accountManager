@@ -105,7 +105,7 @@ export default defineComponent({
         states.identifyCode = ""
         makeCode(states.identifyCodes, 4)
       }else {
-        router.push("acclist")
+        router.push("userlist")
       }
     })
 
@@ -119,7 +119,7 @@ export default defineComponent({
         const d = await Fetch(Config.Api.login, data, "post")
         if (d.status === 0) {
           setStorage(true, d.token, d.user)
-          router.push("acclist")
+          router.push("userlist")
         }else{
           states.openerr.message = d.message
           states.openerr.active = true

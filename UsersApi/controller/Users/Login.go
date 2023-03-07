@@ -1,7 +1,7 @@
 package controller
 
 import (
-	BadgerDB "colaAPI/badger_user"
+	BadgerDB "colaAPI/UsersApi/badger"
 	"colaAPI/database"
 	"colaAPI/utils"
 	"net/http"

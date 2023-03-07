@@ -3,7 +3,7 @@ package utils
 import (
 	"bytes"
 	Redis "colaAPI/Redis"
-	BadgerDB "colaAPI/badger"
+	BadgerDB "colaAPI/UsersApi/badger"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
@@ -16,15 +16,15 @@ type Person struct {
 	Key string `uri:"key" binding:"required"`
 }
 
-// VerifyMiddleware Verify middleware
-func AdminVerifyMiddleware() gin.HandlerFunc {
+// UserVerifyMiddleware Verify middleware
+func UserVerifyMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if len(token) > 67 {
 			secret_key, _ := c.Get("secret_key")
 			SECRET_KEY := secret_key.(string)
 			token = token[7:]
-			if CheckToken(SECRET_KEY, token) {
+			if UserCheckToken(SECRET_KEY, token) {
 				c.Next()
 			} else {
 				c.AbortWithStatus(403)
@@ -51,8 +51,8 @@ func UserProjectsMiddleware() gin.HandlerFunc {
 	}
 }
 
-// CheckToken is a check token function
-func CheckToken(s, a string) bool {
+// UserCheckToken is a check token function
+func UserCheckToken(s, a string) bool {
 	AEStoken, err := DecryptByAes(a, []byte(s))
 	if err != nil {
 		return false

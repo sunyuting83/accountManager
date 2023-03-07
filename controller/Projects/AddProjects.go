@@ -1,7 +1,7 @@
 package controller
 
 import (
-	BadgerDB "colaAPI/badger"
+	Redis "colaAPI/Redis"
 	"colaAPI/database"
 	"colaAPI/utils"
 	"encoding/json"
@@ -110,7 +110,7 @@ func AddProjects(c *gin.Context) {
 	}
 	CacheValues, _ := json.Marshal(&cache)
 
-	BadgerDB.Set([]byte(key), CacheValues)
+	Redis.Set(key, string(CacheValues), 0)
 
 	projects.UpProjectsKey(key)
 
