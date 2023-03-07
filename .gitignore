@@ -1,0 +1,7 @@
+adminWeb/node_modules
+adminWeb/yarn.lock
+db/
+Cache/
+UserCache/
+server
+user

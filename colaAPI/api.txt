@@ -1,0 +1,101 @@
+ 
+微信 22:15:49APi接口：
+tiancaiapi.tablecando.cn
+kmf客户后台官网：member.tablecando.cn
+微信 22:16:04
+http://member.tablecando.cn/api.html?target_id=001
+API文本
+
+
+Nkmmn5QAQHkuxJcU6J
+
+sleepsun
+YOY5h6mZgmNV
+
+api password
+75c2f1d61280032df0bfb140a4ea98cd
+
+
+token
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJjbGllbnQua2VsZWF1dGgiLCJhdWQiOiJzZXJ2ZXIua2VsZWF1dGgiLCJpYXQiOjE2Nzc4MzU1NTQsImV4cCI6MTY3ODQ0MDM1NCwidWlkIjoiMjUyNDEifQ.vpNORvpKjuQuwH8E1t80Aq6wVq9gRtjoS10mrBZ7WAg
+
+-------------------------------
+https://www.apipost.cn/
+sleepsun@yopmail.com
+YOY5h6mZgmNV
+
+# CreateOrder
+```
+{
+  "status": 200,
+  "msg": "操作成功",
+  "data": {
+    "fullurl": "https://open.weixin.qq.com/connect/confirm?uuid=091yCRYV0CNNFa19&key=85a9a564d59b799a13f7654258ae627f8cebd2764a3d536c065a284f12e48a378b6c21235f0addc454d993c350f2376198d56c2517b8d0389b767730eb2068672edc284889151fb7cb1fb797af35cff08fce9168efda4989cf15fd9458174cc834d2ea4ee00adccd18750e348b5b4520526b12b3f81ec731da18eb22ca815389&uin=MjI3NTQwMDIwNg%3D%3D&lang=zh_CN&exportkey=n_ChQIAhIQQfUMUZjveFgwaL6aw7KFzBLRAQIE97dBBAEAAAAAAGr7LysmM04AAAAOpnltbLcz9gKNyK89dVj0d%2BXeSUx%2F8HyklpOIJNoy06c%2BIQihCUMuVQGRdHfwzm51MuJ2xQPAh8hZ6QvaF9hun5rmDJX9BXZsSSuVRW92wqzblUmMCEJmNRxqQcISBLnKx0qshRcJU7JYcMXDk1Q8rkCW1Uu1Q7zmGWDZz%2FjbcSWf8n82AOLRumT%2B4FU56BI4jFR%2F0N4ALMxMQy9WsGZZiKIt2Uynv4pE5OEmbAMkhCXKVgjaNLkgKRzM&pass_ticket=bRaHxerUqDidQOotDkCdDydIzAG9K9i8MWqBKGzvc3o4%2BHhMSAVyo1tiHwkM%2Fu0IOc0bcVNFTTXV1AKrVd%2BW8Q%3D%3D&wx_header=0",
+    "wxdata": {
+      "wxid": null,
+      "nickname": "墨羽"
+    },
+    "wxid": {
+      "wxid": "wxid_p01yca2lxdad12",
+      "nickname": "墨羽"
+    },
+    "order": {
+      "id": "35841662",
+      "oid": "2023030617393600015595",
+      "ordermode": 99,
+      "ordermodetext": "扫码模式"
+    }
+  }
+}
+```
+
+# OrderList
+```
+{
+  "status": "200",
+  "msg": "返回成功",
+  "data": {
+    "list": [
+      {
+        "o_id": "35841662",
+        "order_id": "2023030617393600015595",
+        "user_id": "25241",
+        "app_name": "捕鱼大作战·官方版",
+        "wxid": "wxid_p01yca2lxdad12",
+        "amount": "0.30",
+        "time": "1678095576",
+        "state": "0",
+        "type": "5",
+        "p_type": "",
+        "projectid": "2068",
+        "new_time": "1678181989",
+        "wx_nickname": "墨羽",
+        "remarks": "",
+        "queta": "999",
+        "j_type": "99",
+        "other": "wx44bb2ec18017984b-wx44bb2ec18017984b||com.tuyoo.fish3d.officia-ios.tuyoo.fish3d.tyby",
+        "channel_id": "10",
+        "apigateway": "inself",
+        "remoteorderid": "",
+        "app_logo": "http://mmbiz.qpic.cn/sz_mmbiz_png/RURwFC5mmYyjW9TtY8EFlqsy23t4rQXowYtKs303Kfh8sfucKeSiawxoTFCLHDwbibib5ibFSkTyvkA1DRKJ9NAESA/0?wx_fmt=png/0"
+      }
+    ],
+    "count": 1
+  }
+}
+```
+
+#TowAuth
+```
+{
+  "status": 205,
+  "msg": "操作成功",
+  "data": {
+    "remark": "wx44bb2ec18017984b-wx44bb2ec18017984b||com.tuyoo.fish3d.officia-ios.tuyoo.fish3d.tyby",
+    "order": {
+      "ordermode": null,
+      "ordermodetext": null
+    }
+  }
+}
+```
