@@ -84,7 +84,7 @@ export default defineComponent({
       },
     })
     states.openModal.username = localStorage.getItem('user')
-    console.log(states.openModal.username)
+    // console.log(states.openModal.username)
     const LogOut =() =>{
       setStorage(false)
       router.push("/")

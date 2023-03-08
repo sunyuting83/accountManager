@@ -5,14 +5,14 @@
       <div class="card events-card">
         <header class="card-header">
           <p class="card-header-title">
-            项目列表
+            项目名称：{{projects.ProjectsName}}
           </p>
           <button class="card-header-icon">
-            <button class="button is-link is-small" @click="showAddModel">
+            <button class="button is-link is-small" @click="backRouter">
               <span class="icon is-small">
-                <i class="fa fa-plus"></i>
+                <i class="fa fa-arrow-circle-left"></i>
               </span>
-              <span>添加项目</span>
+              <span>返回</span>
             </button>
           </button>
         </header>
@@ -74,12 +74,6 @@
       </div>
       <PaginAtion v-if="data.length >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
     </div>
-    <AddProject
-      v-if="userLoading"
-      :showData="openAddModal"
-      :ShowMessage="ShowMessage"
-      :UserData="UserData">
-    </AddProject>
     <NotIfication
       :showData="openerr">
     </NotIfication>
@@ -92,7 +86,6 @@ import ManageHeader from '@/components/Other/Header'
 import LoadIng from '@/components/Other/Loading'
 import EmptyEd from '@/components/Other/Empty'
 import NotIfication from "@/components/Other/Notification"
-import AddProject from "@/components/Project/AddProject"
 import PopoButton from '@/components/Other/PopoButton'
 import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
@@ -103,10 +96,12 @@ import CheckLogin from '@/helper/checkLogin'
 import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
-  name: 'ProjectList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, AddProject, PopoButton, PaginAtion, FormaTime },
+  name: 'AccountList',
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PopoButton, PaginAtion, FormaTime },
   setup() {
     let states = reactive({
+      id: 0,
+      projects: {},
       loading: false,
       data: [],
       UserData: [],
@@ -130,8 +125,9 @@ export default defineComponent({
     })
     const router = useRouter()
     onMounted(async() => {
-      document.title = `${Config.GlobalTitle}-项目管理`
+      document.title = `${Config.GlobalTitle}-帐号管理`
       const data = await CheckLogin()
+      states.id = router.currentRoute._value.params.id
       if (data == 0) {
         const username = localStorage.getItem('user')
         states.username = username
@@ -143,18 +139,25 @@ export default defineComponent({
     })
     const GetData = async(page = 1) => {
       const token = localStorage.getItem("token")
-      const d = await Fetch(Config.Api.projectList, {page:page, limit: states.limit}, 'GET', token)
+      const data = {
+        page:page, 
+        limit: states.limit,
+        projectsID: states.id
+      }
+      const d = await Fetch(Config.Api.accountList, data, 'GET', token)
       states.loading = true
       states.pageLoading = false
       if (d.status == 0) {
         states.data = d.data
         states.total = d.total
+        states.projects = d.projects
         states.pageLoading = true
         states.loading = false
       }else{
         states.data = []
         states.total = 0
         states.page = []
+        states.projects = {}
         states.loading = false
       }
     }
@@ -208,7 +211,7 @@ export default defineComponent({
     const getUserData = async() => {
       const token = localStorage.getItem("token")
       const d = await Fetch(Config.Api.UsersAllList, {}, 'GET', token)
-      // console.log(d)
+      console.log(d)
       if (d.status == 0) {
         states.UserData = d.data
         states.userLoading = true
@@ -256,9 +259,10 @@ export default defineComponent({
       }
     }
 
-    const showAccount = (id) => {
-      router.push(`/account/${id}`)
+    const backRouter = () => {
+      router.back()
     }
+
 
     return {
       ...toRefs(states),
@@ -268,7 +272,7 @@ export default defineComponent({
       lockIt,
       deleteIt,
       GetData,
-      showAccount
+      backRouter
     }
   },
 })

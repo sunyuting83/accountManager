@@ -31,6 +31,7 @@ const Api = {
   'addproject': `${RootUrl}AddProjects`,
   'delproject': `${RootUrl}DelProjects`,
   'upprojectstatus': `${RootUrl}UpStatusProjects`,
+  'accountList': `${RootUrl}AccountList`,
 }
 
 const makePopeData = (e, message, active = true)=> {

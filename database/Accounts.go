@@ -30,9 +30,10 @@ func (accounts *Accounts) GetCount(ProjectsID string) (count int64, err error) {
 }
 
 // Account List
-func GetAccountList(page, Limit int) (accounts *[]Accounts, err error) {
+func GetAccountList(page, Limit int, ProjectsID string) (accounts *[]Accounts, err error) {
 	p := makePage(page, Limit)
 	if err = sqlDB.
+		Where("projects_id = ?", ProjectsID).
 		Order("updated_at desc").
 		Limit(Limit).Offset(p).
 		Find(&accounts).Error; err != nil {

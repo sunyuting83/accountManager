@@ -23,7 +23,16 @@ func AccountList(c *gin.Context) {
 		})
 		return
 	}
-	dataList, err := database.GetAccountList(pageInt, LimitInt)
+	ProjectsID, _ := strconv.Atoi(projectsID)
+	Projects, err := database.ProjectsCheckID(int64(ProjectsID))
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": "失败",
+		})
+		return
+	}
+	dataList, err := database.GetAccountList(pageInt, LimitInt, projectsID)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
@@ -32,9 +41,10 @@ func AccountList(c *gin.Context) {
 		return
 	}
 	Data := gin.H{
-		"status": 0,
-		"data":   dataList,
-		"total":  count,
+		"status":   0,
+		"data":     dataList,
+		"total":    count,
+		"projects": Projects,
 	}
 	c.JSON(http.StatusOK, Data)
 }
