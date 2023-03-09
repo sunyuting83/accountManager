@@ -46,7 +46,7 @@ func ModifyProjects(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
-			"message": "失败",
+			"message": "haven't project ID",
 		})
 		return
 	}
@@ -89,7 +89,7 @@ func ModifyProjects(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
-			"message": "失败",
+			"message": "haven't project ID",
 		})
 		return
 	}

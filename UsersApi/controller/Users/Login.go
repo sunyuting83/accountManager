@@ -56,7 +56,7 @@ func Sgin(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
-			"message": "登陆失败",
+			"message": "用户不存在或密码错误",
 		})
 		return
 	}
@@ -64,7 +64,7 @@ func Sgin(c *gin.Context) {
 	if err != nil && err.Error() != "Key not found" {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
-			"message": "登陆失败",
+			"message": "用户不存在",
 		})
 		return
 	}
@@ -104,6 +104,7 @@ func Sgin(c *gin.Context) {
 	}
 	buff, _ := json.Marshal(&cacheToken)
 
+	BadgerDB.SetWithTTL([]byte(login.UserName), []byte(token), ttl)
 	BadgerDB.SetWithTTL([]byte(token), buff, ttl)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  0,

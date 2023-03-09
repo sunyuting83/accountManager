@@ -57,7 +57,7 @@ func ProjectsList(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
-			"message": "失败",
+			"message": "haven't project Count",
 		})
 		return
 	}
@@ -65,7 +65,7 @@ func ProjectsList(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
-			"message": "失败",
+			"message": "haven't project list",
 		})
 		return
 	}
