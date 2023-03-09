@@ -44,10 +44,10 @@
                     <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
                     <td>
                       <div class="buttons">
-                        <button class="button is-success is-small" @click="()=>{showModel(item.UserName)}">修改密码</button>
+                        <button class="button is-success is-small" @click="()=>{showModel(item.UserName)}" v-if="item.ID !== 1">修改密码</button>
                         <PopoButton
-                          :message="item.NewStatus === 0?'锁定':'解锁'" color="is-info" :callBack="()=>{lockIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
-                        <PopoButton message="删除" color="is-danger" :callBack="()=>{deleteIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
+                          :message="item.NewStatus === 0?'锁定':'解锁'" color="is-info" :callBack="()=>{lockIt(item.ID)}" v-if="item.UserName !== username && item.ID !== 1"></PopoButton>
+                        <PopoButton message="删除" color="is-danger" :callBack="()=>{deleteIt(item.ID)}" v-if="item.UserName !== username && item.ID !== 1"></PopoButton>
                       </div>
                     </td>
                   </tr>

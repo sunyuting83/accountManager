@@ -19,7 +19,7 @@ func InitRouter(SECRET_KEY, CurrentPath string) *gin.Engine {
 	router.StaticFS("/css", http.Dir("static/css"))
 	router.StaticFS("/js", http.Dir("static/js"))
 	router.StaticFile("/favicon.ico", "static/favicon.ico")
-	router.LoadHTMLGlob("static/html/*")
+	router.LoadHTMLGlob("static/index.html")
 	adminapiv1 := router.Group("/admin/api/v1")
 	adminapiv1.Use(utils.SetConfigMiddleWare(SECRET_KEY, CurrentPath))
 	{
