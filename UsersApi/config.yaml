@@ -1,14 +1,14 @@
 port: "13002"
-SECRET_KEY: yf9CowCCf3FZLnkGrrCs449n152UXvJT
+SECRET_KEY: UjQxYGXI0dUaIttZ0tCdLxFM94K4aiAF
 AdminPWD: ""
-GlobalToken: QZ1DUua0gkr1lLw3BAoGJOlPIHkhNoqC
-Username: ""
-Password: ""
+GlobalToken: wt3lr6NuJE5K3Q21NWWMgEVdgQkrziNU
 Database:
-  DBType: ""
-  DBHost: ""
-  DBProt: ""
-  DBName: ""
+  Username: acc_manage
+  Password: aaa123123
+  DBType: sqlite
+  DBHost: localhost
+  DBProt: "5432"
+  DBName: acc_manage
 UsersApi:
   port: "13003"
   SECRET_KEY: s9oV39FEtQ4A2cHN3AU2dRFDpegaEVgL

@@ -19,7 +19,7 @@ var (
 )
 
 // InitDB init db
-func InitDB(pwd string, confYaml *utils.Config) {
+func InitDB(confYaml *utils.Config) {
 	GetDB(confYaml)
 	Eloquent, _ = sqlDB.DB()
 	Eloquent.SetMaxIdleConns(10)
@@ -29,22 +29,6 @@ func InitDB(pwd string, confYaml *utils.Config) {
 
 	// SetConnMaxLifetime 设置了连接可复用的最大时间。
 	Eloquent.SetConnMaxLifetime(time.Hour)
-	sqlDB.AutoMigrate(&Users{}, &Projects{}, &Comput{}, &Accounts{}, &Filed{}, &Manager{})
-
-	var (
-		manager *Manager
-	)
-
-	if m := sqlDB.First(&manager); m.Error != nil {
-		if m.Error.Error() == "record not found" {
-			u := Manager{
-				UserName:  "admin",
-				Password:  pwd,
-				NewStatus: 0,
-			}
-			sqlDB.Create(&u)
-		}
-	}
 }
 
 func GetDB(confYaml *utils.Config) {
@@ -67,7 +51,8 @@ func GetDB(confYaml *utils.Config) {
 		}), &gorm.Config{})
 	case "sqlite":
 		CurrentPath, _ := utils.GetCurrentPath()
-		dbPath := strings.Join([]string{CurrentPath, "db"}, "/")
+		SqlitePath := makeSqlitePath(CurrentPath)
+		dbPath := strings.Join([]string{SqlitePath, "db"}, "/")
 		if !utils.IsExist(dbPath) {
 			os.MkdirAll(dbPath, 0755)
 		}
@@ -75,4 +60,12 @@ func GetDB(confYaml *utils.Config) {
 		dbFile := strings.Join([]string{dbPath, dbName}, "/")
 		sqlDB, _ = gorm.Open(sqlite.Open(dbFile), &gorm.Config{})
 	}
+}
+
+func makeSqlitePath(a string) (d string) {
+	b := strings.Split(a, "/")
+	l := len(b) - 1
+	c := b[0:l]
+	d = strings.Join(c, "/")
+	return
 }

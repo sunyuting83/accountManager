@@ -3,8 +3,8 @@ package main
 import (
 	Redis "colaAPI/Redis"
 	BadgerDB "colaAPI/UsersApi/badger"
+	orm "colaAPI/UsersApi/database"
 	"colaAPI/UsersApi/router"
-	orm "colaAPI/database"
 	"colaAPI/utils"
 	"fmt"
 	"os"
@@ -26,6 +26,7 @@ func main() {
 		os.Exit(0)
 	}
 	// gin.SetMode(gin.ReleaseMode)
+	orm.InitDB(confYaml)
 	Redis.InitRedis(confYaml.Redis.Host, confYaml.Redis.Password, confYaml.Redis.DB)
 
 	gin.SetMode(gin.DebugMode)

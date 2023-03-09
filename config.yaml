@@ -4,9 +4,9 @@ AdminPWD: admin888
 GlobalToken: UG7dMgu8DHHPROedVQVBcLetLbnfkTqI
 Database:
   Username: acc_manage
-  Password: 
+  Password: aaa123123
   DBType: sqlite
-  DBHost: 192.168.1.90
+  DBHost: localhost
   DBProt: 5432
   DBName: acc_manage
 UsersApi:

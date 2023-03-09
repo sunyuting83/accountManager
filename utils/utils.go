@@ -21,8 +21,6 @@ type Config struct {
 	SECRET_KEY  string      `yaml:"SECRET_KEY"`
 	AdminPWD    string      `yaml:"AdminPWD"`
 	GlobalToken string      `yaml:"GlobalToken"`
-	Username    string      `yaml:"Username"`
-	Password    string      `yaml:"Password"`
 	Database    Database    `yaml:"Database"`
 	UsersApi    UsersApi    `yaml:"UsersApi"`
 	Redis       RedisConfig `yaml:"Redis"`
@@ -34,10 +32,12 @@ type UsersApi struct {
 }
 
 type Database struct {
-	DBType string `yaml:"DBType"`
-	DBHost string `yaml:"DBHost"`
-	DBProt string `yaml:"DBProt"`
-	DBName string `yaml:"DBName"`
+	Username string `yaml:"Username"`
+	Password string `yaml:"Password"`
+	DBType   string `yaml:"DBType"`
+	DBHost   string `yaml:"DBHost"`
+	DBProt   string `yaml:"DBProt"`
+	DBName   string `yaml:"DBName"`
 }
 
 type RedisConfig struct {
