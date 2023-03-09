@@ -178,6 +178,6 @@ func GetCurrentPath() (string, error) {
 		return "", err
 	}
 	dir := filepath.Dir(path)
-	dbPath := strings.Join([]string{dir, "Cache"}, LinkPathStr)
+	dbPath := strings.Join([]string{dir, "UsersCache"}, LinkPathStr)
 	return dbPath, nil
 }

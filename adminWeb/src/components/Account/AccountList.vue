@@ -22,6 +22,13 @@
               <LoadIng></LoadIng>
             </div>
             <div v-else>
+              <div v-if="statusList.length > 0">
+                <div class="buttons are-small has-addons">
+                  <button class="button" :class="item.status === status?'is-success':''" v-for="(item,index) in statusList" :key="index" @click="()=>{pushToData(item.status)}">
+                    {{item.title}}
+                  </button>
+                </div>
+              </div>
               <div v-if="data.length <= 0">
                 <EmptyEd></EmptyEd>
               </div>
@@ -101,6 +108,8 @@ export default defineComponent({
   setup() {
     let states = reactive({
       id: 0,
+      status: "0",
+      statusList: [],
       projects: {},
       loading: false,
       data: [],
@@ -142,7 +151,8 @@ export default defineComponent({
       const data = {
         page:page, 
         limit: states.limit,
-        projectsID: states.id
+        projectsID: states.id,
+        status: states.status,
       }
       const d = await Fetch(Config.Api.accountList, data, 'GET', token)
       states.loading = true
@@ -151,6 +161,7 @@ export default defineComponent({
         states.data = d.data
         states.total = d.total
         states.projects = d.projects
+        states.statusList = JSON.parse(d.projects.StatusJSON)
         states.pageLoading = true
         states.loading = false
       }else{
@@ -211,7 +222,7 @@ export default defineComponent({
     const getUserData = async() => {
       const token = localStorage.getItem("token")
       const d = await Fetch(Config.Api.UsersAllList, {}, 'GET', token)
-      console.log(d)
+      // console.log(d)
       if (d.status == 0) {
         states.UserData = d.data
         states.userLoading = true
@@ -263,6 +274,11 @@ export default defineComponent({
       router.back()
     }
 
+    const pushToData = (status) => {
+      console.log(status)
+      states.status = status
+      GetData()
+    }
 
     return {
       ...toRefs(states),
@@ -272,7 +288,8 @@ export default defineComponent({
       lockIt,
       deleteIt,
       GetData,
-      backRouter
+      backRouter,
+      pushToData
     }
   },
 })

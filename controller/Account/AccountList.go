@@ -11,6 +11,7 @@ import (
 func AccountList(c *gin.Context) {
 	var page string = c.DefaultQuery("page", "0")
 	var projectsID string = c.DefaultQuery("projectsID", "0")
+	var Status string = c.DefaultQuery("status", "0")
 	var Limit string = c.DefaultQuery("limit", "100")
 	pageInt, _ := strconv.Atoi(page)
 	LimitInt, _ := strconv.Atoi(Limit)
@@ -32,7 +33,7 @@ func AccountList(c *gin.Context) {
 		})
 		return
 	}
-	dataList, err := database.GetAccountList(pageInt, LimitInt, projectsID)
+	dataList, err := database.GetAccountList(pageInt, LimitInt, projectsID, Status)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,

@@ -7,6 +7,7 @@ import (
 	Projects "colaAPI/controller/Projects"
 	User "colaAPI/controller/User"
 	utils "colaAPI/utils"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,10 +16,18 @@ import (
 func InitRouter(SECRET_KEY, CurrentPath string) *gin.Engine {
 	router := gin.Default()
 	router.Use(utils.CORSMiddleware())
+	router.StaticFS("/css", http.Dir("static/css"))
+	router.StaticFS("/js", http.Dir("static/js"))
+	router.StaticFile("/favicon.ico", "static/favicon.ico")
+	router.LoadHTMLGlob("static/html/*")
 	adminapiv1 := router.Group("/admin/api/v1")
 	adminapiv1.Use(utils.SetConfigMiddleWare(SECRET_KEY, CurrentPath))
 	{
 		router.GET("/", controller.Index)
+		router.GET("/adminlist", controller.Index)
+		router.GET("/userlist", controller.Index)
+		router.GET("/project", controller.Index)
+		router.GET("/account/:id", controller.Index)
 		adminapiv1.POST("/AddAdmin", utils.AdminVerifyMiddleware(), Admin.AddAdmin)
 		adminapiv1.PUT("/RePassword", utils.AdminVerifyMiddleware(), Admin.ResetPassword)
 		adminapiv1.DELETE("/DelAdmin", utils.AdminVerifyMiddleware(), Admin.DeleteAdmin)
@@ -37,6 +46,7 @@ func InitRouter(SECRET_KEY, CurrentPath string) *gin.Engine {
 		adminapiv1.DELETE("/DelProjects", utils.AdminVerifyMiddleware(), Projects.DeleteProjects)
 		adminapiv1.GET("/ProjectsList", utils.AdminVerifyMiddleware(), Projects.ProjectsList)
 		adminapiv1.PUT("/UpStatusProjects", utils.AdminVerifyMiddleware(), Projects.UpStatusProjects)
+		adminapiv1.PUT("/UpdateProjects", utils.AdminVerifyMiddleware(), Projects.ModifyProjects)
 		adminapiv1.GET("/AccountList", utils.AdminVerifyMiddleware(), Account.AccountList)
 	}
 

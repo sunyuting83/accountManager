@@ -20,11 +20,17 @@ type Projects struct {
 	Password     string `form:"password" json:"password" xml:"password"`
 	AccNumber    int    `form:"AccNumber" json:"AccNumber" xml:"AccNumber"`
 	ColaAPI      string `form:"ColaAPI" json:"ColaAPI" xml:"ColaAPI"`
+	StatusJSON   string `form:"StatusJSON" json:"StatusJSON" xml:"StatusJSON"`
 }
 
 type CacheValue struct {
 	UsersID    string `json:"UsersID"`
 	ProjectsID string `json:"ProjectsID"`
+}
+
+type StatusJSON struct {
+	Status string `json:"status"`
+	Title  string `json:"title"`
 }
 
 func AddProjects(c *gin.Context) {
@@ -49,6 +55,47 @@ func AddProjects(c *gin.Context) {
 			"message": "haven't projects name",
 		})
 		return
+	}
+	var Sjsons []byte
+	if len(form.StatusJSON) == 0 {
+		var Sjson []*StatusJSON
+		Sjson = append(Sjson, &StatusJSON{
+			Status: "0",
+			Title:  "未注册状态",
+		})
+		Sjson = append(Sjson, &StatusJSON{
+			Status: "1",
+			Title:  "注册中状态",
+		})
+		Sjson = append(Sjson, &StatusJSON{
+			Status: "2",
+			Title:  "注册完成状态",
+		})
+		Sjson = append(Sjson, &StatusJSON{
+			Status: "3",
+			Title:  "游戏中状态",
+		})
+		Sjson = append(Sjson, &StatusJSON{
+			Status: "4",
+			Title:  "游戏完成状态",
+		})
+		Sjson = append(Sjson, &StatusJSON{
+			Status: "5",
+			Title:  "封号状态",
+		})
+		Sjson = append(Sjson, &StatusJSON{
+			Status: "6",
+			Title:  "旧帐号状态",
+		})
+		Sjson = append(Sjson, &StatusJSON{
+			Status: "7",
+			Title:  "备用状态",
+		})
+		Sjson = append(Sjson, &StatusJSON{
+			Status: "8",
+			Title:  "提取状态",
+		})
+		Sjsons, _ = json.Marshal(&Sjson)
 	}
 	var ColaAPI1 bool = false
 	if form.ColaAPI == "true" {
@@ -79,14 +126,28 @@ func AddProjects(c *gin.Context) {
 	}
 	var projects *database.Projects
 	UsersIDInt := StrToUInt(form.UsersID)
-	projects = &database.Projects{
-		UsersID:      UsersIDInt,
-		ProjectsName: form.ProjectsName,
-		UserName:     form.UserName,
-		Password:     form.Password,
-		AccNumber:    form.AccNumber,
-		NewStatus:    0,
-		ColaAPI:      ColaAPI1,
+	if len(form.StatusJSON) == 0 {
+		projects = &database.Projects{
+			UsersID:      UsersIDInt,
+			ProjectsName: form.ProjectsName,
+			UserName:     form.UserName,
+			Password:     form.Password,
+			AccNumber:    form.AccNumber,
+			NewStatus:    0,
+			ColaAPI:      ColaAPI1,
+			StatusJSON:   string(Sjsons),
+		}
+	} else {
+		projects = &database.Projects{
+			UsersID:      UsersIDInt,
+			ProjectsName: form.ProjectsName,
+			UserName:     form.UserName,
+			Password:     form.Password,
+			AccNumber:    form.AccNumber,
+			NewStatus:    0,
+			ColaAPI:      ColaAPI1,
+			StatusJSON:   form.StatusJSON,
+		}
 	}
 	err := projects.Insert()
 	if err != nil {

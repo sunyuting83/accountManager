@@ -1,7 +1,9 @@
 adminWeb/node_modules
 adminWeb/yarn.lock
+adminWeb/dist
 db/
 Cache/
-UserCache/
+UsersCache/
 server
 user
+static/

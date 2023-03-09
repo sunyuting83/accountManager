@@ -6,6 +6,7 @@ type Projects struct {
 	ProjectsName string
 	UserName     string
 	Password     string
+	StatusJSON   string
 	NewStatus    int `gorm:"index"`
 	Accounts     []Accounts
 	Filed        []Filed
@@ -67,4 +68,12 @@ func (projects *Projects) UpStatusProjects(status int) {
 // Reset Password
 func (projects *Projects) UpProjectsKey(key string) {
 	sqlDB.Model(&projects).Update("key", key)
+}
+
+// Reset Password
+func (projects *Projects) UpdateProjects(id string) {
+	sqlDB.Model(&projects).
+		Select("UserName", "Password", "AccNumber", "ColaAPI", "StatusJSON").
+		Where("id = ?", id).
+		Updates(&projects)
 }

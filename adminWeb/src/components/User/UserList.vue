@@ -93,7 +93,7 @@ import CheckLogin from '@/helper/checkLogin'
 import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
-  name: 'AdminList',
+  name: 'UserList',
   components: { ManageHeader, LoadIng, EmptyEd, ChangePassword, NotIfication, AddUser, PopoButton, PaginAtion, FormaTime },
   setup() {
     let states = reactive({

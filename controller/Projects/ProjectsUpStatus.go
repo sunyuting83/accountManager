@@ -1,8 +1,11 @@
 package controller
 
 import (
+	Redis "colaAPI/Redis"
 	"colaAPI/database"
+	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -32,6 +35,17 @@ func UpStatusProjects(c *gin.Context) {
 	if projects.NewStatus == 1 {
 		NewStatus = 0
 		FuckStr = "解锁"
+		projectsIDInt := strconv.Itoa(int(projects.ID))
+		UsersID := strconv.Itoa(int(projects.UsersID))
+		cache := &CacheValue{
+			UsersID:    UsersID,
+			ProjectsID: projectsIDInt,
+		}
+		CacheValues, _ := json.Marshal(&cache)
+
+		Redis.Set(projects.Key, string(CacheValues), 0)
+	} else {
+		Redis.Delete(projects.Key)
 	}
 	projects.UpStatusProjects(NewStatus)
 

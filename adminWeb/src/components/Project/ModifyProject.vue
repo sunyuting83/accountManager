@@ -3,28 +3,15 @@
     <div class="modal-background"></div>
     <div class="modal-card">
       <header class="modal-card-head">
-        <p class="modal-card-title">添加项目</p>
+        <p class="modal-card-title">修改项目</p>
         <button class="delete" aria-label="close" @click="closErr" v-if="loading ? false : true"></button>
       </header>
       <section class="modal-card-body">
-        <div class="field" v-if="data.length !== 0">
-          <div class="select is-normal">
-            <select v-model="form.UserID">
-              <option v-for="(item) in data" :key="item.ID" :value="item.ID">{{item.UserName}}</option>
-            </select>
-          </div>
-        </div>
         <div class="field">
           <p class="control has-icons-left has-icons-right">
-            <input :class="form.ProjectsNameErr ? 'input is-danger': 'input'" type="ProjectsName" v-model="form.ProjectsName" placeholder="项目名称" :onBlur="checkProjectsName">
-            <span class="icon is-small is-left">
-              <i class="fa fa-user-circle-o"></i>
-            </span>
-            <span class="icon is-small is-right" v-if="form.ProjectsNameErr">
-              <i class="fa fa-exclamation-triangle"></i>
-            </span>
+            <input type="text" :placeholder="form.ProjectName" disabled>
+            <input type="hidden" :placeholder="form.ID" disabled>
           </p>
-          <p class="help has-text-left is-danger" v-if="form.ProjectsNameErr">{{form.ProjectsNameErrMessage}}</p>
         </div>
         <div class="field">
           <label class="checkbox">
@@ -98,7 +85,7 @@
         </div>
       </section>
       <footer class="modal-card-foot">
-        <button class="button is-info" @click="onSubmit" :class="loading ? 'is-loading' : ''">添加</button>
+        <button class="button is-info" @click="onSubmit" :class="loading ? 'is-loading' : ''">修改</button>
         <button class="button" @click="closErr" :disabled="loading ? true : false" :class="loading ? 'is-loading' : ''">取消</button>
       </footer>
     </div>
@@ -110,68 +97,41 @@ import { reactive, toRefs, defineComponent } from 'vue'
 import Fetch from '@/helper/fetch'
 import Config from '@/helper/config'
 export default defineComponent ({
-  name: 'AddProject',
+  name: 'ModifyProject',
   props: {
     showData:{
       active:{
         type: Boolean,
         default: false
+      },
+      Project: {
+        type: Object
       }
     },
-    ShowMessage:Function,
-    UserData: Array
+    ShowMessage:Function
   },
   setup(props){
+    let StatusJSON = JSON.parse(props.showData.Project.StatusJSON)
+    console.log(StatusJSON)
+    let haStatus = false
+    if (StatusJSON.length > 0) haStatus = true
     let _data = reactive({
       loading: false,
-      userLoading: false,
-      data: props.UserData,
       form:{
-        ProjectsName: "",
-        ProjectsNameErr: false,
-        ProjectsNameErrMessage: '',
-        UserName: "",
+        ID: props.showData.Project.ID,
+        ProjectName: props.showData.Project.ProjectsName,
+        UserName: props.showData.Project.UserName,
         UserNameErr: false,
         UserNameErrMessage: '',
-        Password: "",
+        Password: props.showData.Project.Password,
         PasswordErr: false,
         PasswordErrMessage: '',
-        accNumber: 0,
+        accNumber: props.showData.Project.AccNumber,
         accNumberErr: false,
         accNumberErrMessage: '',
-        cola: false,
-        UserID: 0,
-        StatusJSON: [
-        {
-          "status": "0",
-          "title":"未注册状态"
-        },{
-          "status": "1",
-          "title":"注册中状态"
-        },{
-          "status": "2",
-          "title":"注册完成状态"
-        },{
-          "status": "3",
-          "title":"游戏中状态"
-        },{
-          "status": "4",
-          "title":"游戏完成状态"
-        },{
-          "status": "5",
-          "title":"封号状态"
-        },{
-          "status": "6",
-          "title":"旧帐号状态"
-        },{
-          "status": "7",
-          "title":"备用状态"
-        },{
-          "status": "8",
-          "title":"提号状态"
-        }
-      ],
-        hastatus: false
+        cola: props.showData.Project.ColaAPI,
+        StatusJSON: StatusJSON,
+        hastatus: haStatus
       }
     })
     const closErr = () => {
@@ -184,31 +144,27 @@ export default defineComponent ({
         message: "",
         color: 'is-success',
         data: []
-      }, 4)
+      }, 5)
     }
     const onSubmit = async() => {
       postData()
     }
     const postData = async() => {
-      const ProjectsName = _data.form.ProjectsName
-      const UserID = _data.form.UserID
       const ColaAPI = _data.form.cola
       const UserName = _data.form.UserName
       const Password = _data.form.Password
       const AccNumber = _data.form.accNumber
       const StatusJSON = JSON.stringify(_data.form.StatusJSON)
-      console.log(StatusJSON)
       const token = localStorage.getItem("token")
       let data = {
-        usersid : String(UserID),
-        ProjectsName: ProjectsName,
+        id : String(_data.form.ID),
         username: UserName,
         password: Password,
         AccNumber: AccNumber,
         ColaAPI: String(ColaAPI),
         StatusJSON: StatusJSON
       }
-      const d = await Fetch(Config.Api.addproject, data, "POST", token)
+      const d = await Fetch(Config.Api.UpdateProjects, data, "PUT", token)
       if (d.status === 0) {
         cleanState()
         closErr()
@@ -217,8 +173,8 @@ export default defineComponent ({
           message: d.message,
           color: 'is-success',
           data: d.data,
-          userLoading: false
-        }, 1)
+          modifyStatus: false
+        }, 6)
       }else{
         _data.form.ProjectsNameErr = true
         _data.loading = false
@@ -227,9 +183,6 @@ export default defineComponent ({
     }
 
     const cleanState = () => {
-      _data.form.ProjectsName = ""
-      _data.form.ProjectsNameErr = false
-      _data.form.ProjectsNameErrMessage = ""
       _data.form.UserName = ""
       _data.form.UserNameErr = false
       _data.form.UserNameErrMessage = ""
@@ -245,19 +198,10 @@ export default defineComponent ({
       _data.form.StatusJSON = []
     }
 
-    const checkProjectsName = () => {
-      if (_data.form.ProjectsName.length < 4) {
-        _data.form.ProjectsNameErr = true
-        _data.form.ProjectsNameErrMessage = "项目名不能小于4位"
-      }else{
-        _data.form.ProjectsNameErr = false
-        _data.form.ProjectsNameErrMessage = ""
-      }
-    }
     const checkUserName = () => {
       if (_data.form.UserName.length < 4) {
         _data.form.UserNameErr = true
-        _data.form.UserNameErrMessage = "项目名不能小于4位"
+        _data.form.UserNameErrMessage = "用户名不能小于4位"
       }else{
         _data.form.UserNameErr = false
         _data.form.UserNameErrMessage = ""
@@ -283,7 +227,7 @@ export default defineComponent ({
     }
     
     const addStatus = () => {
-      const len = _data.form.StatusJSON.length
+      const len = _data.form.StatusJSON.length + 1
       _data.form.StatusJSON = [..._data.form.StatusJSON, {
         "status": String(len),
         "title": ""
@@ -295,7 +239,6 @@ export default defineComponent ({
       props,
       closErr,
       onSubmit,
-      checkProjectsName,
       checkPassword,
       checkUserName,
       checkaccNumber,
@@ -306,7 +249,7 @@ export default defineComponent ({
 </script>
 <style scoped>
 .inputWidth {
-  width: 94px
+  width: 80px
 }
 .newP {
   padding: 0.45rem 0.5rem 0.45rem 0.75rem;
