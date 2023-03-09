@@ -75,6 +75,21 @@ func Get(key []byte) (string, error) {
 	}
 	return string(ival), nil
 }
+func GetToken(key []byte) ([]byte, error) {
+	var ival []byte
+	err := BadgerDB.View(func(txn *badger.Txn) error {
+		item, err := txn.Get(key)
+		if err != nil {
+			return err
+		}
+		ival, err = item.ValueCopy(nil)
+		return err
+	})
+	if err != nil {
+		return []byte(""), err
+	}
+	return ival, nil
+}
 
 func Has(key []byte) (bool, error) {
 	var exist bool = false

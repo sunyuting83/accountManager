@@ -1,9 +1,9 @@
 package controller
 
 import (
+	Redis "colaAPI/Redis"
 	"colaAPI/database"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -74,7 +74,6 @@ func ModifyProjects(c *gin.Context) {
 	if form.ColaAPI == "true" {
 		ColaAPI1 = true
 	}
-	fmt.Println(ColaAPI1)
 	if ColaAPI1 {
 		if len(form.UserName) < 5 {
 			c.JSON(http.StatusUnauthorized, gin.H{
@@ -119,6 +118,19 @@ func ModifyProjects(c *gin.Context) {
 	projects.UpdateProjects(form.ID)
 	ID, _ := strconv.ParseInt(form.ID, 10, 64)
 	data, _ := database.ProjectsCheckID(ID)
+
+	projectsIDInt := strconv.Itoa(int(data.ID))
+	projectsIDStr := string(projectsIDInt)
+	UsersIDInt := strconv.Itoa(int(data.UsersID))
+	UsersIDStr := string(UsersIDInt)
+	cache := &CacheValue{
+		UsersID:    UsersIDStr,
+		ProjectsID: projectsIDStr,
+		ColaAPI:    ColaAPI1,
+	}
+	CacheValues, _ := json.Marshal(&cache)
+
+	Redis.Set(data.Key, string(CacheValues), 0)
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  0,

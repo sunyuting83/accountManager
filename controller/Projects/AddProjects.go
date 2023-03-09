@@ -26,6 +26,7 @@ type Projects struct {
 type CacheValue struct {
 	UsersID    string `json:"UsersID"`
 	ProjectsID string `json:"ProjectsID"`
+	ColaAPI    bool   `json:"ColaAPI"`
 }
 
 type StatusJSON struct {
@@ -168,6 +169,7 @@ func AddProjects(c *gin.Context) {
 	cache := &CacheValue{
 		UsersID:    form.UsersID,
 		ProjectsID: projectsIDStr,
+		ColaAPI:    ColaAPI1,
 	}
 	CacheValues, _ := json.Marshal(&cache)
 

@@ -4,6 +4,7 @@ import (
 	BadgerDB "colaAPI/UsersApi/badger"
 	"colaAPI/UsersApi/database"
 	"colaAPI/utils"
+	"encoding/json"
 	"net/http"
 	"strings"
 	"time"
@@ -15,6 +16,11 @@ import (
 type Login struct {
 	UserName string `form:"username" json:"username" xml:"username"  binding:"required"`
 	Password string `form:"password" json:"password" xml:"password"  binding:"required"`
+}
+
+type CacheToken struct {
+	UserID uint
+	Token  string
 }
 
 func Sgin(c *gin.Context) {
@@ -92,8 +98,13 @@ func Sgin(c *gin.Context) {
 		})
 		return
 	}
-	BadgerDB.SetWithTTL([]byte(form.UserName), []byte(token), ttl)
-	BadgerDB.SetWithTTL([]byte(token), []byte(token), ttl)
+	var cacheToken *CacheToken = &CacheToken{
+		UserID: login.ID,
+		Token:  token,
+	}
+	buff, _ := json.Marshal(&cacheToken)
+
+	BadgerDB.SetWithTTL([]byte(token), buff, ttl)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  0,
 		"message": "登陆成功",

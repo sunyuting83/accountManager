@@ -40,6 +40,7 @@ func UpStatusProjects(c *gin.Context) {
 		cache := &CacheValue{
 			UsersID:    UsersID,
 			ProjectsID: projectsIDInt,
+			ColaAPI:    projects.ColaAPI,
 		}
 		CacheValues, _ := json.Marshal(&cache)
 

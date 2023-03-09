@@ -7,6 +7,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,13 @@ import (
 type Person struct {
 	Key string `uri:"key" binding:"required"`
 }
+
+type CacheToken struct {
+	UserID uint
+	Token  string
+}
+
+var result *CacheToken
 
 // UserVerifyMiddleware Verify middleware
 func UserVerifyMiddleware() gin.HandlerFunc {
@@ -57,14 +65,12 @@ func UserCheckToken(s, a string) bool {
 	if err != nil {
 		return false
 	}
-	token, err := BadgerDB.Get(AEStoken)
+	token, err := BadgerDB.GetToken(AEStoken)
 	if err != nil {
 		return false
 	}
-	if string(token) == string(AEStoken) {
-		return true
-	}
-	return false
+	json.Unmarshal(token, &result)
+	return result.Token == string(AEStoken)
 }
 
 // pkcs7Padding 填充
