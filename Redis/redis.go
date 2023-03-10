@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -22,6 +23,7 @@ func InitRedis(Host, Password string, DB int) {
 	_, err := MyRedis.Ping(ctx).Result()
 	if err != nil {
 		fmt.Println("Redis connect ping failed, err:", err)
+		os.Exit(1)
 		return
 	}
 	fmt.Println("Redis connect succeeded")

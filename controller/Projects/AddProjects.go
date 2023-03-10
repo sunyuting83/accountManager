@@ -4,11 +4,14 @@ import (
 	Redis "colaAPI/Redis"
 	"colaAPI/database"
 	"colaAPI/utils"
+	"crypto/rand"
 	"encoding/json"
+	"math/big"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/gin-gonic/gin"
 )
@@ -165,6 +168,7 @@ func AddProjects(c *gin.Context) {
 	date := d.Format("2006-01-02_15:04:05")
 	key := utils.MD5(strings.Join([]string{form.UsersID, date, projectsIDStr}, ""))
 	key = key[:12]
+	key = MakeKey(key)
 
 	cache := &CacheValue{
 		UsersID:    form.UsersID,
@@ -190,4 +194,19 @@ func StrToUInt(str string) uint {
 		return 0
 	}
 	return uint(i)
+}
+
+func MakeKey(a string) string {
+	b := strings.Split(a, "")
+	c := make([]string, 12)
+	for _, v := range b {
+		if unicode.IsLetter([]rune(v)[0]) {
+			n, _ := rand.Int(rand.Reader, big.NewInt(2))
+			if n.Int64() == 0 {
+				v = strings.ToUpper(v)
+			}
+		}
+		c = append(c, v)
+	}
+	return strings.Join(c, "")
 }

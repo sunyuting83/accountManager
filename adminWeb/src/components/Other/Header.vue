@@ -37,7 +37,7 @@
                 <a class="navbar-item" @click="showModel">
                   修改密码
                 </a>
-                <router-link class="navbar-item" to="/adminlist">
+                <router-link class="navbar-item" to="/adminlist" v-if="openModal.username === 'admin'">
                   管理员管理
                 </router-link>
                 <hr class="navbar-divider">
