@@ -23,6 +23,7 @@ type Config struct {
 	SECRET_KEY  string      `yaml:"SECRET_KEY"`
 	AdminPWD    string      `yaml:"AdminPWD"`
 	GlobalToken string      `yaml:"GlobalToken"`
+	FormMemory  int64       `yaml:"FormMemory"`
 	Database    Database    `yaml:"Database"`
 	UsersApi    UsersApi    `yaml:"UsersApi"`
 	Redis       RedisConfig `yaml:"Redis"`
@@ -89,6 +90,11 @@ func CheckConfig(OS, CurrentPath string) (conf *Config, err error) {
 	if len(confYaml.GlobalToken) <= 0 {
 		GlobalToken := randSeq(32)
 		confYaml.GlobalToken = GlobalToken
+		config, _ := yaml.Marshal(&confYaml)
+		os.WriteFile(ConfigFile, config, 0644)
+	}
+	if confYaml.FormMemory == 0 {
+		confYaml.FormMemory = 32
 		config, _ := yaml.Marshal(&confYaml)
 		os.WriteFile(ConfigFile, config, 0644)
 	}

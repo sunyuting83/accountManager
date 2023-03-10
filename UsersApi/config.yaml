@@ -2,6 +2,7 @@ port: "13002"
 SECRET_KEY: UjQxYGXI0dUaIttZ0tCdLxFM94K4aiAF
 AdminPWD: ""
 GlobalToken: wt3lr6NuJE5K3Q21NWWMgEVdgQkrziNU
+FormMemory: 256
 Database:
   Username: acc_manage
   Password: aaa123123

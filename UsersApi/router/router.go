@@ -12,9 +12,9 @@ import (
 )
 
 // InitRouter make router
-func InitRouter(SECRET_KEY, CurrentPath string) *gin.Engine {
+func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 	router := gin.Default()
-	router.MaxMultipartMemory = 256 << 20
+	router.MaxMultipartMemory = FormMemory << 20
 	router.Use(utils.CORSMiddleware())
 	userApiV1 := router.Group("/api/v1")
 	userApiV1HasKey := router.Group("/api/v1/:key")
