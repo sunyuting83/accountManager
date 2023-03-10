@@ -2,11 +2,11 @@ package utils
 
 import (
 	"bytes"
-	Redis "colaAPI/Redis"
 	BadgerDB "colaAPI/badger"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +15,12 @@ import (
 type Person struct {
 	Key string `uri:"key" binding:"required"`
 }
+type CacheToken struct {
+	UserID uint
+	Token  string
+}
+
+var result *CacheToken
 
 // VerifyMiddleware Verify middleware
 func AdminVerifyMiddleware() gin.HandlerFunc {
@@ -35,36 +41,18 @@ func AdminVerifyMiddleware() gin.HandlerFunc {
 	}
 }
 
-// UserVerifyMiddleware Verify middleware
-func UserProjectsMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var person Person
-		if err := c.ShouldBindUri(&person); err != nil {
-			c.AbortWithStatus(403)
-		}
-		has := Redis.Get(person.Key)
-		if len(has) != 0 {
-			c.Next()
-		} else {
-			c.AbortWithStatus(403)
-		}
-	}
-}
-
 // CheckToken is a check token function
 func CheckToken(s, a string) bool {
 	AEStoken, err := DecryptByAes(a, []byte(s))
 	if err != nil {
 		return false
 	}
-	token, err := BadgerDB.Get(AEStoken)
+	token, err := BadgerDB.GetToken(AEStoken)
 	if err != nil {
 		return false
 	}
-	if string(token) == string(AEStoken) {
-		return true
-	}
-	return false
+	json.Unmarshal(token, &result)
+	return result.Token == string(AEStoken)
 }
 
 // pkcs7Padding 填充

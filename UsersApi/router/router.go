@@ -18,7 +18,7 @@ func InitRouter(SECRET_KEY, CurrentPath string) *gin.Engine {
 	userApiV1 := router.Group("/api/v1")
 	userApiV1HasKey := router.Group("/api/v1/:key")
 	userApiV1.Use(utils.SetConfigMiddleWare(SECRET_KEY, CurrentPath))
-	userApiV1HasKey.Use(utils.SetConfigMiddleWare(SECRET_KEY, CurrentPath), utils.UserProjectsMiddleware())
+	userApiV1HasKey.Use(utils.SetConfigMiddleWare(SECRET_KEY, CurrentPath), utilsUser.UserProjectsMiddleware())
 	{
 		router.GET("/", utilsUser.UserVerifyMiddleware(), controller.Index)
 		userApiV1.POST("/Login", Users.Sgin)

@@ -56,7 +56,7 @@ func Sgin(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
-			"message": "用户不存在或密码错误",
+			"message": "用户不存在或密码错误" + err.Error(),
 		})
 		return
 	}

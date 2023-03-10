@@ -8,10 +8,10 @@
       </div>
       <div id="navMenu" class="navbar-menu">
         <div class="navbar-start">
-          <router-link class="navbar-item" :class="path === 'userlist'?'is-active':''" to="userlist">
+          <router-link class="navbar-item" :class="path === 'userlist'?'is-active':''" to="/userlist">
             用户管理
           </router-link>
-          <router-link class="navbar-item" :class="path === 'project'?'is-active':''" to="project">
+          <router-link class="navbar-item" :class="path === 'project'?'is-active':''" to="/project">
             项目管理
           </router-link>
         </div>
@@ -37,7 +37,7 @@
                 <a class="navbar-item" @click="showModel">
                   修改密码
                 </a>
-                <router-link class="navbar-item" to="adminlist">
+                <router-link class="navbar-item" to="/adminlist">
                   管理员管理
                 </router-link>
                 <hr class="navbar-divider">
