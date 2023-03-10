@@ -19,14 +19,13 @@ import (
 )
 
 type Config struct {
-	Port        string      `yaml:"port"`
-	SECRET_KEY  string      `yaml:"SECRET_KEY"`
-	AdminPWD    string      `yaml:"AdminPWD"`
-	GlobalToken string      `yaml:"GlobalToken"`
-	FormMemory  int64       `yaml:"FormMemory"`
-	Database    Database    `yaml:"Database"`
-	UsersApi    UsersApi    `yaml:"UsersApi"`
-	Redis       RedisConfig `yaml:"Redis"`
+	Port       string      `yaml:"port"`
+	SECRET_KEY string      `yaml:"SECRET_KEY"`
+	AdminPWD   string      `yaml:"AdminPWD"`
+	FormMemory int64       `yaml:"FormMemory"`
+	Database   Database    `yaml:"Database"`
+	UsersApi   UsersApi    `yaml:"UsersApi"`
+	Redis      RedisConfig `yaml:"Redis"`
 }
 
 type UsersApi struct {
@@ -84,12 +83,6 @@ func CheckConfig(OS, CurrentPath string) (conf *Config, err error) {
 	if len(confYaml.SECRET_KEY) <= 0 {
 		secret_key := randSeq(32)
 		confYaml.SECRET_KEY = secret_key
-		config, _ := yaml.Marshal(&confYaml)
-		os.WriteFile(ConfigFile, config, 0644)
-	}
-	if len(confYaml.GlobalToken) <= 0 {
-		GlobalToken := randSeq(32)
-		confYaml.GlobalToken = GlobalToken
 		config, _ := yaml.Marshal(&confYaml)
 		os.WriteFile(ConfigFile, config, 0644)
 	}
