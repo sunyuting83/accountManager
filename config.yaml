@@ -1,6 +1,6 @@
 port: "13002"
 SECRET_KEY: pR7MOPjc71dQcCQSJmplMe0PDukBpzTn
-AdminPWD: admin888
+AdminPWD: 
 FormMemory: 256
 Database:
   Username: acc_manage

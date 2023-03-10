@@ -87,7 +87,8 @@ func CheckConfig(OS, CurrentPath string) (conf *Config, err error) {
 		os.WriteFile(ConfigFile, config, 0644)
 	}
 	if len(confYaml.AdminPWD) <= 0 {
-		confYaml.AdminPWD = "admin888"
+		password := randSeq(12)
+		confYaml.AdminPWD = password
 		config, _ := yaml.Marshal(&confYaml)
 		os.WriteFile(ConfigFile, config, 0644)
 	}
