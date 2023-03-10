@@ -1,5 +1,5 @@
 port: "13002"
-SECRET_KEY: s9oV39FEtQ4A2cHN3AU2dRFDpegaEVgL
+SECRET_KEY: pR7MOPjc71dQcCQSJmplMe0PDukBpzTn
 AdminPWD: admin888
 FormMemory: 256
 Database:
@@ -8,10 +8,10 @@ Database:
   DBType: sqlite
   DBHost: localhost
   DBProt: "5432"
-  DBName: acc_manage
+  DBName: acc_Manage
 UsersApi:
   port: "13003"
-  SECRET_KEY: s9oV39FEtQ4A2cHN3AU2dRFDpegaEVgL
+  SECRET_KEY: N0MTsBEsh7DsXcqr5cgj6e0rAAEFP2cX
 Redis:
   Host: 192.168.1.90:6379
   Password: zH05aXvMzFpy8vDY

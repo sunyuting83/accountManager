@@ -86,8 +86,29 @@ func CheckConfig(OS, CurrentPath string) (conf *Config, err error) {
 		config, _ := yaml.Marshal(&confYaml)
 		os.WriteFile(ConfigFile, config, 0644)
 	}
+	if len(confYaml.AdminPWD) <= 0 {
+		confYaml.AdminPWD = "admin888"
+		config, _ := yaml.Marshal(&confYaml)
+		os.WriteFile(ConfigFile, config, 0644)
+	}
 	if confYaml.FormMemory == 0 {
 		confYaml.FormMemory = 32
+		config, _ := yaml.Marshal(&confYaml)
+		os.WriteFile(ConfigFile, config, 0644)
+	}
+	if len(confYaml.Database.DBName) <= 0 {
+		confYaml.Database.DBName = "acc_Manage"
+		config, _ := yaml.Marshal(&confYaml)
+		os.WriteFile(ConfigFile, config, 0644)
+	}
+	if len(confYaml.UsersApi.Port) <= 0 {
+		confYaml.UsersApi.Port = "13003"
+		config, _ := yaml.Marshal(&confYaml)
+		os.WriteFile(ConfigFile, config, 0644)
+	}
+	if len(confYaml.UsersApi.SECRET_KEY) <= 0 {
+		secret_key := randSeq(32)
+		confYaml.UsersApi.SECRET_KEY = secret_key
 		config, _ := yaml.Marshal(&confYaml)
 		os.WriteFile(ConfigFile, config, 0644)
 	}
