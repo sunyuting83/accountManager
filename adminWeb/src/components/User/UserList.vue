@@ -30,6 +30,7 @@
                   <tr>
                     <td width="35%">用户名</td>
                     <td>状态</td>
+                    <td v-if="userid == '1'">所属管理员</td>
                     <td>创建时间</td>
                     <td width="30%">操作</td>
                   </tr>
@@ -41,6 +42,7 @@
                       <span class="has-text-success" v-if="item.NewStatus === 0">正常</span>
                       <span class="has-text-danger" v-else>锁定</span>
                     </td>
+                    <td  v-if="userid == '1'">{{item.Manager.UserName}}</td>
                     <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
                     <td>
                       <div class="buttons">
@@ -101,6 +103,7 @@ export default defineComponent({
       data: [],
       total: 0,
       username: "",
+      userid:"",
       openModal:{
         active: false,
         username: ""
@@ -122,7 +125,9 @@ export default defineComponent({
       const data = await CheckLogin()
       if (data == 0) {
         const username = localStorage.getItem('user')
+        const userid = localStorage.getItem('userid')
         states.username = username
+        states.userid = userid
         GetData()
       }else{
         setStorage(false)

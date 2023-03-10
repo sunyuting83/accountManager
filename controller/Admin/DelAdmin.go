@@ -28,7 +28,9 @@ func DeleteAdmin(c *gin.Context) {
 		})
 		return
 	}
-	user.DeleteOne(form.ID)
+	if user.ID != 1 {
+		user.DeleteOne(form.ID)
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":  0,
 		"message": "成功删除管理员",

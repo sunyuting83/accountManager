@@ -1,10 +1,12 @@
 package utils
 
 import (
+	"colaAPI/UsersApi/utils"
+	BadgerDB "colaAPI/badger"
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"os"
@@ -65,7 +67,7 @@ func CheckConfig(OS, CurrentPath string) (conf *Config, err error) {
 	ConfigFile := strings.Join([]string{CurrentPath, "config.yaml"}, LinkPathStr)
 
 	var confYaml *Config
-	yamlFile, err := ioutil.ReadFile(ConfigFile)
+	yamlFile, err := os.ReadFile(ConfigFile)
 	if err != nil {
 		return confYaml, errors.New("读取配置文件出错\n10秒后程序自动关闭")
 	}
@@ -76,19 +78,19 @@ func CheckConfig(OS, CurrentPath string) (conf *Config, err error) {
 	if len(confYaml.Port) <= 0 {
 		confYaml.Port = "13002"
 		config, _ := yaml.Marshal(&confYaml)
-		ioutil.WriteFile(ConfigFile, config, 0644)
+		os.WriteFile(ConfigFile, config, 0644)
 	}
 	if len(confYaml.SECRET_KEY) <= 0 {
 		secret_key := randSeq(32)
 		confYaml.SECRET_KEY = secret_key
 		config, _ := yaml.Marshal(&confYaml)
-		ioutil.WriteFile(ConfigFile, config, 0644)
+		os.WriteFile(ConfigFile, config, 0644)
 	}
 	if len(confYaml.GlobalToken) <= 0 {
 		GlobalToken := randSeq(32)
 		confYaml.GlobalToken = GlobalToken
 		config, _ := yaml.Marshal(&confYaml)
-		ioutil.WriteFile(ConfigFile, config, 0644)
+		os.WriteFile(ConfigFile, config, 0644)
 	}
 	return confYaml, nil
 }
@@ -120,6 +122,34 @@ func SetConfigMiddleWare(SECRET_KEY, CurrentPath string) gin.HandlerFunc {
 		c.Set("current_path", CurrentPath)
 		c.Writer.Status()
 	}
+}
+
+func GetTokenUserData(c *gin.Context) (result *CacheToken) {
+
+	token := c.GetHeader("Authorization")
+
+	secret_key, _ := c.Get("secret_key")
+	SECRET_KEY := secret_key.(string)
+	token = token[7:]
+	AEStoken, err := utils.DecryptByAes(token, []byte(SECRET_KEY))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status":  1,
+			"message": "haven't token",
+		})
+		return
+	}
+	Token, err := BadgerDB.GetToken(AEStoken)
+
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": err.Error(),
+		})
+		return
+	}
+	json.Unmarshal(Token, &result)
+	return
 }
 
 func randSeq(n int) string {

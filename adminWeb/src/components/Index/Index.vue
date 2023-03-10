@@ -118,7 +118,8 @@ export default defineComponent({
         }
         const d = await Fetch(Config.Api.login, data, "post")
         if (d.status === 0) {
-          setStorage(true, d.token, d.user)
+          // console.log(d)
+          setStorage(true, d.token, d.username, String(d.userid))
           router.push("userlist")
         }else{
           states.openerr.message = d.message

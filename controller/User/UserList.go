@@ -2,6 +2,7 @@ package controller
 
 import (
 	"colaAPI/database"
+	"colaAPI/utils"
 	"net/http"
 	"strconv"
 
@@ -22,7 +23,8 @@ func UsersList(c *gin.Context) {
 		})
 		return
 	}
-	dataList, err := database.GetUsersList(pageInt, LimitInt)
+	result := utils.GetTokenUserData(c)
+	dataList, err := database.GetUsersList(pageInt, LimitInt, result.UserID)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
@@ -38,7 +40,8 @@ func UsersList(c *gin.Context) {
 	c.JSON(http.StatusOK, Data)
 }
 func UsersAllList(c *gin.Context) {
-	dataList, err := database.GetAllUsersList()
+	result := utils.GetTokenUserData(c)
+	dataList, err := database.GetAllUsersList(result.UserID)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,

@@ -58,10 +58,13 @@ func AddUser(c *gin.Context) {
 		})
 		return
 	}
+
+	result := utils.GetTokenUserData(c)
 	user = &database.Users{
 		UserName:  form.UserName,
 		Password:  PASSWD,
 		NewStatus: 0,
+		ManagerID: result.UserID,
 	}
 	err = user.Insert()
 	if err != nil {

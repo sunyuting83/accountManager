@@ -34,6 +34,8 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
+	result := utils.GetTokenUserData(c)
+
 	var admin database.Manager
 	user, err := database.CheckUserName(form.UserName)
 	if err != nil && err.Error() != "record not found" {
@@ -48,7 +50,23 @@ func ResetPassword(c *gin.Context) {
 		SECRET_KEY := secret_key.(string)
 		PASSWD := utils.MD5(strings.Join([]string{form.Password, SECRET_KEY}, ""))
 		admin.Password = PASSWD
-		data, err := admin.ResetPassword(form.UserName)
+		var (
+			data database.Manager
+			err  error
+		)
+		if user.ID == 1 {
+			if user.ID == result.UserID {
+				data, err = admin.ResetPassword(form.UserName)
+			} else {
+				c.JSON(http.StatusOK, gin.H{
+					"status":  1,
+					"message": "haven't power",
+				})
+				return
+			}
+		} else {
+			data, err = admin.ResetPassword(form.UserName)
+		}
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  1,
@@ -65,6 +83,6 @@ func ResetPassword(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":  1,
-		"message": "用户不存在",
+		"message": "管理员不存在",
 	})
 }

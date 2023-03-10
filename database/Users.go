@@ -1,11 +1,13 @@
 package database
 
 type Users struct {
-	ID        uint   `gorm:"primaryKey"`
+	ID        uint `gorm:"primaryKey"`
+	ManagerID uint
 	UserName  string `gorm:"index"`
 	Password  string `gorm:"index"`
 	NewStatus int    `gorm:"index"`
 	Remarks   string
+	Manager   Manager
 	Projects  []Projects
 	CreatedAt int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt int64 `gorm:"autoUpdateTime:milli"`
@@ -46,23 +48,47 @@ func (user *Users) GetCount() (count int64, err error) {
 }
 
 // Admin List
-func GetUsersList(page, Limit int) (user *[]Users, err error) {
+func GetUsersList(page, Limit int, manager_id uint) (user *[]Users, err error) {
 	p := makePage(page, Limit)
-	if err = sqlDB.
-		Select("id, user_name, new_status, created_at").
-		Order("id desc").
-		Limit(Limit).Offset(p).
-		Find(&user).Error; err != nil {
-		return
+	if manager_id == 1 {
+		if err = sqlDB.
+			Model(&Users{}).
+			Preload("Manager").
+			Select("id, user_name, new_status, manager_id, created_at").
+			Order("users.id desc").
+			Limit(Limit).Offset(p).
+			Find(&user).Error; err != nil {
+			return
+		}
+	} else {
+		if err = sqlDB.
+			Select("id, user_name, new_status, manager_id, created_at").
+			Where("manager_id = ?", manager_id).
+			Order("id desc").
+			Limit(Limit).Offset(p).
+			Find(&user).Error; err != nil {
+			return
+		}
 	}
 	return
 }
 
-func GetAllUsersList() (user *[]Users, err error) {
-	if err = sqlDB.
-		Order("id desc").
-		Find(&user).Error; err != nil {
-		return
+func GetAllUsersList(manager_id uint) (user *[]Users, err error) {
+	if manager_id == 1 {
+		if err = sqlDB.
+			Model(&Users{}).
+			Preload("Manager").
+			Order("id desc").
+			Find(&user).Error; err != nil {
+			return
+		}
+	} else {
+		if err = sqlDB.
+			Where("manager_id = ?", manager_id).
+			Order("id desc").
+			Find(&user).Error; err != nil {
+			return
+		}
 	}
 	return
 }

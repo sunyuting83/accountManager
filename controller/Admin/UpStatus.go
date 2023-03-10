@@ -33,7 +33,9 @@ func UpStatusAdmin(c *gin.Context) {
 		NewStatus = 0
 		FuckStr = "解锁"
 	}
-	user.UpStatusAdmin(NewStatus)
+	if user.ID != 1 {
+		user.UpStatusAdmin(NewStatus)
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  0,

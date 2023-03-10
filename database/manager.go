@@ -6,7 +6,8 @@ type Manager struct {
 	ID        uint   `gorm:"primaryKey"`
 	UserName  string `gorm:"index"`
 	Password  string
-	NewStatus int   `gorm:"index"`
+	NewStatus int `gorm:"index"`
+	Users     []Users
 	CreatedAt int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt int64 `gorm:"autoUpdateTime:milli"`
 }
