@@ -51,7 +51,7 @@ func GetDB(confYaml *utils.Config) {
 		}), &gorm.Config{})
 	case "sqlite":
 		CurrentPath, _ := utils.GetCurrentPath()
-		SqlitePath := makeSqlitePath(CurrentPath)
+		SqlitePath := MakeSqlitePath(CurrentPath)
 		dbPath := strings.Join([]string{SqlitePath, "db"}, "/")
 		if !utils.IsExist(dbPath) {
 			os.MkdirAll(dbPath, 0755)
@@ -62,7 +62,7 @@ func GetDB(confYaml *utils.Config) {
 	}
 }
 
-func makeSqlitePath(a string) (d string) {
+func MakeSqlitePath(a string) (d string) {
 	b := strings.Split(a, "/")
 	l := len(b) - 1
 	c := b[0:l]

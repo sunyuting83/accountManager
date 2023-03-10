@@ -18,8 +18,9 @@ import (
 func main() {
 	OS := runtime.GOOS
 	CurrentPath, _ := utils.GetCurrentPath()
+	ConfigFilePath := orm.MakeSqlitePath(CurrentPath)
 
-	confYaml, err := utils.CheckConfig(OS, CurrentPath)
+	confYaml, err := utils.CheckConfig(OS, ConfigFilePath)
 	if err != nil {
 		fmt.Println(err)
 		time.Sleep(time.Duration(10) * time.Second)

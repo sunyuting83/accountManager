@@ -42,6 +42,18 @@ func GetAccountList(page, Limit int, ProjectsID, Status string) (accounts *[]Acc
 	return
 }
 
+func CheckAccount(projectsid, account string) (user *Users, err error) {
+	if err = sqlDB.First(&user, "projects_id = ? and user_name = ? ", projectsid, account).Error; err != nil {
+		return
+	}
+	return
+}
+
+// Reset Password
+func (user *Users) AccountUpStatus(status string) {
+	sqlDB.Model(&user).Update("new_status", status)
+}
+
 // makePage make page
 func makePage(p, Limit int) int {
 	p = p - 1
