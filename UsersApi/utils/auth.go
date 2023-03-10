@@ -24,6 +24,34 @@ type CacheToken struct {
 
 var result *CacheToken
 
+func GetTokenUserData(c *gin.Context) (result *CacheToken) {
+
+	token := c.GetHeader("Authorization")
+
+	secret_key, _ := c.Get("secret_key")
+	SECRET_KEY := secret_key.(string)
+	token = token[7:]
+	AEStoken, err := DecryptByAes(token, []byte(SECRET_KEY))
+	if err != nil {
+		c.JSON(403, gin.H{
+			"status":  1,
+			"message": "haven't token",
+		})
+		return
+	}
+	Token, err := BadgerDB.GetToken(AEStoken)
+
+	if err != nil {
+		c.JSON(200, gin.H{
+			"status":  1,
+			"message": err.Error(),
+		})
+		return
+	}
+	json.Unmarshal(Token, &result)
+	return
+}
+
 // UserVerifyMiddleware Verify middleware
 func UserVerifyMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {

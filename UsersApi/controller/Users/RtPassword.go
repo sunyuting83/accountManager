@@ -1,10 +1,9 @@
 package controller
 
 import (
-	BadgerDB "colaAPI/UsersApi/badger"
 	"colaAPI/UsersApi/database"
+	UserUtils "colaAPI/UsersApi/utils"
 	"colaAPI/utils"
-	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -32,30 +31,9 @@ func ResetPassword(c *gin.Context) {
 		})
 		return
 	}
-	token := c.GetHeader("Authorization")
 
-	secret_key, _ := c.Get("secret_key")
-	SECRET_KEY := secret_key.(string)
-	token = token[7:]
-	AEStoken, err := utils.DecryptByAes(token, []byte(SECRET_KEY))
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  1,
-			"message": "haven't token",
-		})
-		return
-	}
-	Token, err := BadgerDB.GetToken(AEStoken)
+	result := UserUtils.GetTokenUserData(c)
 
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  1,
-			"message": err.Error(),
-		})
-		return
-	}
-	var result *CacheToken
-	json.Unmarshal(Token, &result)
 	user, err := database.UserCheckID(int64(result.UserID))
 	if err != nil && err.Error() != "record not found" {
 		c.JSON(http.StatusOK, gin.H{

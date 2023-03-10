@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"colaAPI/UsersApi/utils"
 	BadgerDB "colaAPI/badger"
 	"crypto/md5"
 	"encoding/hex"
@@ -152,7 +151,7 @@ func GetTokenUserData(c *gin.Context) (result *CacheToken) {
 	secret_key, _ := c.Get("secret_key")
 	SECRET_KEY := secret_key.(string)
 	token = token[7:]
-	AEStoken, err := utils.DecryptByAes(token, []byte(SECRET_KEY))
+	AEStoken, err := DecryptByAes(token, []byte(SECRET_KEY))
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status":  1,
