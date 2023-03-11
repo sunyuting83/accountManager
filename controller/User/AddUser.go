@@ -39,7 +39,7 @@ func AddUser(c *gin.Context) {
 		return
 	}
 
-	secret_key, _ := c.Get("secret_key")
+	secret_key, _ := c.Get("users_secret_key")
 	SECRET_KEY := secret_key.(string)
 	PASSWD := utils.MD5(strings.Join([]string{form.Password, SECRET_KEY}, ""))
 

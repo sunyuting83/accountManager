@@ -29,47 +29,8 @@ func ModifyProjects(c *gin.Context) {
 		return
 	}
 
-	var Sjsons []byte
-	if len(form.StatusJSON) == 0 {
-		var Sjson []*StatusJSON
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "0",
-			Title:  "未注册状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "1",
-			Title:  "注册中状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "2",
-			Title:  "注册完成状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "3",
-			Title:  "游戏中状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "4",
-			Title:  "游戏完成状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "5",
-			Title:  "封号状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "6",
-			Title:  "旧帐号状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "7",
-			Title:  "备用状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "8",
-			Title:  "提取状态",
-		})
-		Sjsons, _ = json.Marshal(&Sjson)
-	}
+	StatusJSON := MakeStatusJSON(form.StatusJSON)
+
 	var ColaAPI1 bool = false
 	if form.ColaAPI == "true" {
 		ColaAPI1 = true
@@ -97,23 +58,12 @@ func ModifyProjects(c *gin.Context) {
 			return
 		}
 	}
-	var projects *database.Projects
-	if len(form.StatusJSON) == 0 {
-		projects = &database.Projects{
-			UserName:   form.UserName,
-			Password:   form.Password,
-			AccNumber:  form.AccNumber,
-			ColaAPI:    ColaAPI1,
-			StatusJSON: string(Sjsons),
-		}
-	} else {
-		projects = &database.Projects{
-			UserName:   form.UserName,
-			Password:   form.Password,
-			AccNumber:  form.AccNumber,
-			ColaAPI:    ColaAPI1,
-			StatusJSON: form.StatusJSON,
-		}
+	projects := &database.Projects{
+		UserName:   form.UserName,
+		Password:   form.Password,
+		AccNumber:  form.AccNumber,
+		ColaAPI:    ColaAPI1,
+		StatusJSON: StatusJSON,
 	}
 	projects.UpdateProjects(form.ID)
 	ID, _ := strconv.ParseInt(form.ID, 10, 64)

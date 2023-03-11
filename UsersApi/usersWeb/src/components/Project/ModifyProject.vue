@@ -7,67 +7,7 @@
         <button class="delete" aria-label="close" @click="closErr" v-if="loading ? false : true"></button>
       </header>
       <section class="modal-card-body">
-        <div class="field">
-          <p class="control has-icons-left has-icons-right">
-            <input type="text" :placeholder="form.ProjectName" disabled>
-            <input type="hidden" :placeholder="form.ID" disabled>
-          </p>
-        </div>
-        <div class="field">
-          <label class="checkbox">
-            <input type="checkbox" v-model="form.hastatus">
-            自定义帐号状态
-          </label>
-        </div>
-        <div class="field"  v-if="form.hastatus">
-          <div class="columns is-flex flex-wrap is-flex-wrap-wrap is-align-content-flex-start">
-            <div class="field column newP"  v-for="(item) in form.StatusJSON" :key="item.status">
-              <div class="field has-addons ">
-                <p class="control">
-                  <input class="input inputWidth is-small" type="hidden" v-model="item.status">
-                  <input class="input inputWidth is-small" type="text" v-model="item.title">
-                </p>
-                <p class="control">
-                  <span class="button is-static is-small">
-                    {{item.status}}
-                  </span>
-                </p>
-              </div>
-              <div class="control">
-                <label class="checkbox mr-4">
-                  <input type="checkbox" v-model="item.delete">
-                  可删除
-                </label>
-                <label class="checkbox mr-4">
-                  <input type="checkbox" v-model="item.export">
-                  可导出
-                </label>
-                <label class="checkbox mr-4">
-                  <input type="checkbox" v-model="item.import">
-                  可导入
-                </label>
-                <label class="checkbox">
-                  <input type="checkbox" v-model="item.callback">
-                  可退回至
-                  <input type="text" class="input inputWidth1 is-small" :disabled="item.callback ? false: true" v-model="item.backto">
-                  状态
-                </label>
-              </div>
-            </div>
-            <div class="column">
-              <button class="button is-small is-info" @click="addStatus">
-                添加新状态
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="field">
-          <label class="checkbox">
-            <input type="checkbox" v-model="form.cola">
-            可乐API
-          </label>
-        </div>
-        <div v-if="form.cola">
+          <h4>可乐API修改</h4>
           <div class="field">
             <p class="control has-icons-left has-icons-right">
               <input :class="form.UserNameErr ? 'input is-danger': 'input'" type="ProjectsName" v-model="form.UserName" placeholder="平台用户名" :onBlur="checkUserName">
@@ -84,7 +24,7 @@
             <p class="control has-icons-left has-icons-right">
               <input :class="form.PasswordErr ? 'input is-danger': 'input'" type="text" v-model="form.Password" placeholder="API密码" :onBlur="checkPassword">
               <span class="icon is-small is-left">
-                <i class="fa fa-user-circle-o"></i>
+                <i class="fa fa-key"></i>
               </span>
               <span class="icon is-small is-right" v-if="form.PasswordErr">
                 <i class="fa fa-exclamation-triangle"></i>
@@ -96,7 +36,7 @@
             <p class="control has-icons-left has-icons-right">
               <input :class="form.accNumberErr ? 'input is-danger': 'input'" type="number" v-model="form.accNumber" placeholder="帐号数量" :onBlur="checkaccNumber">
               <span class="icon is-small is-left">
-                <i class="fa fa-user-circle-o"></i>
+                <i class="fa fa-calculator"></i>
               </span>
               <span class="icon is-small is-right" v-if="form.accNumberErr">
                 <i class="fa fa-exclamation-triangle"></i>
@@ -104,7 +44,6 @@
             </p>
             <p class="help has-text-left is-danger" v-if="form.accNumberErr">{{form.accNumberErrMessage}}</p>
           </div>
-        </div>
       </section>
       <footer class="modal-card-foot">
         <button class="button is-info" @click="onSubmit" :class="loading ? 'is-loading' : ''">修改</button>
@@ -217,7 +156,6 @@ export default defineComponent ({
       _data.form.cola = false
       _data.data = []
       _data.loading = false
-      _data.hastatus = false
       _data.form.StatusJSON = []
     }
 
@@ -270,3 +208,11 @@ export default defineComponent ({
   }
 })
 </script>
+<style scoped>
+.inputWidth {
+  width: 80px
+}
+.newP {
+  padding: 0.45rem 0.5rem 0.45rem 0.75rem;
+}
+</style>

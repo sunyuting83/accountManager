@@ -8,3 +8,6 @@ server
 user
 static/
 test/
+UsersApi/usersWeb/node_modules
+UsersApi/usersWeb/yarn.lock
+UsersApi/usersWeb/dist

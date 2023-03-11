@@ -33,8 +33,13 @@ type CacheValue struct {
 }
 
 type StatusJSON struct {
-	Status string `json:"status"`
-	Title  string `json:"title"`
+	Status   string `json:"status"`
+	Title    string `json:"title"`
+	Delete   bool   `json:"delete"`
+	CallBack bool   `json:"callback"`
+	BackTo   string `json:"backto"`
+	Export   bool   `json:"export"`
+	Import   bool   `json:"import"`
 }
 
 func AddProjects(c *gin.Context) {
@@ -60,47 +65,9 @@ func AddProjects(c *gin.Context) {
 		})
 		return
 	}
-	var Sjsons []byte
-	if len(form.StatusJSON) == 0 {
-		var Sjson []*StatusJSON
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "0",
-			Title:  "未注册状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "1",
-			Title:  "注册中状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "2",
-			Title:  "注册完成状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "3",
-			Title:  "游戏中状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "4",
-			Title:  "游戏完成状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "5",
-			Title:  "封号状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "6",
-			Title:  "旧帐号状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "7",
-			Title:  "备用状态",
-		})
-		Sjson = append(Sjson, &StatusJSON{
-			Status: "8",
-			Title:  "提取状态",
-		})
-		Sjsons, _ = json.Marshal(&Sjson)
-	}
+
+	StatusJSON := MakeStatusJSON(form.StatusJSON)
+
 	var ColaAPI1 bool = false
 	if form.ColaAPI == "true" {
 		ColaAPI1 = true
@@ -128,31 +95,19 @@ func AddProjects(c *gin.Context) {
 			return
 		}
 	}
-	var projects *database.Projects
 	UsersIDInt := StrToUInt(form.UsersID)
-	if len(form.StatusJSON) == 0 {
-		projects = &database.Projects{
-			UsersID:      UsersIDInt,
-			ProjectsName: form.ProjectsName,
-			UserName:     form.UserName,
-			Password:     form.Password,
-			AccNumber:    form.AccNumber,
-			NewStatus:    0,
-			ColaAPI:      ColaAPI1,
-			StatusJSON:   string(Sjsons),
-		}
-	} else {
-		projects = &database.Projects{
-			UsersID:      UsersIDInt,
-			ProjectsName: form.ProjectsName,
-			UserName:     form.UserName,
-			Password:     form.Password,
-			AccNumber:    form.AccNumber,
-			NewStatus:    0,
-			ColaAPI:      ColaAPI1,
-			StatusJSON:   form.StatusJSON,
-		}
+
+	projects := &database.Projects{
+		UsersID:      UsersIDInt,
+		ProjectsName: form.ProjectsName,
+		UserName:     form.UserName,
+		Password:     form.Password,
+		AccNumber:    form.AccNumber,
+		NewStatus:    0,
+		ColaAPI:      ColaAPI1,
+		StatusJSON:   StatusJSON,
 	}
+
 	err := projects.Insert()
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -209,4 +164,124 @@ func MakeKey(a string) string {
 		c = append(c, v)
 	}
 	return strings.Join(c, "")
+}
+
+func MakeStatusJSON(JSON string) (statusJSON string) {
+	var Sjsons []byte
+	statusJSON = JSON
+	if len(JSON) == 0 {
+		Sjson := &[]StatusJSON{
+			{
+				Status:   "0",
+				Title:    "未注册状态",
+				Delete:   true,
+				CallBack: false,
+				BackTo:   "",
+				Export:   true,
+				Import:   true,
+			},
+			{
+				Status:   "1",
+				Title:    "注册中状态",
+				Delete:   false,
+				CallBack: true,
+				BackTo:   "0",
+				Export:   false,
+				Import:   false,
+			},
+			{
+				Status:   "2",
+				Title:    "注册完成状态",
+				Delete:   false,
+				CallBack: false,
+				BackTo:   "",
+				Export:   false,
+				Import:   true,
+			},
+			{
+				Status:   "3",
+				Title:    "游戏中状态",
+				Delete:   false,
+				CallBack: true,
+				BackTo:   "2",
+				Export:   false,
+				Import:   false,
+			},
+			{
+				Status:   "4",
+				Title:    "游戏完成状态",
+				Delete:   false,
+				CallBack: true,
+				BackTo:   "2",
+				Export:   false,
+				Import:   false,
+			},
+			{
+				Status:   "5",
+				Title:    "封号状态",
+				Delete:   false,
+				CallBack: false,
+				BackTo:   "0",
+				Export:   true,
+				Import:   false,
+			},
+			{
+				Status:   "6",
+				Title:    "旧帐号状态",
+				Delete:   false,
+				CallBack: false,
+				BackTo:   "",
+				Export:   true,
+				Import:   false,
+			},
+			{
+				Status:   "7",
+				Title:    "备用状态",
+				Delete:   false,
+				CallBack: false,
+				BackTo:   "",
+				Export:   true,
+				Import:   false,
+			},
+			{
+				Status:   "8",
+				Title:    "未使用身份证",
+				Delete:   true,
+				CallBack: false,
+				BackTo:   "",
+				Export:   true,
+				Import:   true,
+			},
+			{
+				Status:   "9",
+				Title:    "使用中身份证",
+				Delete:   false,
+				CallBack: true,
+				BackTo:   "8",
+				Export:   false,
+				Import:   false,
+			},
+			{
+				Status:   "10",
+				Title:    "已使用身份证",
+				Delete:   true,
+				CallBack: true,
+				BackTo:   "8",
+				Export:   true,
+				Import:   false,
+			},
+			{
+				Status:   "108",
+				Title:    "提取状态",
+				Delete:   false,
+				CallBack: false,
+				BackTo:   "",
+				Export:   true,
+				Import:   false,
+			},
+		}
+		Sjsons, _ = json.Marshal(&Sjson)
+		statusJSON = string(Sjsons)
+	}
+	return
 }

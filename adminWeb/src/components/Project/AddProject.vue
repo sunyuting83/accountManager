@@ -34,16 +34,38 @@
         </div>
         <div class="field"  v-if="form.hastatus">
           <div class="columns is-flex flex-wrap is-flex-wrap-wrap is-align-content-flex-start">
-            <div class="field has-addons column newP"  v-for="(item) in form.StatusJSON" :key="item.status">
-              <p class="control">
-                <input class="input inputWidth is-small" type="hidden" v-model="item.status">
-                <input class="input inputWidth is-small" type="text" v-model="item.title">
-              </p>
-              <p class="control">
-                <span class="button is-static is-small">
-                  {{item.status}}
-                </span>
-              </p>
+            <div class="field column newP"  v-for="(item) in form.StatusJSON" :key="item.status">
+              <div class="field has-addons ">
+                <p class="control">
+                  <input class="input inputWidth is-small" type="hidden" v-model="item.status">
+                  <input class="input inputWidth is-small" type="text" v-model="item.title">
+                </p>
+                <p class="control">
+                  <span class="button is-static is-small">
+                    {{item.status}}
+                  </span>
+                </p>
+              </div>
+              <div class="control">
+                <label class="checkbox mr-4">
+                  <input type="checkbox" v-model="item.delete">
+                  可删除
+                </label>
+                <label class="checkbox mr-4">
+                  <input type="checkbox" v-model="item.export">
+                  可导出
+                </label>
+                <label class="checkbox mr-4">
+                  <input type="checkbox" v-model="item.import">
+                  可导入
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" v-model="item.callback">
+                  可退回至
+                  <input type="text" class="input inputWidth1 is-small" :disabled="item.callback ? false: true" v-model="item.backto">
+                  状态
+                </label>
+              </div>
             </div>
             <div class="column">
               <button class="button is-small is-info" @click="addStatus">
@@ -144,31 +166,100 @@ export default defineComponent ({
         StatusJSON: [
         {
           "status": "0",
-          "title":"未注册状态"
+          "title":"未注册状态",
+          "delete":   true,
+          "callback": false,
+          "backto":   "",
+          "export":   true,
+          "import": true
         },{
           "status": "1",
-          "title":"注册中状态"
+          "title":"注册中状态",
+          "delete":   false,
+          "callback": true,
+          "backto":   "0",
+          "export":   false,
+          "import": false
         },{
           "status": "2",
-          "title":"注册完成状态"
+          "title":"注册完成状态",
+          "delete":   false,
+          "callback": false,
+          "backto":   "",
+          "export":   false,
+          "import": true
         },{
           "status": "3",
-          "title":"游戏中状态"
+          "title":"游戏中状态",
+          "delete":   false,
+          "callback": true,
+          "backto":   "2",
+          "export":   false,
+          "import": false
         },{
           "status": "4",
-          "title":"游戏完成状态"
+          "title":"游戏完成状态",
+          "delete":   false,
+          "callback": true,
+          "backto":   "2",
+          "export":   false,
+          "import": false
         },{
           "status": "5",
-          "title":"封号状态"
+          "title":"封号状态",
+          "delete":   false,
+          "callback": false,
+          "backto":   "",
+          "export":   true,
+          "import": false
         },{
           "status": "6",
-          "title":"旧帐号状态"
+          "title":"旧帐号状态",
+          "delete":   false,
+          "callback": false,
+          "backto":   "",
+          "export":   true,
+          "import": false
         },{
           "status": "7",
-          "title":"备用状态"
+          "title":"备用状态",
+          "delete":   false,
+          "callback": false,
+          "backto":   "",
+          "export":   true,
+          "import": false
         },{
           "status": "8",
-          "title":"提号状态"
+          "title":"未使用身份证",
+          "delete":   true,
+          "callback": false,
+          "backto":   "",
+          "export":   true,
+          "import": true
+        },{
+          "status": "9",
+          "title":"使用中身份证",
+          "delete":   false,
+          "callback": true,
+          "backto":   "8",
+          "export":   false,
+          "import": false
+        },{
+          "status": "10",
+          "title":"已使用身份证",
+          "delete":   true,
+          "callback": true,
+          "backto":   "8",
+          "export":   true,
+          "import": false
+        },{
+          "status": "108",
+          "title":"提号状态",
+          "delete":   false,
+          "callback": false,
+          "backto":   "",
+          "export":   true,
+          "import": false
         }
       ],
         hastatus: false
@@ -196,8 +287,9 @@ export default defineComponent ({
       const UserName = _data.form.UserName
       const Password = _data.form.Password
       const AccNumber = _data.form.accNumber
-      const StatusJSON = JSON.stringify(_data.form.StatusJSON)
-      console.log(StatusJSON)
+      const hastatus = _data.form.hastatus
+      let StatusJSON = ""
+      if (hastatus) StatusJSON = JSON.stringify(_data.form.StatusJSON)
       const token = localStorage.getItem("token")
       let data = {
         usersid : String(UserID),
@@ -242,6 +334,7 @@ export default defineComponent ({
       _data.form.cola = false
       _data.data = []
       _data.loading = false
+      _data.hastatus = false
       _data.form.StatusJSON = []
     }
 
@@ -285,8 +378,12 @@ export default defineComponent ({
     const addStatus = () => {
       const len = _data.form.StatusJSON.length
       _data.form.StatusJSON = [..._data.form.StatusJSON, {
-        "status": String(len),
-        "title": ""
+        "status": String(len) - 1,
+        "title": "",
+        "delete":   false,
+        "callback": false,
+        "backto":   "",
+        "export":   false
       }]
     }
 
@@ -304,11 +401,17 @@ export default defineComponent ({
   }
 })
 </script>
-<style scoped>
+<style>
 .inputWidth {
-  width: 94px
+  width: 144px
+}
+.inputWidth1 {
+  width: 30px;
+  height: 21px;
 }
 .newP {
-  padding: 0.45rem 0.5rem 0.45rem 0.75rem;
+  padding: 0.45rem 0rem 0.45rem 0.75rem;
+  margin-right: 0.5rem;
+  background: #f9f9f9;
 }
 </style>

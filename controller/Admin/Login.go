@@ -34,7 +34,7 @@ func Sgin(c *gin.Context) {
 		return
 	}
 
-	if len(form.UserName) <= 4 {
+	if len(form.UserName) <= 3 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status":  1,
 			"message": "haven't username",

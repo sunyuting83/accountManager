@@ -78,10 +78,11 @@ func Sgin(c *gin.Context) {
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
-			"status":  0,
-			"message": "登陆成功",
-			"token":   TOKEN,
-			"user":    login.UserName,
+			"status":   0,
+			"message":  "登陆成功",
+			"token":    TOKEN,
+			"username": login.UserName,
+			"userid":   login.ID,
 		})
 		return
 	}
@@ -107,9 +108,10 @@ func Sgin(c *gin.Context) {
 	BadgerDB.SetWithTTL([]byte(login.UserName), []byte(token), ttl)
 	BadgerDB.SetWithTTL([]byte(token), buff, ttl)
 	c.JSON(http.StatusOK, gin.H{
-		"status":  0,
-		"message": "登陆成功",
-		"token":   TOKEN,
-		"user":    login.UserName,
+		"status":   0,
+		"message":  "登陆成功",
+		"token":    TOKEN,
+		"username": login.UserName,
+		"userid":   login.ID,
 	})
 }
