@@ -28,7 +28,7 @@ func AccountList(c *gin.Context) {
 	projectsID := GetProjectsID(c)
 
 	var account *database.Accounts
-	count, err := account.GetCount(projectsID)
+	count, err := account.GetCount(projectsID, Status)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,

@@ -40,19 +40,19 @@ export default defineComponent({
     const setPage = (p) =>{
       if (p !== states.current && p >= 1) {
         states.current = p
-        props.GetData(p)
+        props.GetData(false, p)
       }
     }
     const setNextPage = () =>{
       if (states.current !== states.page.length && states.current < states.page.length) {
         states.current = states.current + 1
-        props.GetData(states.current)
+        props.GetData(false, states.current)
       }
     }
     const setPreviousPage = () =>{
       if (states.current > 1) {
         states.current = states.current - 1
-        props.GetData(states.current)
+        props.GetData(false, states.current)
       }
     }
 

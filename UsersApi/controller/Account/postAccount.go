@@ -1,21 +1,42 @@
 package controller
 
 import (
+	"bytes"
 	"colaAPI/UsersApi/database"
+	"encoding/json"
+	"fmt"
+	"io"
+	"math/rand"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"unicode"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/net/html/charset"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 )
 
 // Node node
 type NodeList struct {
-	Data     string `form:"data" json:"data" xml:"data"  binding:"required"`
+	Data     string `form:"data" json:"data" xml:"data"`
 	SplitStr string `form:"splitstr" json:"splitstr" xml:"splitstr"  binding:"required"`
 	Status   string `form:"status" json:"status" xml:"status" binding:"required"`
 	HasMore  string `form:"hasmore" json:"hasmore" xml:"hasmore" binding:"required"`
+	HasFile  string `form:"hasfile" json:"hasfile" xml:"hasfile" binding:"required"`
+	Repeated string `form:"repeated" json:"repeated" xml:"repeated" binding:"required"`
+}
+
+type StatusJSON struct {
+	Status   string `json:"status"`
+	Title    string `json:"title"`
+	Delete   bool   `json:"delete"`
+	CallBack bool   `json:"callback"`
+	BackTo   string `json:"backto"`
+	Export   bool   `json:"export"`
+	Import   bool   `json:"import"`
 }
 
 func PostAccount(c *gin.Context) {
@@ -36,7 +57,33 @@ func PostAccount(c *gin.Context) {
 		})
 		return
 	}
-	hasMore, err := strconv.Atoi(form.HasMore)
+	hasMore := false
+	if form.HasMore == "true" {
+		hasMore = true
+	}
+	HasFile := false
+	if form.HasFile == "true" {
+		HasFile = true
+	}
+	Repeated := false
+	if form.Repeated == "true" {
+		Repeated = true
+	}
+
+	if !HasFile {
+		if len(form.Data) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  1,
+				"message": "数据不能为空",
+			})
+			return
+		}
+	}
+
+	projectsID := GetProjectsID(c)
+	ProjectsID, _ := strconv.Atoi(projectsID)
+
+	Projects, err := database.ProjectsCheckID(int64(ProjectsID))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  1,
@@ -44,24 +91,123 @@ func PostAccount(c *gin.Context) {
 		})
 		return
 	}
+	var statusJson []*StatusJSON
+	json.Unmarshal([]byte(Projects.StatusJSON), &statusJson)
+
+	var hasPower bool = false
+
+	for _, item := range statusJson {
+		if item.Status == form.Status {
+			if item.Import {
+				hasPower = true
+				break
+			}
+		}
+	}
+
+	if !hasPower {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  1,
+			"message": "状态不支持导入",
+		})
+		return
+	}
+
+	Data := form.Data
+
+	if HasFile {
+		file, handler, err := c.Request.FormFile("files")
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "上传文件失败",
+			})
+			return
+		}
+		extList := strings.Split(handler.Filename, ".")
+		extLen := len(extList) - 1
+		ext := extList[extLen]
+		if ext != "txt" {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "必须是.txt文件",
+			})
+			return
+		}
+
+		b, err := io.ReadAll(file)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "上传文件失败",
+			})
+			return
+		}
+		if len(b) == 0 {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "别传空文件",
+			})
+			return
+		}
+		_, what, certain := charset.DetermineEncoding(b, "txt")
+
+		if !certain && what != "utf-8" {
+			fmt.Println(what)
+			a, _ := GbkToUtf8(b)
+			Data = string(a)
+		} else {
+			Data = string(b)
+		}
+	}
 
 	linSplit := "\r\n"
-	if !strings.Contains(form.Data, "\r") {
+	if !strings.Contains(Data, "\r") {
 		linSplit = "\n"
 	}
-	if !strings.Contains(form.Data, "\n") {
+	if !strings.Contains(Data, "\n") {
 		linSplit = "\r"
 	}
 
 	itemSplit := makeSplitStr(form.SplitStr)
 
-	data := strings.Split(form.Data, linSplit)
+	data := strings.Split(Data, linSplit)
+	dataLen := len(data)
+	if dataLen == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": "别传空文件",
+		})
+		return
+	}
+	if dataLen > 30000 {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": "数据超过30000行",
+		})
+		return
+	}
+
+	var FirstLen string = data[0]
+	dataLen = dataLen - 1
+	checkFirstLen := len(data[0])
+	if checkFirstLen == 0 {
+		hasContent := RandInt(1, dataLen)
+		FirstLen = data[hasContent]
+	}
+
+	IdIsFirst := true
+
+	if form.Status == "8" {
+		checkID := strings.Split(FirstLen, itemSplit)[0]
+		if !IsIdCard(checkID) {
+			IdIsFirst = false
+		}
+	}
 
 	var account []database.Accounts
-	projectsID := GetProjectsID(c)
-	ProjectsID, _ := strconv.Atoi(projectsID)
 
-	hasPhone, index := isPhone(data[0], itemSplit)
+	hasPhone, index := isPhone(FirstLen, itemSplit)
 
 	for _, item := range data {
 		itemS := strings.Split(item, itemSplit)
@@ -78,6 +224,7 @@ func PostAccount(c *gin.Context) {
 					Crazy         int    = 0
 					Precise       int    = 0
 					Cold          int    = 0
+					Remarks       string = ""
 				)
 				if len(itemS) >= 1 {
 					Password = itemS[1]
@@ -86,13 +233,29 @@ func PostAccount(c *gin.Context) {
 					PhoneNumber = itemS[index]
 					PhonePassword = itemS[index+1]
 				}
-				if hasMore == 1 {
+				if form.Status == "8" {
+					if !IdIsFirst {
+						UserName = itemS[1]
+						Password = itemS[0]
+					}
+				}
+				if len(itemS) > 2 {
+					for i := 3; i < len(itemS); i++ {
+						Remarks += strings.Join([]string{itemS[i], "----"}, "")
+					}
+				}
+				if hasMore {
 					TodayGold, _ = strconv.ParseInt(itemS[2], 10, 64)
 					Multiple, _ = strconv.ParseInt(itemS[3], 10, 64)
 					Diamond, _ = strconv.Atoi(itemS[4])
 					Crazy, _ = strconv.Atoi(itemS[5])
 					Precise, _ = strconv.Atoi(itemS[6])
 					Cold, _ = strconv.Atoi(itemS[7])
+					if len(itemS) > 7 {
+						for i := 8; i < len(itemS); i++ {
+							Remarks += strings.Join([]string{itemS[i], "----"}, "")
+						}
+					}
 				}
 				account = append(account, database.Accounts{
 					ProjectsID:    uint(ProjectsID),
@@ -117,7 +280,30 @@ func PostAccount(c *gin.Context) {
 			}
 		}
 	}
+	account = RemoveRepeatedSingle(account, hasPhone)
 	batchLen := len(account)
+	if Repeated {
+		var hasStatus []int
+		if StatusInt <= 6 {
+			for i := 0; i < 6; i++ {
+				hasStatus = append(hasStatus, i)
+			}
+		}
+		if StatusInt > 6 && StatusInt != 108 {
+			for i := 8; i < 10; i++ {
+				hasStatus = append(hasStatus, i)
+			}
+		}
+		accList, err := database.GetAccountListUseIn(projectsID, hasStatus)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "获取所有帐号失败，关闭过滤重复功能再试",
+			})
+			return
+		}
+		account = IgnoreRepeated(account, accList, hasPhone)
+	}
 	if batchLen > 1000 {
 		database.AccountInBatches(account)
 	} else {
@@ -167,4 +353,75 @@ func isPhone(s, itemSplit string) (has bool, i int) {
 		}
 	}
 	return x, index
+}
+
+// RemoveRepeatedSingle Remove Repeated Element
+func RemoveRepeatedSingle(personList []database.Accounts, hasPhone bool) (result []database.Accounts) {
+	n := len(personList)
+	for i := 0; i < n; i++ {
+		repeat := false
+		for j := i + 1; j < n; j++ {
+			if hasPhone {
+				if personList[i].PhoneNumber == personList[j].PhoneNumber {
+					repeat = true
+					break
+				}
+			} else {
+				if personList[i].UserName == personList[j].UserName {
+					repeat = true
+					break
+				}
+			}
+		}
+		if !repeat {
+			result = append(result, personList[i])
+		}
+	}
+	return
+}
+
+func IgnoreRepeated(postList, dataList []database.Accounts, hasPhone bool) []database.Accounts {
+	if len(dataList) != 0 {
+		var temp []database.Accounts
+		for _, item := range postList {
+			exist := false
+			for _, ig := range dataList {
+				if hasPhone {
+					if item.UserName == ig.UserName {
+						exist = true
+					}
+				} else {
+					if item.PhoneNumber == ig.PhoneNumber {
+						exist = true
+					}
+				}
+			}
+			if !exist {
+				temp = append(temp, item)
+			}
+		}
+		return temp
+	}
+	return postList
+}
+
+func GbkToUtf8(s []byte) ([]byte, error) {
+	reader := transform.NewReader(bytes.NewReader(s), simplifiedchinese.GBK.NewDecoder())
+	d, e := io.ReadAll(reader)
+	if e != nil {
+		return nil, e
+	}
+	return d, nil
+}
+
+func RandInt(min, max int) int {
+	if min >= max || min == 0 || max == 0 {
+		return max
+	}
+	return rand.Intn(max-min+1) + min
+}
+
+func IsIdCard(idCard string) (res bool) {
+	res, _ = regexp.Match("^[1-9]\\d{7}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])\\d{3}$|^[1-9]\\d{5}[1-9]\\d{3}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])\\d{3}([0-9]|X)$", []byte(idCard))
+	return
 }

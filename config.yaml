@@ -13,6 +13,6 @@ UsersApi:
   port: "13003"
   SECRET_KEY: N0MTsBEsh7DsXcqr5cgj6e0rAAEFP2cX
 Redis:
-  Host: 192.168.1.90:6379
-  Password: zH05aXvMzFpy8vDY
+  Host: localhost:6379
+  Password: 3SuLc0VvzLJm
   DB: 1

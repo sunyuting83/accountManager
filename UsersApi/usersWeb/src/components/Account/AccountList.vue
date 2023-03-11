@@ -31,65 +31,70 @@
                   </span>
                 </div>
                 <div>
-                  <table>
-                    <tr>
-                      <td align="right">
-                        <div class="buttons are-small has-addons is-justify-content-flex-end">
-                          <button class="button is-small is-success is-light" v-if="CurrentStatus.import">
-                            导入{{CurrentStatus.title}}帐号
-                          </button>
-                          <button class="button is-small is-link is-light" v-if="CurrentStatus.callback">
-                            退回{{CurrentStatus.title}}帐号
-                          </button>
-                          <button class="button is-small is-danger" v-if="CurrentStatus.delete">
-                            删除{{CurrentStatus.title}}帐号
-                          </button>
-                          <button class="button is-small is-warning is-light" v-if="CurrentStatus.export">
-                            导出{{CurrentStatus.title}}帐号
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  </table>
+                  
+                <div class="buttons are-small has-addons is-justify-content-flex-end mb-3">
+                  <span v-if="total !== 0" class="is-size-7 mr-3">帐号总数 <span class="has-text-danger ml-1">{{total}}</span></span>
+                  <button class="button is-small is-success is-light" v-if="CurrentStatus.import">
+                    导入{{CurrentStatus.title}}帐号
+                  </button>
+                  <button class="button is-small is-link is-light" v-if="CurrentStatus.callback">
+                    退回{{CurrentStatus.title}}帐号
+                  </button>
+                  <button class="button is-small is-danger is-light" v-if="CurrentStatus.delete">
+                    删除{{CurrentStatus.title}}帐号
+                  </button>
+                  <button class="button is-small is-warning is-light" v-if="CurrentStatus.export">
+                    导出{{CurrentStatus.title}}帐号
+                  </button>
+                </div>
                 </div>
               </div>
               <div v-if="data.length <= 0">
                 <EmptyEd></EmptyEd>
               </div>
               <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left" v-else>
-                <thead>
+                <thead class="is-size-7">
                   <tr>
-                    <td width="10%">项目名称</td>
-                    <td>所属用户</td>
-                    <td>Key</td>
-                    <td>状态</td>
-                    <td>可乐API</td>
-                    <td>创建时间</td>
-                    <td>用户名</td>
+                    <td>序号</td>
+                    <td>缩略图</td>
+                    <td>帐号</td>
                     <td>密码</td>
-                    <td>帐号数</td>
-                    <td width="18%">操作</td>
+                    <td>手机号</td>
+                    <td>手机密码</td>
+                    <td>今日金币</td>
+                    <td>昨日金币</td>
+                    <td>炮台</td>
+                    <td>钻石</td>
+                    <td>狂暴</td>
+                    <td>冰冻</td>
+                    <td>瞄准</td>
+                    <td>其他</td>
+                    <td>价格</td>
+                    <td>过期时间</td>
+                    <td>创建时间</td>
+                    <td>更新时间</td>
                   </tr>
                 </thead>
-                <tbody class=" is-size-7">
-                  <tr v-for="(item) in data" :key="item.ID">
-                    <td>{{item.ProjectsName}}</td>
-                    <td>{{item.Users.UserName}}</td>
-                    <td>{{item.Key}}</td>
-                    <td>
-                      <span class="has-text-success" v-if="item.NewStatus === 0">正常</span>
-                      <span class="has-text-danger" v-else>锁定</span>
-                    </td>
-                    <td>
-                      <span class="has-text-success" v-if="item.ColaAPI">是</span>
-                      <span class="has-text-danger" v-else>否</span>
-                    </td>
-                    <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
+                <tbody class="is-size-7">
+                  <tr v-for="(item, index) in data" :key="item.ID">
+                    <td>{{index}}</td>
+                    <td>{{item.Cover}}</td>
                     <td>{{item.UserName}}</td>
                     <td>{{item.Password}}</td>
-                    <td>{{item.AccNumber}}</td>
-                    <td>
-                    </td>
+                    <td>{{item.PhoneNumber}}</td>
+                    <td>{{item.PhonePassword}}</td>
+                    <td>{{item.TodayGold}}</td>
+                    <td>{{item.YesterdayGold}}</td>
+                    <td>{{item.Multiple}}</td>
+                    <td>{{item.Diamond}}</td>
+                    <td>{{item.Crazy}}</td>
+                    <td>{{item.Cold}}</td>
+                    <td>{{item.Precise}}</td>
+                    <td>{{item.Remarks}}</td>
+                    <td>{{item.Price}}</td>
+                    <td><FormaTime v-if="item.Exptime !== 0" :DateTime="item.Exptime"></FormaTime></td>
+                    <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
+                    <td><FormaTime :DateTime="item.UpdatedAt"></FormaTime></td>
                   </tr>
                 </tbody>
               </table>
@@ -97,7 +102,7 @@
           </div>
         </div>
       </div>
-      <PaginAtion v-if="data.length >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
+      <PaginAtion v-if="total >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
     </div>
     <NotIfication
       :showData="openerr">
@@ -165,10 +170,12 @@ export default defineComponent({
     })
     const GetData = async(first = false, page = 1) => {
       const token = localStorage.getItem("token")
+      let status = states.CurrentStatus.status
+      if (first) status = "0"
       const data = {
         page:page, 
         limit: states.limit,
-        status: states.status,
+        status: status,
       }
       const url = Config.MakeAccountListUri(states.AccountKey)
       const d = await Fetch(url, data, 'GET', token)
@@ -241,6 +248,9 @@ export default defineComponent({
 
     const pushToData = (index) => {
       states.CurrentStatus = states.statusList[index]
+      states.data = []
+      states.total = 0
+      states.pageLoading = false
       GetData()
     }
 

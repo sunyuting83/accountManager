@@ -25,8 +25,8 @@ type Accounts struct {
 }
 
 // Get Count
-func (accounts *Accounts) GetCount(ProjectsID string) (count int64, err error) {
-	if err = sqlDB.Model(&accounts).Where("projects_id = ?", ProjectsID).Count(&count).Error; err != nil {
+func (accounts *Accounts) GetCount(ProjectsID, Status string) (count int64, err error) {
+	if err = sqlDB.Model(&accounts).Where("projects_id = ? and new_status = ?", ProjectsID, Status).Count(&count).Error; err != nil {
 		return
 	}
 	return
@@ -39,6 +39,17 @@ func GetAccountList(page, Limit int, ProjectsID, Status string) (accounts *[]Acc
 		Where("projects_id = ? and new_status = ?", ProjectsID, Status).
 		Order("updated_at desc").
 		Limit(Limit).Offset(p).
+		Find(&accounts).Error; err != nil {
+		return
+	}
+	return
+}
+
+// Account List
+func GetAccountListUseIn(ProjectsID string, statusList []int) (accounts []Accounts, err error) {
+	if err = sqlDB.
+		Where("projects_id = ? and new_status in ?", ProjectsID, statusList).
+		Order("updated_at desc").
 		Find(&accounts).Error; err != nil {
 		return
 	}
