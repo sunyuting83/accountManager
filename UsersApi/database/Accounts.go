@@ -4,6 +4,8 @@ type Accounts struct {
 	ID            uint `gorm:"primaryKey"`
 	ProjectsID    uint
 	ComputID      uint
+	PhoneNumber   string
+	PhonePassword string
 	UserName      string
 	Password      string
 	Cover         string
@@ -16,6 +18,7 @@ type Accounts struct {
 	Precise       int
 	Cold          int
 	Exptime       int64
+	Price         float64
 	Remarks       string
 	CreatedAt     int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt     int64 `gorm:"autoUpdateTime:milli"`
@@ -42,16 +45,23 @@ func GetAccountList(page, Limit int, ProjectsID, Status string) (accounts *[]Acc
 	return
 }
 
-func CheckAccount(projectsid, account string) (user *Users, err error) {
-	if err = sqlDB.First(&user, "projects_id = ? and user_name = ? ", projectsid, account).Error; err != nil {
+func CheckAccount(projectsid, account string) (accounts *Accounts, err error) {
+	if err = sqlDB.First(&accounts, "projects_id = ? and user_name = ? ", projectsid, account).Error; err != nil {
 		return
 	}
 	return
 }
 
 // Reset Password
-func (user *Users) AccountUpStatus(status string) {
-	sqlDB.Model(&user).Update("new_status", status)
+func (account *Accounts) AccountUpStatus(status string) {
+	sqlDB.Model(&account).Update("new_status", status)
+}
+
+func AccountBatches(accounts []Accounts) {
+	sqlDB.Create(&accounts)
+}
+func AccountInBatches(accounts []Accounts) {
+	sqlDB.CreateInBatches(&accounts, 1000)
 }
 
 // makePage make page

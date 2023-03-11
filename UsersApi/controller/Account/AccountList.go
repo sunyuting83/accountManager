@@ -25,23 +25,8 @@ func AccountList(c *gin.Context) {
 	pageInt, _ := strconv.Atoi(page)
 	LimitInt, _ := strconv.Atoi(Limit)
 
-	var person Person
-	var result *CacheValue
-	if err := c.ShouldBindUri(&person); err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  1,
-			"message": err.Error(),
-		})
-		return
-	}
-	var (
-		projectsID string
-	)
-	has := Redis.Get(person.Key)
-	if len(has) != 0 {
-		json.Unmarshal([]byte(has), &result)
-		projectsID = result.ProjectsID
-	}
+	projectsID := GetProjectsID(c)
+
 	var account *database.Accounts
 	count, err := account.GetCount(projectsID)
 	if err != nil {
@@ -75,4 +60,22 @@ func AccountList(c *gin.Context) {
 		"projects": Projects,
 	}
 	c.JSON(http.StatusOK, Data)
+}
+
+func GetProjectsID(c *gin.Context) (projectsID string) {
+	var person Person
+	if err := c.ShouldBindUri(&person); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": err.Error(),
+		})
+		return
+	}
+	var result *CacheValue
+	has := Redis.Get(person.Key)
+	if len(has) != 0 {
+		json.Unmarshal([]byte(has), &result)
+		projectsID = result.ProjectsID
+	}
+	return
 }

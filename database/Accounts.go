@@ -4,6 +4,8 @@ type Accounts struct {
 	ID            uint `gorm:"primaryKey"`
 	ProjectsID    uint
 	ComputID      uint
+	PhoneNumber   string
+	PhonePassword string
 	UserName      string
 	Password      string
 	Cover         string
@@ -16,6 +18,7 @@ type Accounts struct {
 	Precise       int
 	Cold          int
 	Exptime       int64
+	Price         float64
 	Remarks       string
 	CreatedAt     int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt     int64 `gorm:"autoUpdateTime:milli"`
