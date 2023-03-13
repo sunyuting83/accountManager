@@ -254,7 +254,7 @@ export default defineComponent({
 
     const showPostModal = () => {
       states.openPostModal.active = true
-      console.log(states.CurrentStatus)
+      // console.log(states.CurrentStatus)
       states.openPostModal.postParams = states.CurrentStatus
       states.postStatus = true
     }

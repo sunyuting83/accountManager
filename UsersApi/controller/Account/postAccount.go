@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"colaAPI/UsersApi/database"
 	"encoding/json"
-	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"unicode"
@@ -37,6 +37,7 @@ type StatusJSON struct {
 	BackTo   string `json:"backto"`
 	Export   bool   `json:"export"`
 	Import   bool   `json:"import"`
+	Pull     bool   `json:"pull"`
 }
 
 func PostAccount(c *gin.Context) {
@@ -120,7 +121,7 @@ func PostAccount(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  1,
-				"message": "上传文件失败",
+				"message": "上传文件失败" + err.Error(),
 			})
 			return
 		}
@@ -139,7 +140,7 @@ func PostAccount(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  1,
-				"message": "上传文件失败",
+				"message": err.Error(),
 			})
 			return
 		}
@@ -153,7 +154,7 @@ func PostAccount(c *gin.Context) {
 		_, what, certain := charset.DetermineEncoding(b, "txt")
 
 		if !certain && what != "utf-8" {
-			fmt.Println(what)
+			// fmt.Println(what)
 			a, _ := GbkToUtf8(b)
 			Data = string(a)
 		} else {
@@ -282,18 +283,17 @@ func PostAccount(c *gin.Context) {
 		}
 	}
 	account = RemoveRepeatedSingle(account, hasPhone)
-	batchLen := len(account)
 	if Repeated {
-		var hasStatus []int
-		if StatusInt <= 6 {
-			for i := 0; i < 6; i++ {
-				hasStatus = append(hasStatus, i)
+		var (
+			hasStatus []string
+		)
+		for _, item := range statusJson {
+			if item.Pull {
+				hasStatus = append(hasStatus, item.Status)
 			}
 		}
-		if StatusInt > 6 && StatusInt != 108 {
-			for i := 8; i < 10; i++ {
-				hasStatus = append(hasStatus, i)
-			}
+		if !in(form.Status, hasStatus) {
+			hasStatus = append(hasStatus, form.Status)
 		}
 		accList, err := database.GetAccountListUseIn(projectsID, hasStatus)
 		if err != nil {
@@ -305,10 +305,14 @@ func PostAccount(c *gin.Context) {
 		}
 		account = IgnoreRepeated(account, accList, hasPhone)
 	}
+	batchLen := len(account)
+	// fmt.Println(batchLen)
 	if batchLen > 1000 {
 		database.AccountInBatches(account)
 	} else {
-		database.AccountBatches(account)
+		if batchLen > 0 {
+			database.AccountBatches(account)
+		}
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":  0,
@@ -388,11 +392,11 @@ func IgnoreRepeated(postList, dataList []database.Accounts, hasPhone bool) []dat
 			exist := false
 			for _, ig := range dataList {
 				if hasPhone {
-					if item.UserName == ig.UserName {
+					if item.PhoneNumber == ig.PhoneNumber {
 						exist = true
 					}
 				} else {
-					if item.PhoneNumber == ig.PhoneNumber {
+					if item.UserName == ig.UserName {
 						exist = true
 					}
 				}
@@ -401,6 +405,7 @@ func IgnoreRepeated(postList, dataList []database.Accounts, hasPhone bool) []dat
 				temp = append(temp, item)
 			}
 		}
+		// fmt.Println(temp)
 		return temp
 	}
 	return postList
@@ -425,4 +430,12 @@ func RandInt(min, max int) int {
 func IsIdCard(idCard string) (res bool) {
 	res, _ = regexp.Match("^[1-9]\\d{7}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])\\d{3}$|^[1-9]\\d{5}[1-9]\\d{3}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])\\d{3}([0-9]|X)$", []byte(idCard))
 	return
+}
+func in(target string, str_array []string) bool {
+	sort.Strings(str_array)
+	index := sort.SearchStrings(str_array, target)
+	if index < len(str_array) && str_array[index] == target {
+		return true
+	}
+	return false
 }

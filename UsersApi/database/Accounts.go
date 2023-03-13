@@ -46,9 +46,9 @@ func GetAccountList(page, Limit int, ProjectsID, Status string) (accounts *[]Acc
 }
 
 // Account List
-func GetAccountListUseIn(ProjectsID string, statusList []int) (accounts []Accounts, err error) {
+func GetAccountListUseIn(ProjectsID string, statusList []string) (accounts []Accounts, err error) {
 	if err = sqlDB.
-		Where("projects_id = ? and new_status in ?", ProjectsID, statusList).
+		Where("projects_id = ? and new_status IN ?", ProjectsID, statusList).
 		Order("updated_at desc").
 		Find(&accounts).Error; err != nil {
 		return

@@ -106,7 +106,7 @@
             </div>
             <div class="file is-large is-boxed has-name mb-3" v-else>
               <label class="uploaders file-label">
-                <input class="file-input" type="file" name="resume">
+                <input class="file-input" type="file" name="files" @change="(e)=> {uploaders(e)}">
                 <span class="file-cta">
                   <span class="file-icon">
                     <i class="fa fa-upload"></i>
@@ -121,9 +121,18 @@
               </label>
             </div>
             <div class="buttons">
-              <button class="button is-primary" :disabled="seleteData.length > 0?false:true" :class="loading?'is-loading':''" @click="onSubmit">导入</button>
-              <button class="button is-light" @click="CleanSeleteData">清空</button>
+              <button class="button is-primary" :disabled="isfile.size > 0 && isfile.type == 'text/plain'?false:true" :class="loading?'is-loading':''" v-if="hasfile" @click="onSubmit">上传</button>
+              <button class="button is-primary"  v-if="!hasfile"  :disabled="seleteData.length > 0?false:true" :class="loading?'is-loading':''" @click="onSubmit">导入</button>
+              <button class="button is-light" v-if="!hasfile" @click="CleanSeleteData">清空</button>
             </div>
+          </div>
+          <div class="mb-5 mt-5" v-if="errStatus">
+              <div class="icon-text">
+                <span class="icon has-text-danger">
+                  <i class="fa fa-ban"></i>
+                </span>
+                <span>{{errMessage}}</span>
+              </div>
           </div>
         </div>
       </div>
@@ -160,6 +169,9 @@ export default defineComponent({
       repeated: false,
       hasfile: false,
       shownote: false,
+      isfile: {},
+      errStatus: false,
+      errMessage: ""
     })
     const router = useRouter()
     const closErr = () => {
@@ -181,13 +193,18 @@ export default defineComponent({
       const _this = props
       states.loading = true
       const url = `${Config.RootUrl}${AccountKey}/PostAccount`
-      const params = {
+      
+      let params = {
         data: states.seleteData,
         splitstr: states.splitstr,
         status: _this.showData.postParams.status,
         hasmore: String(states.hasmore),
         hasfile: String(states.hasfile),
         repeated: String(states.repeated),
+      }
+      if (states.hasfile) {
+        params['data'] = ""
+        params['files'] = states.isfile
       }
       const d = await Fetch(url, params, 'POST', token)
       if (d.status == 0) {
@@ -199,31 +216,15 @@ export default defineComponent({
         _this.ShowMessage({
           active: false,
           message: "",
-          color: 'is-success',
-          data: []
+          color: 'is-success'
         }, 4)
       }else{
         states.loading = false
-        _this.ShowMessage({
-          active: false,
-          message: "",
-          color: 'is-danger',
-          data: []
-        })
+        states.errStatus = true
+        states.errMessage = d.message
       }
     }
 
-    const PostData = async() => {
-      // let url = Config.Api.PostAccount
-      // states.loading = true
-      // const params = {
-      //   data: states.seleteData,
-      //   splitstr: states.splitstr
-      // }
-      // const d = await Fetch(url, params, 'POST')
-      // if (d.status == 1) color = "is-danger"
-      states.loading = false
-    }
     const CleanSeleteData = () => {
       states.seleteData = ""
     }
@@ -236,9 +237,15 @@ export default defineComponent({
       states.repeated = false
       states.hasfile = false
       states.shownote = false
+      states.isfile = {}
     }
 
     const selectTab = () => {
+      if (states.hasfile) {
+        states.seleteData = ""
+      }else {
+        states.isfile = {}
+      }
       states.hasfile = !states.hasfile
     }
 
@@ -246,14 +253,28 @@ export default defineComponent({
       states.shownote = !states.shownote
     }
 
+    const uploaders = (e) => {
+      if (e.target.files.length > 0) {
+        if (e.target.files[0].type == "text/plain") {
+          states.isfile = e.target.files[0]
+        }else {
+          states.errStatus = true
+          states.errMessage = "必须是.txt文件"
+        }
+        // console.log(states.isfile)
+        // console.log(states.isfile.size)
+        // console.log(states.isfile.type)
+      }
+    }
+
     return {
       ...toRefs(states),
       closErr,
       onSubmit,
       CleanSeleteData,
-      PostData,
       selectTab,
-      showNote
+      showNote,
+      uploaders
     }
   },
 })
