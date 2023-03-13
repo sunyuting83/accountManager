@@ -226,7 +226,7 @@ func PostAccount(c *gin.Context) {
 					Cold          int    = 0
 					Remarks       string = ""
 				)
-				if len(itemS) >= 1 {
+				if len(itemS) > 1 {
 					Password = itemS[1]
 				}
 				if hasPhone {
@@ -240,8 +240,8 @@ func PostAccount(c *gin.Context) {
 					}
 				}
 				if len(itemS) > 2 {
-					for i := 3; i < len(itemS); i++ {
-						Remarks += strings.Join([]string{itemS[i], "----"}, "")
+					for i := 2; i < len(itemS); i++ {
+						Remarks = strings.Join([]string{Remarks, itemS[i], itemSplit}, "")
 					}
 				}
 				if hasMore {
@@ -252,11 +252,12 @@ func PostAccount(c *gin.Context) {
 					Precise, _ = strconv.Atoi(itemS[6])
 					Cold, _ = strconv.Atoi(itemS[7])
 					if len(itemS) > 7 {
-						for i := 8; i < len(itemS); i++ {
-							Remarks += strings.Join([]string{itemS[i], "----"}, "")
+						for i := 7; i < len(itemS); i++ {
+							Remarks += strings.Join([]string{itemS[i], itemSplit}, "")
 						}
 					}
 				}
+				Remarks = strings.TrimRight(Remarks, itemSplit)
 				account = append(account, database.Accounts{
 					ProjectsID:    uint(ProjectsID),
 					ComputID:      0,
@@ -275,7 +276,7 @@ func PostAccount(c *gin.Context) {
 					Cold:          Cold,
 					Exptime:       0,
 					Price:         0,
-					Remarks:       "",
+					Remarks:       Remarks,
 				})
 			}
 		}

@@ -46,6 +46,10 @@
                   <input type="checkbox" v-model="item.import">
                   可导入
                 </label>
+                <label class="checkbox mr-4">
+                  <input type="checkbox" v-model="item.pull">
+                  可提取
+                </label>
                 <label class="checkbox">
                   <input type="checkbox" v-model="item.callback">
                   可退回至

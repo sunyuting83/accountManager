@@ -34,16 +34,14 @@
                   
                 <div class="buttons are-small has-addons is-justify-content-flex-end mb-3">
                   <span v-if="total !== 0" class="is-size-7 mr-3">帐号总数 <span class="has-text-danger ml-1">{{total}}</span></span>
-                  <button class="button is-small is-success is-light" v-if="CurrentStatus.import">
+                  <button class="button is-small is-success is-light" :class="buttonLoading?'is-loading':''" v-if="CurrentStatus.import" @click="showPostModal">
                     导入{{CurrentStatus.title}}帐号
                   </button>
-                  <button class="button is-small is-link is-light" v-if="CurrentStatus.callback">
+                  <button class="button is-small is-link is-light" :class="buttonLoading?'is-loading':''"  v-if="CurrentStatus.callback">
                     退回{{CurrentStatus.title}}帐号
                   </button>
-                  <button class="button is-small is-danger is-light" v-if="CurrentStatus.delete">
-                    删除{{CurrentStatus.title}}帐号
-                  </button>
-                  <button class="button is-small is-warning is-light" v-if="CurrentStatus.export">
+                  <PopoButton :message="`删除${CurrentStatus.title}帐号`" color="is-danger"  :loading="buttonLoading" :callBack="deleteAccount" v-if="CurrentStatus.delete"></PopoButton>
+                  <button class="button is-small is-warning is-light" :class="buttonLoading?'is-loading':''"  v-if="CurrentStatus.export">
                     导出{{CurrentStatus.title}}帐号
                   </button>
                 </div>
@@ -56,11 +54,10 @@
                 <thead class="is-size-7">
                   <tr>
                     <td>序号</td>
-                    <td>缩略图</td>
                     <td>帐号</td>
-                    <td>密码</td>
-                    <td>手机号</td>
-                    <td>手机密码</td>
+                    <td v-if="data[0].Password.length > 0">密码</td>
+                    <td v-if="data[0].PhoneNumber.length > 0">手机号</td>
+                    <td v-if="data[0].PhonePassword.length > 0">手机密码</td>
                     <td>今日金币</td>
                     <td>昨日金币</td>
                     <td>炮台</td>
@@ -68,8 +65,8 @@
                     <td>狂暴</td>
                     <td>冰冻</td>
                     <td>瞄准</td>
-                    <td>其他</td>
-                    <td>价格</td>
+                    <td v-if="data[0].Remarks.length > 0">其他</td>
+                    <td v-if="data[0].Price.length > 0">价格</td>
                     <td>过期时间</td>
                     <td>创建时间</td>
                     <td>更新时间</td>
@@ -78,11 +75,10 @@
                 <tbody class="is-size-7">
                   <tr v-for="(item, index) in data" :key="item.ID">
                     <td>{{index}}</td>
-                    <td>{{item.Cover}}</td>
                     <td>{{item.UserName}}</td>
-                    <td>{{item.Password}}</td>
-                    <td>{{item.PhoneNumber}}</td>
-                    <td>{{item.PhonePassword}}</td>
+                    <td v-if="item.Password.length > 0">{{item.Password}}</td>
+                    <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
+                    <td v-if="item.PhonePassword.length > 0">{{item.PhonePassword}}</td>
                     <td>{{item.TodayGold}}</td>
                     <td>{{item.YesterdayGold}}</td>
                     <td>{{item.Multiple}}</td>
@@ -90,8 +86,8 @@
                     <td>{{item.Crazy}}</td>
                     <td>{{item.Cold}}</td>
                     <td>{{item.Precise}}</td>
-                    <td>{{item.Remarks}}</td>
-                    <td>{{item.Price}}</td>
+                    <td v-if="item.Remarks.length > 0">{{item.Remarks}}</td>
+                    <td v-if="item.Price.length > 0">{{item.Price}}</td>
                     <td><FormaTime v-if="item.Exptime !== 0" :DateTime="item.Exptime"></FormaTime></td>
                     <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
                     <td><FormaTime :DateTime="item.UpdatedAt"></FormaTime></td>
@@ -104,6 +100,11 @@
       </div>
       <PaginAtion v-if="total >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
     </div>
+    <PostData
+      v-if="postStatus"
+      :showData="openPostModal"
+      :ShowMessage="ShowMessage">
+    </PostData>
     <NotIfication
       :showData="openerr">
     </NotIfication>
@@ -115,9 +116,11 @@ import { useRouter } from 'vue-router'
 import ManageHeader from '@/components/Other/Header'
 import LoadIng from '@/components/Other/Loading'
 import EmptyEd from '@/components/Other/Empty'
+import PostData from "@/components/Account/Postdata"
 import NotIfication from "@/components/Other/Notification"
 import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
+import PopoButton from '@/components/Other/PopoButton'
 
 
 import Fetch from '@/helper/fetch'
@@ -126,7 +129,7 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'AccountList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, PostData, PopoButton },
   setup() {
     let states = reactive({
       AccountKey: "",
@@ -135,16 +138,13 @@ export default defineComponent({
       projects: {},
       loading: false,
       data: [],
-      UserData: [],
       total: 0,
       username: "",
-      userLoading: false,
-      openModal:{
+      buttonLoading: false,
+      postStatus: false,
+      openPostModal:{
         active: false,
-        username: ""
-      },
-      openAddModal:{
-        active: false
+        postParams: {}
       },
       openerr: {
         active: false,
@@ -162,13 +162,13 @@ export default defineComponent({
       if (data == 0) {
         const username = localStorage.getItem('user')
         states.username = username
-        GetData(true)
+        GetData(1,true)
       }else{
         setStorage(false)
         router.push("/")
       }
     })
-    const GetData = async(first = false, page = 1) => {
+    const GetData = async(page = 1, first = false) => {
       const token = localStorage.getItem("token")
       let status = states.CurrentStatus.status
       if (first) status = "0"
@@ -177,7 +177,7 @@ export default defineComponent({
         limit: states.limit,
         status: status,
       }
-      const url = Config.MakeAccountListUri(states.AccountKey)
+      const url = `${Config.RootUrl}${states.AccountKey}/AccountList`
       const d = await Fetch(url, data, 'GET', token)
       states.loading = true
       states.pageLoading = false
@@ -209,7 +209,6 @@ export default defineComponent({
       switch (status) {
         case 1:
           states.data = [...states.data, e.data]
-          states.userLoading = false
           break;
         case 2:
           states.data = states.data.map((e)=>{
@@ -229,8 +228,7 @@ export default defineComponent({
           })
           break;
         case 4:
-          states.userLoading = false
-          states.UserData = []
+          GetData()
           break;
         default:
           break;
@@ -254,13 +252,51 @@ export default defineComponent({
       GetData()
     }
 
+    const showPostModal = () => {
+      states.openPostModal.active = true
+      console.log(states.CurrentStatus)
+      states.openPostModal.postParams = states.CurrentStatus
+      states.postStatus = true
+    }
+
+    const deleteAccount = async() => {
+      const token = localStorage.getItem("token")
+      let status = states.CurrentStatus.status
+      const data = {
+        status: status,
+      }
+      const url = `${Config.RootUrl}${states.AccountKey}/DeleteAccount`
+      const d = await Fetch(url, data, 'DELETE', token)
+      states.loading = true
+      states.pageLoading = false
+      states.buttonLoading = true
+      if (d.status == 0) {
+        states.data = []
+        states.total = 0
+        states.page = []
+        states.pageLoading = true
+        states.loading = false
+        states.buttonLoading = false
+      }else{
+        states.data = []
+        states.total = 0
+        states.page = []
+        states.projects = {}
+        states.pageLoading = true
+        states.loading = false
+        states.buttonLoading = false
+      }
+    }
+
     return {
       ...toRefs(states),
       ShowMessage,
       showModel,
       GetData,
       backRouter,
-      pushToData
+      pushToData,
+      showPostModal,
+      deleteAccount
     }
   },
 })

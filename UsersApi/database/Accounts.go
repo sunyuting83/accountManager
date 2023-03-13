@@ -63,6 +63,12 @@ func CheckAccount(projectsid, account string) (accounts *Accounts, err error) {
 	return
 }
 
+// Delete Admin
+func (accounts *Accounts) DeleteAll(projectid string, status string) {
+	// time.Sleep(time.Duration(100) * time.Millisecond)
+	sqlDB.Where("projects_id = ? and new_status = ?", projectid, status).Delete(&accounts)
+}
+
 // Reset Password
 func (account *Accounts) AccountUpStatus(status string) {
 	sqlDB.Model(&account).Update("new_status", status)

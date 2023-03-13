@@ -59,6 +59,10 @@
                   <input type="checkbox" v-model="item.import">
                   可导入
                 </label>
+                <label class="checkbox mr-4">
+                  <input type="checkbox" v-model="item.pull">
+                  可提取
+                </label>
                 <label class="checkbox">
                   <input type="checkbox" v-model="item.callback">
                   可退回至
@@ -171,7 +175,8 @@ export default defineComponent ({
           "callback": false,
           "backto":   "",
           "export":   true,
-          "import": true
+          "import": true,
+          "pull": false
         },{
           "status": "1",
           "title":"注册中状态",
@@ -179,7 +184,8 @@ export default defineComponent ({
           "callback": true,
           "backto":   "0",
           "export":   false,
-          "import": false
+          "import": false,
+          "pull": false
         },{
           "status": "2",
           "title":"注册完成状态",
@@ -187,7 +193,8 @@ export default defineComponent ({
           "callback": false,
           "backto":   "",
           "export":   false,
-          "import": true
+          "import": true,
+          "pull": true
         },{
           "status": "3",
           "title":"游戏中状态",
@@ -195,7 +202,8 @@ export default defineComponent ({
           "callback": true,
           "backto":   "2",
           "export":   false,
-          "import": false
+          "import": false,
+          "pull": true
         },{
           "status": "4",
           "title":"游戏完成状态",
@@ -203,7 +211,8 @@ export default defineComponent ({
           "callback": true,
           "backto":   "2",
           "export":   false,
-          "import": false
+          "import": false,
+          "pull": true
         },{
           "status": "5",
           "title":"封号状态",
@@ -211,7 +220,8 @@ export default defineComponent ({
           "callback": false,
           "backto":   "",
           "export":   true,
-          "import": false
+          "import": false,
+          "pull": false
         },{
           "status": "6",
           "title":"旧帐号状态",
@@ -219,7 +229,8 @@ export default defineComponent ({
           "callback": false,
           "backto":   "",
           "export":   true,
-          "import": false
+          "import": false,
+          "pull": false
         },{
           "status": "7",
           "title":"备用状态",
@@ -227,7 +238,8 @@ export default defineComponent ({
           "callback": false,
           "backto":   "",
           "export":   true,
-          "import": false
+          "import": false,
+          "pull": false
         },{
           "status": "8",
           "title":"未使用身份证",
@@ -235,7 +247,8 @@ export default defineComponent ({
           "callback": false,
           "backto":   "",
           "export":   true,
-          "import": true
+          "import": true,
+          "pull": false
         },{
           "status": "9",
           "title":"使用中身份证",
@@ -243,7 +256,8 @@ export default defineComponent ({
           "callback": true,
           "backto":   "8",
           "export":   false,
-          "import": false
+          "import": false,
+          "pull": false
         },{
           "status": "10",
           "title":"已使用身份证",
@@ -251,7 +265,8 @@ export default defineComponent ({
           "callback": true,
           "backto":   "8",
           "export":   true,
-          "import": false
+          "import": false,
+          "pull": false
         },{
           "status": "108",
           "title":"提号状态",
@@ -259,7 +274,8 @@ export default defineComponent ({
           "callback": false,
           "backto":   "",
           "export":   true,
-          "import": false
+          "import": false,
+          "pull": false
         }
       ],
         hastatus: false
