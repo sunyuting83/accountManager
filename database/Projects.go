@@ -1,5 +1,7 @@
 package database
 
+import "gorm.io/gorm/clause"
+
 type Projects struct {
 	ID           uint `gorm:"primaryKey"`
 	UsersID      uint
@@ -57,7 +59,7 @@ func ProjectsCheckID(id int64) (projects *Projects, err error) {
 // Delete Admin
 func (projects *Projects) DeleteOne(id int64) {
 	// time.Sleep(time.Duration(100) * time.Millisecond)
-	sqlDB.Select("clause.Associations").Where("id = ?", id).Delete(&projects)
+	sqlDB.Select(clause.Associations).Where("id = ?", id).Delete(&projects)
 }
 
 // Reset Password

@@ -240,21 +240,55 @@ func PostAccount(c *gin.Context) {
 						Password = itemS[0]
 					}
 				}
-				if len(itemS) > 2 {
-					for i := 2; i < len(itemS); i++ {
-						Remarks = strings.Join([]string{Remarks, itemS[i], itemSplit}, "")
-					}
-				}
 				if hasMore {
-					TodayGold, _ = strconv.ParseInt(itemS[2], 10, 64)
+					if len(itemS) < 8 {
+						c.JSON(http.StatusOK, gin.H{
+							"status":  1,
+							"message": "数据格式错误",
+						})
+						return
+					}
+					var gold int64
+					if strings.Contains(itemS[2], "亿") {
+						gx := strings.Split(itemS[2], "亿")
+						goldstr := gx[0]
+						if strings.Contains(itemS[2], ".") {
+							g := strings.Split(goldstr, ".")
+							goldstr = strings.Join([]string{g[0], g[1]}, "")
+							var x int64 = 10000000
+							if len(g[1]) >= 2 {
+								x = 1000000
+							}
+							n, _ := strconv.ParseInt(goldstr, 10, 64)
+							gold = n * x
+						} else {
+							n, _ := strconv.ParseInt(goldstr, 10, 64)
+							gold = n * 100000000
+						}
+					} else if strings.Contains(itemS[2], "万") {
+						gx := strings.Split(itemS[2], "万")
+						goldstr := gx[0]
+						n, _ := strconv.ParseInt(goldstr, 10, 64)
+						gold = n * 10000
+					} else {
+						n, _ := strconv.ParseInt(itemS[2], 10, 64)
+						gold = n
+					}
+					TodayGold = gold
 					Multiple, _ = strconv.ParseInt(itemS[3], 10, 64)
 					Diamond, _ = strconv.Atoi(itemS[4])
 					Crazy, _ = strconv.Atoi(itemS[5])
 					Precise, _ = strconv.Atoi(itemS[6])
 					Cold, _ = strconv.Atoi(itemS[7])
-					if len(itemS) > 7 {
+					if len(itemS) > 8 {
 						for i := 7; i < len(itemS); i++ {
 							Remarks += strings.Join([]string{itemS[i], itemSplit}, "")
+						}
+					}
+				} else {
+					if len(itemS) > 2 {
+						for i := 2; i < len(itemS); i++ {
+							Remarks = strings.Join([]string{Remarks, itemS[i], itemSplit}, "")
 						}
 					}
 				}

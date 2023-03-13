@@ -79,9 +79,9 @@
                     <td v-if="item.Password.length > 0">{{item.Password}}</td>
                     <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
                     <td v-if="item.PhonePassword.length > 0">{{item.PhonePassword}}</td>
-                    <td>{{item.TodayGold}}</td>
-                    <td>{{item.YesterdayGold}}</td>
-                    <td>{{item.Multiple}}</td>
+                    <td><FormaNumber :Numbers="item.TodayGold" /></td>
+                    <td><FormaNumber :Numbers="item.YesterdayGold" /></td>
+                    <td><FormaNumber :Numbers="item.Multiple" /></td>
                     <td>{{item.Diamond}}</td>
                     <td>{{item.Crazy}}</td>
                     <td>{{item.Cold}}</td>
@@ -120,6 +120,7 @@ import PostData from "@/components/Account/Postdata"
 import NotIfication from "@/components/Other/Notification"
 import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
+import FormaNumber from '@/components/Other/FormaNumber'
 import PopoButton from '@/components/Other/PopoButton'
 
 
@@ -129,7 +130,7 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'AccountList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, PostData, PopoButton },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, PostData, PopoButton, FormaNumber },
   setup() {
     let states = reactive({
       AccountKey: "",

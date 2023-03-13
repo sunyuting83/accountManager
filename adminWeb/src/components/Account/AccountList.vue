@@ -24,54 +24,73 @@
             <div v-else>
               <div v-if="statusList.length > 0">
                 <div class="buttons are-small has-addons">
-                  <button class="button" :class="item.status === status?'is-success':''" v-for="(item,index) in statusList" :key="index" @click="()=>{pushToData(item.status)}">
-                    {{item.title}}
+                  <span class="f-1" v-for="(item,index) in statusList" :key="item.status" >
+                    <button class="button" v-if="item.status !== '108'" :class="item.status === CurrentStatus.status?'is-success':''" @click="()=>{pushToData(index)}">
+                      {{item.title}}
+                    </button>
+                  </span>
+                </div>
+                <div>
+                  
+                <div class="buttons are-small has-addons is-justify-content-flex-end mb-3">
+                  <span v-if="total !== 0" class="is-size-7 mr-3">帐号总数 <span class="has-text-danger ml-1">{{total}}</span></span>
+                  <button class="button is-small is-success is-light" :class="buttonLoading?'is-loading':''" v-if="CurrentStatus.import" @click="showPostModal">
+                    导入{{CurrentStatus.title}}帐号
                   </button>
+                  <button class="button is-small is-link is-light" :class="buttonLoading?'is-loading':''"  v-if="CurrentStatus.callback && data.length > 0" @click="backTo">
+                    退回{{CurrentStatus.title}}帐号
+                  </button>
+                  <PopoButton :message="`删除${CurrentStatus.title}帐号`" color="is-danger"  :loading="buttonLoading" :callBack="deleteAccount" v-if="CurrentStatus.delete && data.length > 0"></PopoButton>
+                  <button class="button is-small is-warning is-light" :class="buttonLoading?'is-loading':''" @click="ExportAccount" v-if="CurrentStatus.export && data.length > 0">
+                    导出{{CurrentStatus.title}}帐号
+                  </button>
+                </div>
                 </div>
               </div>
               <div v-if="data.length <= 0">
                 <EmptyEd></EmptyEd>
               </div>
               <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left" v-else>
-                <thead>
+                <thead class="is-size-7">
                   <tr>
-                    <td width="10%">项目名称</td>
-                    <td>所属用户</td>
-                    <td>Key</td>
-                    <td>状态</td>
-                    <td>可乐API</td>
+                    <td>序号</td>
+                    <td>帐号</td>
+                    <td v-if="data[0].Password.length > 0">密码</td>
+                    <td v-if="data[0].PhoneNumber.length > 0">手机号</td>
+                    <td v-if="data[0].PhonePassword.length > 0">手机密码</td>
+                    <td>今日金币</td>
+                    <td>昨日金币</td>
+                    <td>炮台</td>
+                    <td>钻石</td>
+                    <td>狂暴</td>
+                    <td>冰冻</td>
+                    <td>瞄准</td>
+                    <td v-if="data[0].Remarks.length > 0">其他</td>
+                    <td v-if="data[0].Price.length > 0">价格</td>
+                    <td>过期时间</td>
                     <td>创建时间</td>
-                    <td>用户名</td>
-                    <td>密码</td>
-                    <td>帐号数</td>
-                    <td width="18%">操作</td>
+                    <td>更新时间</td>
                   </tr>
                 </thead>
-                <tbody class=" is-size-7">
-                  <tr v-for="(item) in data" :key="item.ID">
-                    <td>{{item.ProjectsName}}</td>
-                    <td>{{item.Users.UserName}}</td>
-                    <td>{{item.Key}}</td>
-                    <td>
-                      <span class="has-text-success" v-if="item.NewStatus === 0">正常</span>
-                      <span class="has-text-danger" v-else>锁定</span>
-                    </td>
-                    <td>
-                      <span class="has-text-success" v-if="item.ColaAPI">是</span>
-                      <span class="has-text-danger" v-else>否</span>
-                    </td>
-                    <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
+                <tbody class="is-size-7">
+                  <tr v-for="(item, index) in data" :key="item.ID">
+                    <td>{{index}}</td>
                     <td>{{item.UserName}}</td>
-                    <td>{{item.Password}}</td>
-                    <td>{{item.AccNumber}}</td>
-                    <td>
-                      <div class="buttons">
-                        <button class="button is-success is-small" @click="()=>{showAccount(item.ID)}">帐号管理</button>
-                        <PopoButton
-                          :message="item.NewStatus === 0?'锁定':'解锁'" color="is-info" :callBack="()=>{lockIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
-                        <PopoButton message="删除" color="is-danger" :callBack="()=>{deleteIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
-                      </div>
-                    </td>
+                    <td v-if="item.Password.length > 0">{{item.Password}}</td>
+                    <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
+                    <td v-if="item.PhonePassword.length > 0">{{item.PhonePassword}}</td>
+                    <td><FormaNumber :Numbers="item.TodayGold" /></td>
+                    <td><FormaNumber :Numbers="item.YesterdayGold" /></td>
+                    <td><FormaNumber :Numbers="item.Multiple" /></td>
+                    <td>{{item.Diamond}}</td>
+                    <td>{{item.Crazy}}</td>
+                    <td>{{item.Cold}}</td>
+                    <td>{{item.Precise}}</td>
+                    <td v-if="item.Remarks.length > 0" class="w165">{{item.Remarks}}</td>
+                    <td v-if="item.Price.length > 0">{{item.Price}}</td>
+                    <td><FormaTime v-if="item.Exptime !== 0" :DateTime="item.Exptime"></FormaTime></td>
+                    <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
+                    <td><FormaTime :DateTime="item.UpdatedAt"></FormaTime></td>
                   </tr>
                 </tbody>
               </table>
@@ -79,8 +98,13 @@
           </div>
         </div>
       </div>
-      <PaginAtion v-if="data.length >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
+      <PaginAtion v-if="total >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
     </div>
+    <PostData
+      v-if="postStatus"
+      :showData="openPostModal"
+      :ShowMessage="ShowMessage">
+    </PostData>
     <NotIfication
       :showData="openerr">
     </NotIfication>
@@ -92,10 +116,12 @@ import { useRouter } from 'vue-router'
 import ManageHeader from '@/components/Other/Header'
 import LoadIng from '@/components/Other/Loading'
 import EmptyEd from '@/components/Other/Empty'
+import PostData from "@/components/Account/Postdata"
 import NotIfication from "@/components/Other/Notification"
-import PopoButton from '@/components/Other/PopoButton'
 import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
+import FormaNumber from '@/components/Other/FormaNumber'
+import PopoButton from '@/components/Other/PopoButton'
 
 
 import Fetch from '@/helper/fetch'
@@ -104,25 +130,22 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'AccountList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PopoButton, PaginAtion, FormaTime },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, PostData, PopoButton, FormaNumber },
   setup() {
     let states = reactive({
-      id: 0,
-      status: "0",
+      AccountKey: "",
+      CurrentStatus: {},
       statusList: [],
       projects: {},
       loading: false,
       data: [],
-      UserData: [],
       total: 0,
       username: "",
-      userLoading: false,
-      openModal:{
+      buttonLoading: false,
+      postStatus: false,
+      openPostModal:{
         active: false,
-        username: ""
-      },
-      openAddModal:{
-        active: false
+        postParams: {}
       },
       openerr: {
         active: false,
@@ -136,27 +159,41 @@ export default defineComponent({
     onMounted(async() => {
       document.title = `${Config.GlobalTitle}-帐号管理`
       const data = await CheckLogin()
-      states.id = router.currentRoute._value.params.id
+      states.AccountKey = router.currentRoute._value.params.id
       if (data == 0) {
         const username = localStorage.getItem('user')
         states.username = username
-        GetData()
+        GetData(1,true)
       }else{
         setStorage(false)
         router.push("/")
       }
     })
-    const GetData = async(page = 1) => {
+
+    const CleanData = () => {
+      states.data = []
+      states.total = 0
+      states.page = []
+      states.projects = {}
+      states.pageLoading = true
+      states.loading = false
+      states.buttonLoading = false
+    }
+
+    const GetData = async(page = 1, first = false) => {
       const token = localStorage.getItem("token")
+      let status = states.CurrentStatus.status
+      if (first) status = "0"
       const data = {
         page:page, 
         limit: states.limit,
-        projectsID: states.id,
-        status: states.status,
+        status: status,
+        projectsID: states.AccountKey
       }
-      const d = await Fetch(Config.Api.accountList, data, 'GET', token)
+      const url = `${Config.Api.accountList}`
       states.loading = true
       states.pageLoading = false
+      const d = await Fetch(url, data, 'GET', token)
       if (d.status == 0) {
         states.data = d.data
         states.total = d.total
@@ -164,6 +201,7 @@ export default defineComponent({
         states.statusList = JSON.parse(d.projects.StatusJSON)
         states.pageLoading = true
         states.loading = false
+        if (first) states.CurrentStatus = states.statusList[0]
       }else{
         states.data = []
         states.total = 0
@@ -184,7 +222,6 @@ export default defineComponent({
       switch (status) {
         case 1:
           states.data = [...states.data, e.data]
-          states.userLoading = false
           break;
         case 2:
           states.data = states.data.map((e)=>{
@@ -204,8 +241,7 @@ export default defineComponent({
           })
           break;
         case 4:
-          states.userLoading = false
-          states.UserData = []
+          GetData()
           break;
         default:
           break;
@@ -215,82 +251,154 @@ export default defineComponent({
       states.openModal.active = true
       states.openModal.username = username
     }
-    const showAddModel = async() => {
-      states.UserData = await getUserData()
-      if (states.userLoading) states.openAddModal.active = true
-    }
-    const getUserData = async() => {
-      const token = localStorage.getItem("token")
-      const d = await Fetch(Config.Api.UsersAllList, {}, 'GET', token)
-      // console.log(d)
-      if (d.status == 0) {
-        states.UserData = d.data
-        states.userLoading = true
-      }else{
-        states.UserData = []
-        states.userLoading = false
-      }
-    }
-    const lockIt = async(id) => {
-      const token = localStorage.getItem("token")
-      const d = await Fetch(Config.Api.upprojectstatus, {id: id}, 'PUT', token)
-      if (d.status == 0) {
-        const data = {
-          active: true,
-          message: d.message,
-          color: 'is-success'
-        }
-        ShowMessage(data, 2, id)
-      }else{
-        const data = {
-          active: true,
-          message: d.message,
-          color: 'is-danger'
-        }
-        ShowMessage(data, 0)
-      }
-    }
-    const deleteIt = async(id) => {
-      const token = localStorage.getItem("token")
-      const d = await Fetch(Config.Api.delproject, {id: id}, 'DELETE', token)
-      if (d.status == 0) {
-        const data = {
-          active: true,
-          message: d.message,
-          color: 'is-success'
-        }
-        ShowMessage(data, 3, d.id)
-      }else{
-        const data = {
-          active: true,
-          message: d.message,
-          color: 'is-danger'
-        }
-        ShowMessage(data, 0)
-      }
-    }
+    
 
     const backRouter = () => {
       router.back()
     }
 
-    const pushToData = (status) => {
-      console.log(status)
-      states.status = status
+    const pushToData = (index) => {
+      states.CurrentStatus = states.statusList[index]
+      states.data = []
+      states.total = 0
+      states.pageLoading = false
       GetData()
+    }
+
+    const showPostModal = () => {
+      states.openPostModal.active = true
+      // console.log(states.CurrentStatus)
+      states.openPostModal.postParams = states.CurrentStatus
+      states.postStatus = true
+    }
+
+    const deleteAccount = async() => {
+      const token = localStorage.getItem("token")
+      let status = states.CurrentStatus.status
+      const data = {
+        status: status,
+      }
+      const url = `${Config.RootUrl}${states.AccountKey}/DeleteAccount`
+      states.loading = true
+      states.pageLoading = false
+      states.buttonLoading = true
+      const d = await Fetch(url, data, 'DELETE', token)
+      if (d.status == 0) {
+        CleanData()
+      }else{
+        CleanData()
+      }
+    }
+
+    const backTo = async() => {
+      const token = localStorage.getItem("token")
+      let status = states.CurrentStatus.status
+      const data = {
+        status: status,
+      }
+      const url = `${Config.RootUrl}${states.AccountKey}/GoBackAccount`
+      const d = await Fetch(url, data, 'PUT', token)
+      states.loading = true
+      states.pageLoading = false
+      states.buttonLoading = true
+      if (d.status == 0) {
+        CleanData()
+      }else{
+        CleanData()
+      }
+    }
+
+    const ExportAccount = async() => {
+      const d = await exportFile()
+      download(d)
+    }
+
+    const exportFile = () => {
+      const token = localStorage.getItem("token")
+      let status = states.CurrentStatus.status
+
+      const url = `${Config.RootUrl}${states.AccountKey}/ExportAccount`
+      let requestConfig = {
+        method: "put",
+        responseType: "blob"
+      }
+      Object.defineProperty(requestConfig, 'body', {
+          value: JSON.stringify({
+          status: status,
+        })
+      })
+      requestConfig.headers = new Headers({
+        Accept: '*/*',
+      })
+      requestConfig.headers.append("Content-Type","application/json;charset=UTF-8")
+      requestConfig.headers.append('Authorization',`Bearer ${token}`)
+      return new Promise((resolve) => {
+        fetch(url, requestConfig)
+          .then(res => {
+            if(res.ok) {
+              resolve(res.text())
+            }else {
+              resolve({
+                status: 1,
+                message: "访问出错"
+              })
+            }
+          })
+          .catch((err) => {
+            resolve({
+              status: 1,
+              message: err.message
+            })
+          })
+      })
+    }
+    const download = (data) => {
+        if (!data) {
+            return
+        }
+        // const contentType = data.type
+        // const fileName = contentType.split('filename=')[1]
+        let url = window.URL.createObjectURL(new Blob([data]))
+        let link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = url
+        link.id='Adownload'
+        const date = new Date(),
+            Y = date.getFullYear(),
+            M = date.getMonth(),
+            D = date.getDate(),
+            h = date.getHours(),
+            m = date.getMinutes(),
+            s = date.getSeconds(),
+            fileName = `${String(Y)}${String(M)}${String(D)}${String(h)}${String(m)}${String(s)}.txt`
+        // console.log(fileName)
+        link.setAttribute('download', fileName)
+        
+        document.body.appendChild(link)
+        link.click()
+        document.getElementById('Adownload').remove();
     }
 
     return {
       ...toRefs(states),
       ShowMessage,
       showModel,
-      showAddModel,
-      lockIt,
-      deleteIt,
       GetData,
       backRouter,
-      pushToData
+      pushToData,
+      showPostModal,
+      deleteAccount,
+      backTo,
+      ExportAccount
     }
   },
 })
 </script>
+<style scoped>
+.f-1 {
+  margin-left: -1px;
+}
+.w165 {
+  width: 165px;
+}
+</style>
