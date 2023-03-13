@@ -86,7 +86,7 @@
                     <td>{{item.Crazy}}</td>
                     <td>{{item.Cold}}</td>
                     <td>{{item.Precise}}</td>
-                    <td v-if="item.Remarks.length > 0">{{item.Remarks}}</td>
+                    <td v-if="item.Remarks.length > 0" class="w165">{{item.Remarks}}</td>
                     <td v-if="item.Price.length > 0">{{item.Price}}</td>
                     <td><FormaTime v-if="item.Exptime !== 0" :DateTime="item.Exptime"></FormaTime></td>
                     <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
@@ -304,5 +304,8 @@ export default defineComponent({
 <style scoped>
 .f-1 {
   margin-left: -1px;
+}
+.w165 {
+  width: 165px;
 }
 </style>
