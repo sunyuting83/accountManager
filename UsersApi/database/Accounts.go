@@ -74,11 +74,27 @@ func (account *Accounts) AccountUpStatus(status string) {
 	sqlDB.Model(&account).Update("new_status", status)
 }
 
+// Reset Password
+func (account *Accounts) BackTo(projectsID, status, backToStatus string) {
+	sqlDB.Model(&account).
+		Where("projects_id = ? and new_status = ?", projectsID, status).
+		Update("new_status", backToStatus)
+}
+
 func AccountBatches(accounts []Accounts) {
 	sqlDB.Create(&accounts)
 }
 func AccountInBatches(accounts []Accounts) {
 	sqlDB.CreateInBatches(&accounts, 1000)
+}
+
+func (account *Accounts) ExportAccount(projectsID, status string) (accounts []*Accounts, err error) {
+	if err = sqlDB.
+		Where("projects_id = ? and new_status = ?", projectsID, status).
+		Find(&accounts).Error; err != nil {
+		return
+	}
+	return
 }
 
 // makePage make page

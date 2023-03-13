@@ -37,7 +37,6 @@ export default async (url = '', params = {}, method = 'GET', token = '') => {
       for (const key in params) {
         formData.append(key,params[key])
       }
-      console.log(formData.get("files"))
       // Object.defineProperty(requestConfig, 'body', formData)
       requestConfig.body = formData
     }
@@ -52,7 +51,6 @@ export default async (url = '', params = {}, method = 'GET', token = '') => {
     requestConfig.headers.append('Authorization',`Bearer ${token}`)
   }
   return new Promise((resolve) => {
-    console.log(requestConfig)
     fetch(url, requestConfig)
       .then(res => {
         if(res.ok) {

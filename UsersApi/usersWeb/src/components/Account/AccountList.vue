@@ -37,11 +37,11 @@
                   <button class="button is-small is-success is-light" :class="buttonLoading?'is-loading':''" v-if="CurrentStatus.import" @click="showPostModal">
                     导入{{CurrentStatus.title}}帐号
                   </button>
-                  <button class="button is-small is-link is-light" :class="buttonLoading?'is-loading':''"  v-if="CurrentStatus.callback">
+                  <button class="button is-small is-link is-light" :class="buttonLoading?'is-loading':''"  v-if="CurrentStatus.callback && data.length > 0" @click="backTo">
                     退回{{CurrentStatus.title}}帐号
                   </button>
-                  <PopoButton :message="`删除${CurrentStatus.title}帐号`" color="is-danger"  :loading="buttonLoading" :callBack="deleteAccount" v-if="CurrentStatus.delete"></PopoButton>
-                  <button class="button is-small is-warning is-light" :class="buttonLoading?'is-loading':''"  v-if="CurrentStatus.export">
+                  <PopoButton :message="`删除${CurrentStatus.title}帐号`" color="is-danger"  :loading="buttonLoading" :callBack="deleteAccount" v-if="CurrentStatus.delete && data.length > 0"></PopoButton>
+                  <button class="button is-small is-warning is-light" :class="buttonLoading?'is-loading':''" @click="ExportAccount" v-if="CurrentStatus.export && data.length > 0">
                     导出{{CurrentStatus.title}}帐号
                   </button>
                 </div>
@@ -168,6 +168,17 @@ export default defineComponent({
         router.push("/")
       }
     })
+
+    const CleanData = () => {
+      states.data = []
+      states.total = 0
+      states.page = []
+      states.projects = {}
+      states.pageLoading = true
+      states.loading = false
+      states.buttonLoading = false
+    }
+
     const GetData = async(page = 1, first = false) => {
       const token = localStorage.getItem("token")
       let status = states.CurrentStatus.status
@@ -178,9 +189,9 @@ export default defineComponent({
         status: status,
       }
       const url = `${Config.RootUrl}${states.AccountKey}/AccountList`
-      const d = await Fetch(url, data, 'GET', token)
       states.loading = true
       states.pageLoading = false
+      const d = await Fetch(url, data, 'GET', token)
       if (d.status == 0) {
         states.data = d.data
         states.total = d.total
@@ -266,26 +277,104 @@ export default defineComponent({
         status: status,
       }
       const url = `${Config.RootUrl}${states.AccountKey}/DeleteAccount`
+      states.loading = true
+      states.pageLoading = false
+      states.buttonLoading = true
       const d = await Fetch(url, data, 'DELETE', token)
+      if (d.status == 0) {
+        CleanData()
+      }else{
+        CleanData()
+      }
+    }
+
+    const backTo = async() => {
+      const token = localStorage.getItem("token")
+      let status = states.CurrentStatus.status
+      const data = {
+        status: status,
+      }
+      const url = `${Config.RootUrl}${states.AccountKey}/GoBackAccount`
+      const d = await Fetch(url, data, 'PUT', token)
       states.loading = true
       states.pageLoading = false
       states.buttonLoading = true
       if (d.status == 0) {
-        states.data = []
-        states.total = 0
-        states.page = []
-        states.pageLoading = true
-        states.loading = false
-        states.buttonLoading = false
+        CleanData()
       }else{
-        states.data = []
-        states.total = 0
-        states.page = []
-        states.projects = {}
-        states.pageLoading = true
-        states.loading = false
-        states.buttonLoading = false
+        CleanData()
       }
+    }
+
+    const ExportAccount = async() => {
+      const d = await exportFile()
+      download(d)
+    }
+
+    const exportFile = () => {
+      const token = localStorage.getItem("token")
+      let status = states.CurrentStatus.status
+
+      const url = `${Config.RootUrl}${states.AccountKey}/ExportAccount`
+      let requestConfig = {
+        method: "put",
+        responseType: "blob"
+      }
+      Object.defineProperty(requestConfig, 'body', {
+          value: JSON.stringify({
+          status: status,
+        })
+      })
+      requestConfig.headers = new Headers({
+        Accept: '*/*',
+      })
+      requestConfig.headers.append("Content-Type","application/json;charset=UTF-8")
+      requestConfig.headers.append('Authorization',`Bearer ${token}`)
+      return new Promise((resolve) => {
+        fetch(url, requestConfig)
+          .then(res => {
+            if(res.ok) {
+              resolve(res.text())
+            }else {
+              resolve({
+                status: 1,
+                message: "访问出错"
+              })
+            }
+          })
+          .catch((err) => {
+            resolve({
+              status: 1,
+              message: err.message
+            })
+          })
+      })
+    }
+    const download = (data) => {
+        if (!data) {
+            return
+        }
+        // const contentType = data.type
+        // const fileName = contentType.split('filename=')[1]
+        let url = window.URL.createObjectURL(new Blob([data]))
+        let link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = url
+        link.id='Adownload'
+        const date = new Date(),
+            Y = date.getFullYear(),
+            M = date.getMonth(),
+            D = date.getDate(),
+            h = date.getHours(),
+            m = date.getMinutes(),
+            s = date.getSeconds(),
+            fileName = `${String(Y)}${String(M)}${String(D)}${String(h)}${String(m)}${String(s)}.txt`
+        // console.log(fileName)
+        link.setAttribute('download', fileName)
+        
+        document.body.appendChild(link)
+        link.click()
+        document.getElementById('Adownload').remove();
     }
 
     return {
@@ -296,7 +385,9 @@ export default defineComponent({
       backRouter,
       pushToData,
       showPostModal,
-      deleteAccount
+      deleteAccount,
+      backTo,
+      ExportAccount
     }
   },
 })
