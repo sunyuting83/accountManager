@@ -3,7 +3,7 @@ package controller
 import (
 	BadgerDB "colaAPI/UsersApi/badger"
 	"colaAPI/UsersApi/database"
-	"colaAPI/utils"
+	"colaAPI/UsersApi/utils"
 	"encoding/json"
 	"net/http"
 	"strings"

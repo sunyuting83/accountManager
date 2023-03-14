@@ -192,7 +192,6 @@ export default defineComponent({
       }
       const url = `${Config.Api.accountList}`
       states.loading = true
-      states.pageLoading = false
       const d = await Fetch(url, data, 'GET', token)
       if (d.status == 0) {
         states.data = d.data

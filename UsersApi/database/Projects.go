@@ -40,7 +40,7 @@ func GetProjectsList(userid int64, page, Limit int) (projects *[]Projects, err e
 }
 
 // Check ID
-func ProjectsCheckID(id int64) (projects *Projects, err error) {
+func ProjectsCheckID(id string) (projects *Projects, err error) {
 	if err = sqlDB.First(&projects, "id = ?", id).Error; err != nil {
 		return
 	}
@@ -48,7 +48,7 @@ func ProjectsCheckID(id int64) (projects *Projects, err error) {
 }
 
 // Reset Password
-func (projects *Projects) UpdateProjects(id int64) {
+func (projects *Projects) UpdateProjects(id string) {
 	sqlDB.Model(&projects).
 		Select("UserName", "Password", "AccNumber").
 		Where("id = ?", id).

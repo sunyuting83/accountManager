@@ -26,7 +26,6 @@ export default defineComponent({
       current: 1,
       page: []
     })
-
     const makePage = (t) => {
       let x = []
       const p = Math.ceil(t/props.number)
@@ -40,19 +39,19 @@ export default defineComponent({
     const setPage = (p) =>{
       if (p !== states.current && p >= 1) {
         states.current = p
-        props.GetData(p, false)
+        props.GetData(p)
       }
     }
     const setNextPage = () =>{
       if (states.current !== states.page.length && states.current < states.page.length) {
         states.current = states.current + 1
-        props.GetData(states.current, false)
+        props.GetData(states.current)
       }
     }
     const setPreviousPage = () =>{
       if (states.current > 1) {
         states.current = states.current - 1
-        props.GetData(states.current, false)
+        props.GetData(states.current)
       }
     }
 

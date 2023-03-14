@@ -50,6 +50,7 @@
                     <td>
                       <div class="buttons">
                         <button class="button is-success is-small" @click="()=>{showAccount(item.Key)}">帐号管理</button>
+                        <button class="button is-info is-small" @click="()=>{showAccountDraw(item.Key)}">提号管理</button>
                         <button class="button is-warning is-small" v-if="item.ColaAPI" @click="()=>{showModifyModal(item.ID)}">修改项目</button>
                       </div>
                     </td>
@@ -234,6 +235,9 @@ export default defineComponent({
     const showAccount = (id) => {
       router.push(`/account/${id}`)
     }
+    const showAccountDraw = (id) => {
+      router.push(`/accountDraw/${id}/gold`)
+    }
 
     return {
       ...toRefs(states),
@@ -242,6 +246,7 @@ export default defineComponent({
       showAddModel,
       GetData,
       showAccount,
+      showAccountDraw,
       showModifyModal
     }
   },

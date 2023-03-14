@@ -95,7 +95,7 @@ func Sgin(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
-			"message": "登陆失败",
+			"message": err.Error(),
 		})
 		return
 	}

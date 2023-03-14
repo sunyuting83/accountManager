@@ -5,7 +5,7 @@ import (
 	BadgerDB "colaAPI/UsersApi/badger"
 	orm "colaAPI/UsersApi/database"
 	"colaAPI/UsersApi/router"
-	"colaAPI/utils"
+	"colaAPI/UsersApi/utils"
 	"fmt"
 	"os"
 	"runtime"

@@ -36,8 +36,7 @@ func AccountList(c *gin.Context) {
 		})
 		return
 	}
-	ProjectsID, _ := strconv.Atoi(projectsID)
-	Projects, err := database.ProjectsCheckID(int64(ProjectsID))
+	Projects, err := database.ProjectsCheckID(projectsID)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,

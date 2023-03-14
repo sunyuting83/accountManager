@@ -33,6 +33,32 @@ func (accounts *Accounts) GetCount(ProjectsID, Status string) (count int64, err 
 }
 
 // Account List
+func (account *Accounts) GetInCount(ProjectsID string, statusList []string) (count int64, err error) {
+	if err = sqlDB.
+		Model(&account).
+		Where("projects_id = ? and new_status IN ?", ProjectsID, statusList).
+		Order("updated_at desc").
+		Count(&count).Error; err != nil {
+		return
+	}
+	return
+}
+
+// Account List
+func (account *Accounts) GetInList(ProjectsID string, statusList []string, page, Limit int) (accounts *[]Accounts, err error) {
+	p := makePage(page, Limit)
+	if err = sqlDB.
+		Where("projects_id = ? and new_status IN ?", ProjectsID, statusList).
+		Order("updated_at desc").
+		Order("updated_at desc").
+		Limit(Limit).Offset(p).
+		Find(&accounts).Error; err != nil {
+		return
+	}
+	return
+}
+
+// Account List
 func GetAccountList(page, Limit int, ProjectsID, Status string) (accounts *[]Accounts, err error) {
 	p := makePage(page, Limit)
 	if err = sqlDB.

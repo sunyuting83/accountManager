@@ -2,8 +2,8 @@ package controller
 
 import (
 	"colaAPI/UsersApi/database"
+	"colaAPI/UsersApi/utils"
 	UserUtils "colaAPI/UsersApi/utils"
-	"colaAPI/utils"
 	"net/http"
 	"strings"
 

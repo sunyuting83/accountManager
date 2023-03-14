@@ -4,7 +4,6 @@ import (
 	"colaAPI/UsersApi/database"
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,9 +20,8 @@ func GoBackAccount(c *gin.Context) {
 	}
 
 	projectsID := GetProjectsID(c)
-	ProjectsID, _ := strconv.Atoi(projectsID)
 
-	Projects, err := database.ProjectsCheckID(int64(ProjectsID))
+	Projects, err := database.ProjectsCheckID(projectsID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  1,

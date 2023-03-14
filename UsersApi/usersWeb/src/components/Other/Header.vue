@@ -11,7 +11,7 @@
           <router-link class="navbar-item" :class="path === 'project'?'is-active':''" to="/project">
             项目管理
           </router-link>
-          <a class="navbar-item" :class="path === 'account'?'is-active':''">
+          <a class="navbar-item" :class="path.indexOf('account') !== -1?'is-active':''">
             帐号管理
           </a>
         </div>

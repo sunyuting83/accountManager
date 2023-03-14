@@ -5,7 +5,6 @@ import (
 	"colaAPI/UsersApi/database"
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,12 +34,12 @@ func ModifyProjects(c *gin.Context) {
 		return
 	}
 	var (
-		ProjectsID int64
+		ProjectsID string
 	)
 	has := Redis.Get(person.Key)
 	if len(has) != 0 {
 		json.Unmarshal([]byte(has), &result)
-		ProjectsID, _ = strconv.ParseInt(result.ProjectsID, 10, 64)
+		ProjectsID = result.ProjectsID
 	}
 	projects, err := database.ProjectsCheckID(ProjectsID)
 	if err != nil {

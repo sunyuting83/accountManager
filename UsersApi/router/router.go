@@ -6,7 +6,6 @@ import (
 	Projects "colaAPI/UsersApi/controller/Projects"
 	Users "colaAPI/UsersApi/controller/Users"
 	utilsUser "colaAPI/UsersApi/utils"
-	"colaAPI/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,11 +14,11 @@ import (
 func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 	router := gin.Default()
 	router.MaxMultipartMemory = FormMemory << 20
-	router.Use(utils.CORSMiddleware())
+	router.Use(utilsUser.CORSMiddleware())
 	userApiV1 := router.Group("/api/v1")
 	userApiV1HasKey := router.Group("/api/v1/:key")
-	userApiV1.Use(utils.SetConfigMiddleWare(SECRET_KEY, CurrentPath, SECRET_KEY))
-	userApiV1HasKey.Use(utils.SetConfigMiddleWare(SECRET_KEY, CurrentPath, SECRET_KEY), utilsUser.UserProjectsMiddleware())
+	userApiV1.Use(utilsUser.SetConfigMiddleWare(SECRET_KEY, CurrentPath, SECRET_KEY))
+	userApiV1HasKey.Use(utilsUser.SetConfigMiddleWare(SECRET_KEY, CurrentPath, SECRET_KEY), utilsUser.UserProjectsMiddleware())
 	{
 		router.GET("/", utilsUser.UserVerifyMiddleware(), controller.Index)
 		userApiV1.POST("/Login", Users.Sgin)
@@ -32,6 +31,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1HasKey.DELETE("/DeleteAccount", utilsUser.UserVerifyMiddleware(), Account.DeleteAccount)
 		userApiV1HasKey.PUT("/GoBackAccount", utilsUser.UserVerifyMiddleware(), Account.GoBackAccount)
 		userApiV1HasKey.PUT("/ExportAccount", utilsUser.UserVerifyMiddleware(), Account.ExportAccount)
+		userApiV1HasKey.GET("/AccountDrawList", utilsUser.UserVerifyMiddleware(), Account.AccountDrawList)
 
 	}
 

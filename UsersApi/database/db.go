@@ -1,7 +1,7 @@
 package database
 
 import (
-	"colaAPI/utils"
+	"colaAPI/UsersApi/utils"
 	"database/sql"
 	"os"
 	"strings"
