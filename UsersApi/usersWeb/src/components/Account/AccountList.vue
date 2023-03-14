@@ -74,7 +74,7 @@
                 </thead>
                 <tbody class="is-size-7">
                   <tr v-for="(item, index) in data" :key="item.ID">
-                    <td>{{index}}</td>
+                    <td>{{index + 1}}</td>
                     <td>{{item.UserName}}</td>
                     <td v-if="item.Password.length > 0">{{item.Password}}</td>
                     <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>

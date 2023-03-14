@@ -11,8 +11,14 @@
           <router-link class="navbar-item" :class="path === 'project'?'is-active':''" to="/project">
             项目管理
           </router-link>
-          <a class="navbar-item" v-if="path.indexOf('account') !== -1" :class="path.indexOf('account') !== -1?'is-active':''">
+          <a class="navbar-item" v-if="path === 'account'" :class="path === 'account'?'is-active':''">
             帐号管理
+          </a>
+          <a class="navbar-item" v-if="path === 'accountDraw'" :class="path === 'accountDraw'?'is-active':''">
+            未提取帐号管理
+          </a>
+          <a class="navbar-item" v-if="path === 'accountDrawed'" :class="path === 'accountDrawed'?'is-active':''">
+            已提取帐号管理
           </a>
         </div>
       </div>

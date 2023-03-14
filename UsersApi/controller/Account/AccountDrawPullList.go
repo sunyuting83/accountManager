@@ -2,7 +2,6 @@ package controller
 
 import (
 	"colaAPI/UsersApi/database"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +21,6 @@ func PullAccountDrawList(c *gin.Context) {
 		return
 	}
 	tempList := RemoveRepeatedList(form.List)
-	fmt.Println(tempList)
 	if len(tempList) != 0 {
 		var acc *database.Accounts
 

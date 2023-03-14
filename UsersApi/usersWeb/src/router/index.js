@@ -3,6 +3,7 @@ import AppIndex from '@/components/Index/Index'
 import ProjectList from '@/components/Project/ProjectList'
 import AccountList from '@/components/Account/AccountList'
 import AccountDraw from '@/components/AccountDraw/AccountList'
+import AccountDrawed from '@/components/AccountDrawed/AccountList'
 
 const routerHistory = createWebHistory()
 
@@ -26,6 +27,11 @@ const constantRoutes = [
     path: '/accountDraw/:key/:type',
     name: 'accountDraw',
     component: AccountDraw
+  },
+  {
+    path: '/accountDrawed/:key',
+    name: 'accountDrawed',
+    component: AccountDrawed
   }
 ]
 

@@ -1,8 +1,6 @@
 package database
 
 import (
-	"fmt"
-
 	"gorm.io/gorm"
 )
 
@@ -136,6 +134,10 @@ func (account *Accounts) PullDataUseIn(IDs []int) {
 		Update("new_status", "108")
 }
 
+func (account *Accounts) PullDataUseSQL(SQL string) {
+	sqlDB.Exec(SQL)
+}
+
 func (account *Accounts) GetDateInCount(projectsID string, statusList []string, starTime, endTime int64) (count int64, err error) {
 	if err = sqlDB.
 		Model(&account).
@@ -164,7 +166,7 @@ func GetDateTimeData(projectsID, statusList, GeType string) (re []string, err er
 		d = "created_at"
 	}
 	sql := "SELECT DISTINCT DATE(" + d + " / 1000 ,'unixepoch','localtime') FROM accounts WHERE projects_id = " + projectsID + " AND new_status IN (" + statusList + ") ORDER BY " + d + " DESC"
-	fmt.Println(sql)
+	// fmt.Println(sql)
 	re, err = RawQueryParseToMap(sqlDB, sql, d)
 	return
 }
@@ -212,7 +214,6 @@ func RawQueryParseToMap(db *gorm.DB, query, date string) ([]string, error) {
 
 		list = append(list, item)
 	}
-	fmt.Println(list)
 	var l []string
 	//將byte array轉換為字串
 	for index := range list {
@@ -223,7 +224,6 @@ func RawQueryParseToMap(db *gorm.DB, query, date string) ([]string, error) {
 			}
 		}
 	}
-	fmt.Println(l)
 	return l, nil
 
 }
