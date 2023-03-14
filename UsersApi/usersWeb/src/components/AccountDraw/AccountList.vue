@@ -22,12 +22,170 @@
               <LoadIng></LoadIng>
             </div>
             <div v-else>
-              <div class="buttons are-small has-addons">
-                <button class="button is-warning" :disabled="AccountType == 'gold'?true:false" @click="pushRouter">
+              <div class="columns flex-wrap is-justify-content-space-between mt-1">
+                <div class="field ml-3">
+                  <div class="buttons is-horizontal are-small has-addons">
+                    <button class="button is-warning" :disabled="AccountType == 'gold'?true:false" @click="pushRouter">
+                      按金币排列
+                    </button>
+                    <button class="button is-info" :disabled="AccountType == 'date'?true:false" @click="pushRouter">
+                      按日期排列
+                    </button>
+                  </div>
+                </div>
+                <div class="field mr-3">
+                  <div class="buttons is-horizontal are-small has-addons">
+                    <button class="button is-warning" :disabled="AccountType == 'gold'?true:false" @click="pushRouter">
+                      提取选中
+                    </button>
+                    <button class="button is-info" :disabled="AccountType == 'date'?true:false" @click="pushRouter">
+                      按日期排列
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="field mt-5">
+                <div class="columns flex-wrap is-flex-wrap-wrap">
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <div class="field-body">
+                      <div class="field is-expanded">
+                        <div class="field has-addons">
+                          <p class="control">
+                            <a class="button  is-small is-static">
+                              金币大于
+                            </a>
+                          </p>
+                          <p class="control is-expanded">
+                            <input class="input is-small w165" min="0" type="number" placeholder="90" v-model="Filter.mingold">
+                          </p>
+                          <p class="control">
+                            <span class="button is-small is-static">
+                              亿
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <div class="field-body">
+                      <div class="field is-expanded">
+                        <div class="field has-addons">
+                          <p class="control">
+                            <a class="button  is-small is-static">
+                              金币小于
+                            </a>
+                          </p>
+                          <p class="control is-expanded">
+                            <input class="input is-small w165" min="0" type="number" placeholder="500" v-model="Filter.maxgold">
+                          </p>
+                          <p class="control">
+                            <span class="button is-small is-static">
+                              亿
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <div class="field-body">
+                      <div class="field is-expanded">
+                        <div class="field has-addons">
+                          <p class="control">
+                            <a class="button  is-small is-static">
+                              炮台大于
+                            </a>
+                          </p>
+                          <p class="control is-expanded">
+                            <input class="input is-small w165" min="0" type="number" placeholder="2500000" v-model="Filter.multiple">
+                          </p>
+                          <p class="control">
+                            <span class="button is-small is-static">
+                              万
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <div class="field-body">
+                      <div class="field is-expanded">
+                        <div class="field has-addons">
+                          <p class="control">
+                            <a class="button  is-small is-static">
+                              钻石大于
+                            </a>
+                          </p>
+                          <p class="control is-expanded">
+                            <input class="input is-small w165" min="0" type="number" placeholder="300" v-model="Filter.diamond">
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <div class="field-body">
+                      <div class="field is-expanded">
+                        <div class="field has-addons">
+                          <p class="control">
+                            <a class="button  is-small is-static">
+                              狂暴大于
+                            </a>
+                          </p>
+                          <p class="control is-expanded">
+                            <input class="input is-small w165" min="0" type="number" placeholder="300" v-model="Filter.crazy">
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <div class="field-body">
+                      <div class="field is-expanded">
+                        <div class="field has-addons">
+                          <p class="control">
+                            <a class="button  is-small is-static">
+                              冰冻大于
+                            </a>
+                          </p>
+                          <p class="control is-expanded">
+                            <input class="input is-small w165" min="0" type="number" placeholder="300"  v-model="Filter.cold">
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <div class="field-body">
+                      <div class="field is-expanded">
+                        <div class="field has-addons">
+                          <p class="control">
+                            <a class="button  is-small is-static">
+                              瞄准大于
+                            </a>
+                          </p>
+                          <p class="control is-expanded">
+                            <input class="input is-small w165" min="0" type="number" placeholder="300" v-model="Filter.precise">
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field ml-3">
+                    <button
+                      class="button is-primary is-small"
+                      :disabled="Filter.mingold > 0 ||Filter.maxgold > 0 ||Filter.cold > 0 ||Filter.crazy > 0 ||Filter.multiple > 0 ||Filter.precise > 0 ||Filter.diamond > 0 ?false:true"
+                      @click="pushRouter">
+                      按条件提取
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="buttons are-small has-addons" v-if="AccountType == 'date'">
+                <button class="button is-warning">
                   按金币排列
-                </button>
-                <button class="button is-info" :disabled="AccountType == 'date'?true:false" @click="pushRouter">
-                  按日期排列
                 </button>
               </div>
               <div v-if="data.length <= 0">
@@ -36,6 +194,12 @@
               <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left" v-else>
                 <thead class="is-size-7">
                   <tr>
+                    <td>
+                      <label class="checkbox">
+                        <input type="checkbox">
+                      </label>
+                      选择
+                    </td>
                     <td>序号</td>
                     <td>帐号</td>
                     <td v-if="data[0].PhoneNumber.length > 0">手机号</td>
@@ -54,6 +218,11 @@
                 </thead>
                 <tbody class="is-size-7">
                   <tr v-for="(item, index) in data" :key="item.ID">
+                    <td>
+                      <label class="checkbox">
+                        <input type="checkbox" v-model="item.ID">
+                      </label>
+                    </td>
                     <td>{{index}}</td>
                     <td>{{item.UserName}}</td>
                     <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
@@ -128,7 +297,16 @@ export default defineComponent({
         color: ""
       },
       pageLoading: false,
-      limit: Config.Limit
+      limit: Config.Limit,
+      Filter: {
+        mingold: 0,
+        maxgold: 0,
+        multiple: 0,
+        diamond: 0,
+        crazy: 0,
+        cold: 0,
+        precise: 0,
+      }
     })
     const Reload = inject('reload')
     const router = useRouter()
@@ -356,6 +534,7 @@ export default defineComponent({
   margin-left: -1px;
 }
 .w165 {
-  width: 165px;
+  min-width: 100px;
+  max-width: 140px;
 }
 </style>

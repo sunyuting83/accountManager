@@ -121,6 +121,7 @@ func (account *Accounts) ExportAccount(projectsID, status string) (accounts []*A
 		return
 	}
 	return
+	// SELECT DISTINCT DATE(updated_at / 1000, 'unixepoch','localtime') FROM accounts WHERE new_status IN (2,3,4,5)
 }
 
 // makePage make page
