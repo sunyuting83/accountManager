@@ -88,9 +88,9 @@
                     <td>{{item.Precise}}</td>
                     <td v-if="item.Remarks.length > 0" class="w165">{{item.Remarks}}</td>
                     <td v-if="item.Price.length > 0">{{item.Price}}</td>
-                    <td><FormaTime v-if="item.Exptime !== 0" :DateTime="item.Exptime"></FormaTime></td>
-                    <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
-                    <td><FormaTime :DateTime="item.UpdatedAt"></FormaTime></td>
+                    <td><ExpTime :DateTime="item.Exptime" /></td>
+                    <td><FormaTime :DateTime="item.CreatedAt" /></td>
+                    <td><FormaTime :DateTime="item.UpdatedAt" /></td>
                   </tr>
                 </tbody>
               </table>
@@ -122,6 +122,7 @@ import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
 import FormaNumber from '@/components/Other/FormaNumber'
 import PopoButton from '@/components/Other/PopoButton'
+import ExpTime from '@/components/Other/ExpTime.vue'
 
 
 import Fetch from '@/helper/fetch'
@@ -130,7 +131,7 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'AccountList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, PostData, PopoButton, FormaNumber },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, PostData, PopoButton, FormaNumber, ExpTime },
   setup() {
     let states = reactive({
       AccountKey: "",

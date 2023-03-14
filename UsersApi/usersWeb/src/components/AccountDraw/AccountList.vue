@@ -35,7 +35,8 @@
                 </div>
                 <div class="field mr-3">
                   <div class="buttons is-horizontal are-small has-addons">
-                    <button class="button is-warning" :disabled="AccountType == 'gold'?true:false" @click="pushRouter">
+                    <span v-if="total !== 0" class="is-size-7 mr-3">帐号总数 <span class="has-text-danger ml-1">{{total}}</span></span>
+                    <button class="button is-success" @click="pullData" :disabled="checkTemp.length <= 0">
                       提取选中
                     </button>
                     <button class="button is-info" :disabled="AccountType == 'date'?true:false" @click="pushRouter">
@@ -184,8 +185,13 @@
                 </div>
               </div>
               <div class="buttons are-small has-addons" v-if="AccountType == 'date'">
-                <button class="button is-warning">
-                  按金币排列
+                <button
+                  class="button is-info is-light"
+                  v-for="(item,index) in dateList"
+                  :key="index"
+                  :disabled="CurrentDate == item ? true : false"
+                  @click="()=>{getDateData(item)}">
+                  {{item}}
                 </button>
               </div>
               <div v-if="data.length <= 0">
@@ -196,7 +202,7 @@
                   <tr>
                     <td>
                       <label class="checkbox">
-                        <input type="checkbox">
+                        <label class="checkbox"><input type="checkbox" @click="checkall" />全选</label>
                       </label>
                       选择
                     </td>
@@ -220,7 +226,7 @@
                   <tr v-for="(item, index) in data" :key="item.ID">
                     <td>
                       <label class="checkbox">
-                        <input type="checkbox" v-model="item.ID">
+                        <input type="checkbox" v-model="item.check" @click="(e)=>checkBox(e,item.ID)">
                       </label>
                     </td>
                     <td>{{index}}</td>
@@ -234,9 +240,9 @@
                     <td>{{item.Cold}}</td>
                     <td>{{item.Precise}}</td>
                     <td v-if="item.Price.length > 0">{{item.Price}}</td>
-                    <td><FormaTime v-if="item.Exptime !== 0" :DateTime="item.Exptime"></FormaTime></td>
-                    <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
-                    <td><FormaTime :DateTime="item.UpdatedAt"></FormaTime></td>
+                    <td><ExpTime :DateTime="item.Exptime" /></td>
+                    <td><FormaTime :DateTime="item.CreatedAt" /></td>
+                    <td><FormaTime :DateTime="item.UpdatedAt" /></td>
                   </tr>
                 </tbody>
               </table>
@@ -244,13 +250,9 @@
           </div>
         </div>
       </div>
-      <PaginAtion v-if="total >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
+      <PaginAtion v-if="AccountType == 'gold' && total >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetGoldData"></PaginAtion>
+      <PaginAtion v-if="AccountType == 'date' && total >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetGoldData"></PaginAtion>
     </div>
-    <PostData
-      v-if="postStatus"
-      :showData="openPostModal"
-      :ShowMessage="ShowMessage">
-    </PostData>
     <NotIfication
       :showData="openerr">
     </NotIfication>
@@ -262,11 +264,11 @@ import { useRouter } from 'vue-router'
 import ManageHeader from '@/components/Other/Header'
 import LoadIng from '@/components/Other/Loading'
 import EmptyEd from '@/components/Other/Empty'
-import PostData from "@/components/Account/Postdata"
 import NotIfication from "@/components/Other/Notification"
 import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
 import FormaNumber from '@/components/Other/FormaNumber'
+import ExpTime from '@/components/Other/ExpTime'
 
 
 import Fetch from '@/helper/fetch'
@@ -275,12 +277,16 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'AccountList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, PostData, FormaNumber },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime },
   setup() {
     let states = reactive({
       AccountKey: "",
       AccountType: "",
       projects: {},
+      CurrentDate: "",
+      dateList: [],
+      temp: [],
+      checkTemp: [],
       loading: false,
       data: [],
       total: 0,
@@ -312,13 +318,25 @@ export default defineComponent({
     const router = useRouter()
     onMounted(async() => {
       document.title = `${Config.GlobalTitle}-帐号管理`
+      
       const data = await CheckLogin()
-      states.AccountKey = router.currentRoute._value.params.key
-      states.AccountType = router.currentRoute._value.params.type
       if (data == 0) {
+        states.AccountKey = router.currentRoute._value.params.key
+        states.AccountType = router.currentRoute._value.params.type
         const username = localStorage.getItem('user')
         states.username = username
-        GetData(1)
+        if (states.AccountType == 'date') {
+          const dlist = await GetDate()
+          if (states.dateList.length > 0) {
+            states.CurrentDate = dlist[0]
+            states.loading = false
+            GetDateList()
+          }else {
+            states.loading = false
+          }
+        }else {
+          GetGoldData()
+        }
       }else{
         setStorage(false)
         router.push("/")
@@ -327,15 +345,68 @@ export default defineComponent({
 
     const CleanData = () => {
       states.data = []
+      states.temp = []
+      states.checkTemp = []
       states.total = 0
       states.page = []
       states.projects = {}
+      states.CurrentDate= ""
+      states.dateList= []
       states.pageLoading = true
       states.loading = false
       states.buttonLoading = false
     }
 
-    const GetData = async(page = 1) => {
+    const GetDate = async() => {
+      const token = localStorage.getItem("token")
+      const data = {}
+      const url = `${Config.RootUrl}${states.AccountKey}/GetAllDateForDraw`
+      states.loading = true
+      const d = await Fetch(url, data, 'GET', token)
+      if (d.status == 0) {
+        states.dateList = d.dateList
+        return d.dateList
+      }else{
+        states.data = []
+        states.total = 0
+        states.page = []
+        states.projects = {}
+        states.loading = false
+      }
+    }
+    const GetDateList = async(page = 1) => {
+      const token = localStorage.getItem("token")
+      const data = {
+        page:page, 
+        limit: states.limit,
+        date: states.CurrentDate
+      }
+      const url = `${Config.RootUrl}${states.AccountKey}/AccountDrawDateList`
+      states.loading = true
+      const d = await Fetch(url, data, 'GET', token)
+      if (d.status == 0) {
+        states.data = d.data
+        states.temp = d.data
+        states.total = d.total
+        states.projects = d.projects
+        states.pageLoading = true
+        states.loading = false
+      }else{
+        states.data = []
+        states.temp = []
+        states.total = 0
+        states.page = []
+        states.projects = {}
+        states.loading = false
+      }
+    }
+
+    const getDateData = (date) => {
+      states.CurrentDate = date
+      GetDateList()
+    }
+
+    const GetGoldData = async(page = 1) => {
       const token = localStorage.getItem("token")
       const data = {
         page:page, 
@@ -346,12 +417,14 @@ export default defineComponent({
       const d = await Fetch(url, data, 'GET', token)
       if (d.status == 0) {
         states.data = d.data
+        states.temp = d.data
         states.total = d.total
         states.projects = d.projects
         states.pageLoading = true
         states.loading = false
       }else{
         states.data = []
+        states.temp = []
         states.total = 0
         states.page = []
         states.projects = {}
@@ -389,28 +462,15 @@ export default defineComponent({
           })
           break;
         case 4:
-          GetData()
           break;
         default:
           break;
       }
     }
-    const showModel = (username) => {
-      states.openModal.active = true
-      states.openModal.username = username
-    }
     
 
     const backRouter = () => {
       router.push("/project")
-    }
-
-
-    const showPostModal = () => {
-      states.openPostModal.active = true
-      // console.log(states.CurrentStatus)
-      states.openPostModal.postParams = states.CurrentStatus
-      states.postStatus = true
     }
 
     const pushRouter = () => {
@@ -421,28 +481,80 @@ export default defineComponent({
       }else {
         states.AccountType = 'gold'
       }
+      CleanData()
       router.push(`/accountDraw/${AccountKey}/${states.AccountType}`)
       Reload()
     }
 
-
-    const backTo = async() => {
-      const token = localStorage.getItem("token")
-      let status = states.CurrentStatus.status
-      const data = {
-        status: status,
-      }
-      const url = `${Config.RootUrl}${states.AccountKey}/GoBackAccount`
-      const d = await Fetch(url, data, 'PUT', token)
-      states.loading = true
-      states.pageLoading = false
-      states.buttonLoading = true
-      if (d.status == 0) {
-        CleanData()
+    const checkBox = (e, account) => {
+      if (e.target.checked) {
+        states.checkTemp = [...states.checkTemp, account]
       }else{
-        CleanData()
+        states.checkTemp = states.checkTemp.filter((el) => {
+          if (el !== account) return el
+        })
       }
     }
+    const checkall = (e) => {
+      if (e.target.checked) {
+        states.checkTemp = []
+        states.data.forEach((el) => {
+          states.checkTemp =  [...states.checkTemp,el.ID]
+        })
+        states.data = states.data.map((el) => {
+          el.check =  true
+          return el
+        })
+      }else{
+        states.checkTemp = []
+        states.data = states.data.map((el) => {
+          el.check =  false
+          return el
+        })
+      }
+    }
+
+    const pullData = async() => {
+      const list = states.checkTemp
+      const e = {
+        active: true,
+        message: "获取失败",
+        color: "is-danger",
+        newtime: 0,
+      }
+      if (list.length > 0 ) {
+        const token = localStorage.getItem("token")
+        const data = {
+          list: states.checkTemp
+        }
+        const url = `${Config.RootUrl}${states.AccountKey}/PullAccountDrawList`
+        states.pageLoading = false
+        states.loading = true
+        const d = await Fetch(url, data, 'PUT', token)
+        if (d.status == 0) {
+          states.loading = false
+          e.color = 'is-success'
+          e.message = d.message
+          ShowMessage(e)
+          const AccountType = router.currentRoute._value.params.type
+          if (AccountType == 'date') {
+            GetDateList()
+          }else {
+            GetGoldData()
+          }
+        }else{
+          states.checkTemp = []
+          states.loading = false
+          ShowMessage(e)
+        }
+      }else{
+        states.loading = false
+        ShowMessage(e)
+      }
+    }
+
+    // -------------------------------------------------------------------
+
 
     const ExportAccount = async() => {
       const d = await exportFile()
@@ -518,13 +630,14 @@ export default defineComponent({
     return {
       ...toRefs(states),
       ShowMessage,
-      showModel,
-      GetData,
+      GetGoldData,
       backRouter,
-      showPostModal,
-      backTo,
       ExportAccount,
-      pushRouter
+      pushRouter,
+      getDateData,
+      checkBox,
+      checkall,
+      pullData
     }
   },
 })
