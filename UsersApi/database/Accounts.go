@@ -160,12 +160,45 @@ func GetDateInData(projectsID string, statusList []string, starTime, endTime int
 	return
 }
 
+func (account *Accounts) GetDatedInCount(projectsID string, starTime, endTime int64) (count int64, err error) {
+	if err = sqlDB.
+		Model(&account).
+		Where("projects_id = ? AND new_status = ? AND updated_at >= ? AND updated_at <= ?", projectsID, "108", starTime, endTime).
+		Count(&count).Error; err != nil {
+		return
+	}
+	return
+}
+
+func GetDatedInData(projectsID string, starTime, endTime int64, page, Limit int) (accounts []*Accounts, err error) {
+	p := makePage(page, Limit)
+	if err = sqlDB.
+		Where("projects_id = ? AND new_status = ? AND updated_at >= ? AND updated_at <= ?", projectsID, "108", starTime, endTime).
+		Order("updated_at desc").
+		Limit(Limit).Offset(p).
+		Find(&accounts).Error; err != nil {
+		return
+	}
+	return
+}
+
 func GetDateTimeData(projectsID, statusList, GeType string) (re []string, err error) {
 	var d string = "updated_at"
 	if GeType == "0" {
 		d = "created_at"
 	}
 	sql := "SELECT DISTINCT DATE(" + d + " / 1000 ,'unixepoch','localtime') FROM accounts WHERE projects_id = " + projectsID + " AND new_status IN (" + statusList + ") ORDER BY " + d + " DESC"
+	// fmt.Println(sql)
+	re, err = RawQueryParseToMap(sqlDB, sql, d)
+	return
+}
+
+func GetDateTimeDataDraw(projectsID, GeType string) (re []string, err error) {
+	var d string = "updated_at"
+	if GeType == "0" {
+		d = "created_at"
+	}
+	sql := "SELECT DISTINCT DATE(" + d + " / 1000 ,'unixepoch','localtime') FROM accounts WHERE projects_id = " + projectsID + " AND new_status = 108 ORDER BY " + d + " DESC"
 	// fmt.Println(sql)
 	re, err = RawQueryParseToMap(sqlDB, sql, d)
 	return

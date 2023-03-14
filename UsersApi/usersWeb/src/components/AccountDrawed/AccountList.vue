@@ -184,7 +184,7 @@ export default defineComponent({
     const GetDate = async() => {
       const token = localStorage.getItem("token")
       const data = {}
-      const url = `${Config.RootUrl}${states.AccountKey}/GetAllDateForDraw`
+      const url = `${Config.RootUrl}${states.AccountKey}/GetAllDateForDrawed`
       states.loading = true
       const d = await Fetch(url, data, 'GET', token)
       if (d.status == 0) {
@@ -206,7 +206,7 @@ export default defineComponent({
         limit: states.limit,
         date: states.CurrentDate
       }
-      const url = `${Config.RootUrl}${states.AccountKey}/AccountDrawDateList`
+      const url = `${Config.RootUrl}${states.AccountKey}/AccountDrawedDateList`
       states.loading = true
       const d = await Fetch(url, data, 'GET', token)
       if (d.status == 0) {
