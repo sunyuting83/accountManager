@@ -23,9 +23,9 @@ type Accounts struct {
 	Cold          int
 	Exptime       int64
 	Price         float64
-	Remarks       string
-	CreatedAt     int64 `gorm:"autoUpdateTime:milli"`
-	UpdatedAt     int64 `gorm:"autoUpdateTime:milli"`
+	Remarks       string `gorm:"column:remarks;type:longtext"`
+	CreatedAt     int64  `gorm:"autoUpdateTime:milli"`
+	UpdatedAt     int64  `gorm:"autoUpdateTime:milli"`
 }
 
 // Get Count
@@ -187,8 +187,17 @@ func GetDateTimeData(projectsID, statusList, GeType string) (re []string, err er
 	if GeType == "0" {
 		d = "created_at"
 	}
-	sql := "SELECT DISTINCT DATE(" + d + " / 1000 ,'unixepoch','localtime') FROM accounts WHERE projects_id = " + projectsID + " AND new_status IN (" + statusList + ") ORDER BY " + d + " DESC"
-	// fmt.Println(sql)
+	SQLStart := "SELECT DISTINCT DATE(" + d + " / 1000 ,'unixepoch','localtime') FROM accounts WHERE projects_id = "
+	if DBType == "pgsql" {
+		SQLStart = "SELECT DISTINCT to_char(to_timestamp(" + d + " / 1000) AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD') FROM accounts WHERE projects_id = "
+	}
+	if DBType == "mysql" {
+		SQLStart = "SELECT DISTINCT DATE_FORMAT(from_unixtime(" + d + ` / 1000) ,'%Y-%m-%d') FROM accounts WHERE projects_id = `
+	}
+	sql := SQLStart + projectsID + " AND new_status IN (" + statusList + ") ORDER BY " + d + " DESC"
+	if DBType == "pgsql" {
+		sql = SQLStart + projectsID + " AND new_status IN (" + statusList + ") ORDER BY to_char(to_timestamp(" + d + " / 1000) AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD') DESC"
+	}
 	re, err = RawQueryParseToMap(sqlDB, sql, d)
 	return
 }
@@ -198,8 +207,19 @@ func GetDateTimeDataDraw(projectsID, GeType string) (re []string, err error) {
 	if GeType == "0" {
 		d = "created_at"
 	}
-	sql := "SELECT DISTINCT DATE(" + d + " / 1000 ,'unixepoch','localtime') FROM accounts WHERE projects_id = " + projectsID + " AND new_status = 108 ORDER BY " + d + " DESC"
+	SQLStart := "SELECT DISTINCT DATE(" + d + " / 1000 ,'unixepoch','localtime') FROM accounts WHERE projects_id = "
+	if DBType == "pgsql" {
+		SQLStart = "SELECT DISTINCT to_char(to_timestamp(" + d + " / 1000) AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD') FROM accounts WHERE projects_id = "
+	}
+	if DBType == "mysql" {
+		SQLStart = "SELECT DISTINCT DATE_FORMAT(from_unixtime(" + d + ` / 1000) ,'%Y-%m-%d') FROM accounts WHERE projects_id = `
+	}
+	sql := SQLStart + projectsID + " AND new_status = 108 ORDER BY " + d + " DESC"
 	// fmt.Println(sql)
+
+	if DBType == "pgsql" {
+		sql = SQLStart + projectsID + " AND new_status = 108 ORDER BY to_char(to_timestamp(" + d + " / 1000) AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD') DESC"
+	}
 	re, err = RawQueryParseToMap(sqlDB, sql, d)
 	return
 }
@@ -249,14 +269,25 @@ func RawQueryParseToMap(db *gorm.DB, query, date string) ([]string, error) {
 	}
 	var l []string
 	//將byte array轉換為字串
+	DateFunction := "DATE(" + date + " / 1000 ,'unixepoch','localtime')"
+	if DBType == "pgsql" {
+		DateFunction = "to_char"
+	}
+	if DBType == "mysql" {
+		DateFunction = "DATE_FORMAT(from_unixtime(" + date + ` / 1000) ,'%Y-%m-%d')`
+	}
 	for index := range list {
 		for _, column := range columns {
-			if column == "DATE("+date+" / 1000 ,'unixepoch','localtime')" {
-				list[index][column] = list[index][column].(string)
+			if column == DateFunction {
+				// list[index][column] = list[index][column].(string)
+				// if DBType == "mysql" {
+				// 	l = append(l, string(list[index][column].([]uint8)))
+				// } else {
+				// 	l = append(l, list[index][column].(string))
+				// }
 				l = append(l, list[index][column].(string))
 			}
 		}
 	}
 	return l, nil
-
 }

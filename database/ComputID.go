@@ -5,9 +5,8 @@ type Comput struct {
 	UsersID    uint
 	ProjectsID uint
 	ComputCode string `gorm:"index"`
-	Accounts   []Accounts
-	CreatedAt  int64 `gorm:"autoUpdateTime:milli"`
-	UpdatedAt  int64 `gorm:"autoUpdateTime:milli"`
+	CreatedAt  int64  `gorm:"autoUpdateTime:milli"`
+	UpdatedAt  int64  `gorm:"autoUpdateTime:milli"`
 }
 
 // 新建后台 生成唯一码 写入Leveldb key 编码 value UsersID ProjectsID 通过唯一key生成url

@@ -6,12 +6,12 @@ type Projects struct {
 	ProjectsName string
 	UserName     string
 	Password     string
-	StatusJSON   string
-	NewStatus    int `gorm:"index"`
+	StatusJSON   string `gorm:"column:status_json;type:longtext"`
+	NewStatus    int    `gorm:"index"`
 	Accounts     []Accounts
 	Filed        []Filed
 	Key          string
-	Remarks      string
+	Remarks      string `gorm:"column:remarks;type:longtext"`
 	AccNumber    int
 	ColaAPI      bool
 	CreatedAt    int64 `gorm:"autoUpdateTime:milli"`

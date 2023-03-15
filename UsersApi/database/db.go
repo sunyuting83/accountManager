@@ -16,11 +16,13 @@ import (
 var (
 	Eloquent *sql.DB
 	sqlDB    *gorm.DB
+	DBType   string
 )
 
 // InitDB init db
 func InitDB(confYaml *utils.Config) {
 	GetDB(confYaml)
+	DBType = confYaml.Database.DBType
 	Eloquent, _ = sqlDB.DB()
 	Eloquent.SetMaxIdleConns(10)
 
