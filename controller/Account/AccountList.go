@@ -16,7 +16,7 @@ func AccountList(c *gin.Context) {
 	pageInt, _ := strconv.Atoi(page)
 	LimitInt, _ := strconv.Atoi(Limit)
 	var account *database.Accounts
-	count, err := account.GetCount(projectsID)
+	count, err := account.GetCount(projectsID, Status)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,

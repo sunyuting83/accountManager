@@ -23,9 +23,9 @@ type Accounts struct {
 	Cold          int
 	Exptime       int64
 	Price         float64
-	Remarks       string `gorm:"column:remarks;type:longtext"`
-	CreatedAt     int64  `gorm:"autoUpdateTime:milli"`
-	UpdatedAt     int64  `gorm:"autoUpdateTime:milli"`
+	Remarks       string
+	CreatedAt     int64 `gorm:"autoUpdateTime:milli"`
+	UpdatedAt     int64 `gorm:"autoUpdateTime:milli"`
 }
 
 // Get Count
