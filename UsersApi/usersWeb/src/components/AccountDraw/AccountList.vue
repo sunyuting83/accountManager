@@ -181,7 +181,7 @@
                     <button
                       class="button is-primary is-small"
                       :class="buttonLoading ? 'is-loading' : '' "
-                      :disabled="Filter.mingold > 0 ?false:true"
+                      :disabled="data.length > 0 && Filter.mingold > 0 ?false:true"
                       @click="pullSelectData">
                       按条件提取
                     </button>

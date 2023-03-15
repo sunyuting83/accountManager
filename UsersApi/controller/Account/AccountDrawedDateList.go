@@ -54,6 +54,9 @@ func AccountDrawedDateList(c *gin.Context) {
 		})
 		return
 	}
+	if len(dataList) == 0 {
+		dataList = make([]*database.Accounts, 0)
+	}
 
 	Data := gin.H{
 		"status":   0,

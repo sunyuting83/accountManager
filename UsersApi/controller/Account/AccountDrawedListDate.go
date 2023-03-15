@@ -18,6 +18,7 @@ func GetAllDateForAccountDrawed(c *gin.Context) {
 		})
 		return
 	}
+
 	dateList, err := database.GetDateTimeDataDraw(projectsID, "1")
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -25,6 +26,9 @@ func GetAllDateForAccountDrawed(c *gin.Context) {
 			"message": err.Error(),
 		})
 		return
+	}
+	if len(dateList) == 0 {
+		dateList = make([]string, 0)
 	}
 
 	Data := gin.H{

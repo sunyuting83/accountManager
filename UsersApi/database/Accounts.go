@@ -48,7 +48,7 @@ func (account *Accounts) GetInCount(ProjectsID string, statusList []string) (cou
 }
 
 // Account List
-func (account *Accounts) GetInList(ProjectsID string, statusList []string, page, Limit int) (accounts *[]Accounts, err error) {
+func (account *Accounts) GetInList(ProjectsID string, statusList []string, page, Limit int) (accounts []*Accounts, err error) {
 	p := makePage(page, Limit)
 	if err = sqlDB.
 		Where("projects_id = ? and new_status IN ?", ProjectsID, statusList).

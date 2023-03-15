@@ -42,7 +42,9 @@ func GetAllDateForAccountDraw(c *gin.Context) {
 		})
 		return
 	}
-
+	if len(dateList) == 0 {
+		dateList = make([]string, 0)
+	}
 	Data := gin.H{
 		"status":   0,
 		"dateList": dateList,
