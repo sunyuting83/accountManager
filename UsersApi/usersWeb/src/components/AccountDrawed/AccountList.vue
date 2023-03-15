@@ -31,13 +31,13 @@
                       class="button is-info"
                       :class="buttonLoading ? 'is-loading' : '' "
                       @click="pullData">
-                      导出本页到文本
+                      导出当前日期数据到文本
                     </button>
                     <button 
                       class="button is-success"
                       :class="buttonLoading ? 'is-loading' : '' "
                       @click="pullData">
-                      导出本页到Excel
+                      导出当前日期数据到Excel
                     </button>
                   </div>
                 </div>
