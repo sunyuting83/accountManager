@@ -38,7 +38,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1HasKey.PUT("/PullDrawSelect", utilsUser.UserVerifyMiddleware(), Account.PullAccountDrawSelect)
 		userApiV1HasKey.GET("/GetAllDateForDrawed", utilsUser.UserVerifyMiddleware(), Account.GetAllDateForAccountDrawed)
 		userApiV1HasKey.GET("/AccountDrawedDateList", utilsUser.UserVerifyMiddleware(), Account.AccountDrawedDateList)
+		userApiV1HasKey.GET("/ExportDrawed", utilsUser.UserVerifyMiddleware(), Account.ExportAccountDrawed)
 	}
-
 	return router
 }

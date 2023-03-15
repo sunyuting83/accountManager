@@ -174,8 +174,18 @@ func GetDatedInData(projectsID string, starTime, endTime int64, page, Limit int)
 	p := makePage(page, Limit)
 	if err = sqlDB.
 		Where("projects_id = ? AND new_status = ? AND updated_at >= ? AND updated_at <= ?", projectsID, "108", starTime, endTime).
-		Order("updated_at desc").
+		Order("today_gold desc").
 		Limit(Limit).Offset(p).
+		Find(&accounts).Error; err != nil {
+		return
+	}
+	return
+}
+
+func ExportAccountDrawed(projectsID string, starTime, endTime int64) (accounts []*Accounts, err error) {
+	if err = sqlDB.
+		Where("projects_id = ? AND new_status = ? AND updated_at >= ? AND updated_at <= ?", projectsID, "108", starTime, endTime).
+		Order("today_gold desc").
 		Find(&accounts).Error; err != nil {
 		return
 	}

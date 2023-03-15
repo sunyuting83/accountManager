@@ -22,11 +22,58 @@
               <LoadIng></LoadIng>
             </div>
             <div v-else>
+              <div class="field mt-5">
+                <div class="columns flex-wrap is-flex-wrap-wrap">
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <label class="checkbox mr-4">
+                      <input type="checkbox" v-model="multiple">
+                      炮台
+                    </label>
+                  </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <label class="checkbox mr-4">
+                      <input type="checkbox"  v-model="diamond">
+                      钻石
+                    </label>
+                  </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <label class="checkbox mr-4">
+                      <input type="checkbox"  v-model="crazy">
+                      狂暴
+                    </label>
+                  </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <label class="checkbox mr-4">
+                      <input type="checkbox"  v-model="cold">
+                      冰冻
+                    </label>
+                  </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <label class="checkbox mr-4">
+                      <input type="checkbox" v-model="precise">
+                      瞄准
+                    </label>
+                  </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <label class="checkbox mr-4">
+                      <input type="checkbox" v-model="remarks">
+                      其他
+                    </label>
+                  </div>
+                </div>
+              </div>
               <div class="columns flex-wrap is-justify-content-space-between mt-1">
                 <div class="field mr-3"></div>
                 <div class="field mr-3">
                   <div class="buttons is-horizontal are-small has-addons">
                     <span v-if="total !== 0" class="is-size-7 mr-3">帐号总数 <span class="has-text-danger ml-1">{{total}}</span></span>
+                    <DownloadFile 
+                      :uri="`${RootUrl}${AccountKey}/ExportDrawed`"
+                      styles="is-info"
+                      :status="CurrentStatus.status"
+                      :buttonLoading="buttonLoading"
+                      title="导出当前日期数据到文本"
+                      v-if="data.length > 0" />
                     <button 
                       class="button is-info"
                       :class="buttonLoading ? 'is-loading' : '' "
@@ -142,6 +189,12 @@ export default defineComponent({
       },
       pageLoading: false,
       limit: Config.Limit,
+      multiple: true,
+      diamond: false,
+      crazy: false,
+      cold: false,
+      precise: false,
+      remarks: false
     })
     const router = useRouter()
     onMounted(async() => {
