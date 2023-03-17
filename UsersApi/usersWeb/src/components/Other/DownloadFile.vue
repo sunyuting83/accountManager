@@ -27,16 +27,26 @@ export default defineComponent({
     styles:{
       type: String,
       default: ""
+    },
+    ext:{
+      type: String,
+      default: ".txt"
     }
   },
   setup(props) {
     const token = localStorage.getItem("token")
     const _this = props
     const url = _this.uri
-    const Data = _this.Data
-    console.log(token, url, Data)
+    let Data = _this.Data
+    const ext = _this.ext
     const ExportAccount = async() => {
-      const d = await Fetch(url, Data, 'GET', token, true)
+      let d
+      if (ext === "."){
+        d = await Fetch(url, Data, 'GET', token, true)
+      }else {
+        Data.excel = true
+        d = await Fetch(url, Data, 'GET', token, true, true)
+      }
       download(d)
     }
 
@@ -47,6 +57,7 @@ export default defineComponent({
         // const contentType = data.type
         // const fileName = contentType.split('filename=')[1]
         let url = window.URL.createObjectURL(new Blob([data]))
+        if (ext == ".xlsx") url = window.URL.createObjectURL(new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}))
         let link = document.createElement('a')
         link.style.display = 'none'
         link.href = url
@@ -58,7 +69,7 @@ export default defineComponent({
             h = date.getHours(),
             m = date.getMinutes(),
             s = date.getSeconds(),
-            fileName = `${String(Y)}${String(M)}${String(D)}${String(h)}${String(m)}${String(s)}.txt`
+            fileName = `${String(Y)}${String(M)}${String(D)}${String(h)}${String(m)}${String(s)}${ext}`
         // console.log(fileName)
         link.setAttribute('download', fileName)
         

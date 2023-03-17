@@ -73,13 +73,16 @@
                       :Data="form"
                       :buttonLoading="buttonLoading"
                       title="导出当前日期数据到文本"
+                      ext=".txt"
                       v-if="data.length > 0" />
-                    <button 
-                      class="button is-success"
-                      :class="buttonLoading ? 'is-loading' : '' "
-                      @click="pullData">
-                      导出当前日期数据到Excel
-                    </button>
+                    <DownloadFile 
+                      :uri="`${RootUrl}${AccountKey}/ExportDrawed`"
+                      styles="is-success"
+                      :Data="form"
+                      :buttonLoading="buttonLoading"
+                      title="导出当前日期数据到Excel"
+                      ext=".xlsx"
+                      v-if="data.length > 0" />
                   </div>
                 </div>
               </div>
@@ -192,7 +195,8 @@ export default defineComponent({
         crazy: false,
         cold: false,
         precise: false,
-        remarks: false
+        remarks: false,
+        excel: false,
       }
     })
     const router = useRouter()
@@ -219,20 +223,6 @@ export default defineComponent({
         router.push("/")
       }
     })
-
-    // const CleanData = () => {
-    //   states.data = []
-    //   states.temp = []
-    //   states.checkTemp = []
-    //   states.total = 0
-    //   states.page = []
-    //   states.projects = {}
-    //   states.CurrentDate= ""
-    //   states.dateList= []
-    //   states.pageLoading = true
-    //   states.loading = false
-    //   states.buttonLoading = false
-    // }
 
     const GetDate = async() => {
       const token = localStorage.getItem("token")
@@ -285,18 +275,6 @@ export default defineComponent({
       GetDateList()
     }
 
-    
-    /**
-     * 
-     * @param {*} e message用到的值
-     * @param {*} status 0默认不传参 1添加-加入列表 2锁定-替换列表值 3删除-filter值
-     */
-    const ShowMessage = (e) => {
-      states.openerr.active = e.active
-      states.openerr.message = e.message
-      states.openerr.color = e.color
-    }
-
     const backRouter = () => {
       router.push("/project")
     }
@@ -305,8 +283,7 @@ export default defineComponent({
       ...toRefs(states),
       backRouter,
       getDateData,
-      GetDateList,
-      ShowMessage
+      GetDateList
     }
   },
 })

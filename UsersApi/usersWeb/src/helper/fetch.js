@@ -1,4 +1,4 @@
-export default async (url = '', params = {}, method = 'GET', token = '', d = false) => {
+export default async (url = '', params = {}, method = 'GET', token = '', d = false, excel = false) => {
   method = method.toUpperCase()
   // 此处规定get请求的参数使用时放在data中，如同post请求
   if (method === 'GET') {
@@ -58,7 +58,11 @@ export default async (url = '', params = {}, method = 'GET', token = '', d = fal
       .then(res => {
         if(res.ok) {
           if (d) {
-            return res.text()
+            if (excel) {
+              return res.blob()
+            }else {
+              return res.text()
+            }
           }else {
             return res.json()
           }
