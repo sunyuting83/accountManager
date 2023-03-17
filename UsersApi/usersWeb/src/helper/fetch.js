@@ -1,4 +1,4 @@
-export default async (url = '', params = {}, method = 'GET', token = '') => {
+export default async (url = '', params = {}, method = 'GET', token = '', d = false) => {
   method = method.toUpperCase()
   // 此处规定get请求的参数使用时放在data中，如同post请求
   if (method === 'GET') {
@@ -15,6 +15,9 @@ export default async (url = '', params = {}, method = 'GET', token = '') => {
 
   let requestConfig = {
     method: method,
+  }
+  if (d) {
+    requestConfig['responseType'] = "blob"
   }
   // console.log(params)
   // console.log(Object.hasOwnProperty.call(params, "files"))
@@ -54,7 +57,11 @@ export default async (url = '', params = {}, method = 'GET', token = '') => {
     fetch(url, requestConfig)
       .then(res => {
         if(res.ok) {
-          return res.json()
+          if (d) {
+            return res.text()
+          }else {
+            return res.json()
+          }
         }else {
           resolve({
             status: 1,

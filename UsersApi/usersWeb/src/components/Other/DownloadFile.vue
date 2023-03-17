@@ -3,6 +3,7 @@
 </template>
 <script>
 import { defineComponent } from 'vue'
+import Fetch from '@/helper/fetch'
 
 export default defineComponent({
   name: 'DownloadFile',
@@ -11,9 +12,9 @@ export default defineComponent({
       type: String,
       default: ""
     },
-    status:{
-      type: String,
-      default: ""
+    Data:{
+      type: Object,
+      default: () => ({})
     },
     title:{
       type: String,
@@ -29,51 +30,16 @@ export default defineComponent({
     }
   },
   setup(props) {
+    const token = localStorage.getItem("token")
     const _this = props
     const url = _this.uri
-    const status = _this.status
+    const Data = _this.Data
+    console.log(token, url, Data)
     const ExportAccount = async() => {
-      const d = await exportFile()
+      const d = await Fetch(url, Data, 'GET', token, true)
       download(d)
     }
 
-    const exportFile = () => {
-      const token = localStorage.getItem("token")
-
-      let requestConfig = {
-        method: "put",
-        responseType: "blob"
-      }
-      Object.defineProperty(requestConfig, 'body', {
-          value: JSON.stringify({
-          status: status,
-        })
-      })
-      requestConfig.headers = new Headers({
-        Accept: '*/*',
-      })
-      requestConfig.headers.append("Content-Type","application/json;charset=UTF-8")
-      requestConfig.headers.append('Authorization',`Bearer ${token}`)
-      return new Promise((resolve) => {
-        fetch(url, requestConfig)
-          .then(res => {
-            if(res.ok) {
-              resolve(res.text())
-            }else {
-              resolve({
-                status: 1,
-                message: "访问出错"
-              })
-            }
-          })
-          .catch((err) => {
-            resolve({
-              status: 1,
-              message: err.message
-            })
-          })
-      })
-    }
     const download = (data) => {
         if (!data) {
             return

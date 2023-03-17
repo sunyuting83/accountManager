@@ -26,37 +26,37 @@
                 <div class="columns flex-wrap is-flex-wrap-wrap">
                   <div class="field is-horizontal ml-3 mr-2">
                     <label class="checkbox mr-4">
-                      <input type="checkbox" v-model="multiple">
+                      <input type="checkbox" v-model="form.multiple">
                       炮台
                     </label>
                   </div>
                   <div class="field is-horizontal ml-3 mr-2">
                     <label class="checkbox mr-4">
-                      <input type="checkbox"  v-model="diamond">
+                      <input type="checkbox"  v-model="form.diamond">
                       钻石
                     </label>
                   </div>
                   <div class="field is-horizontal ml-3 mr-2">
                     <label class="checkbox mr-4">
-                      <input type="checkbox"  v-model="crazy">
+                      <input type="checkbox"  v-model="form.crazy">
                       狂暴
                     </label>
                   </div>
                   <div class="field is-horizontal ml-3 mr-2">
                     <label class="checkbox mr-4">
-                      <input type="checkbox"  v-model="cold">
+                      <input type="checkbox"  v-model="form.cold">
                       冰冻
                     </label>
                   </div>
                   <div class="field is-horizontal ml-3 mr-2">
                     <label class="checkbox mr-4">
-                      <input type="checkbox" v-model="precise">
+                      <input type="checkbox" v-model="form.precise">
                       瞄准
                     </label>
                   </div>
                   <div class="field is-horizontal ml-3 mr-2">
                     <label class="checkbox mr-4">
-                      <input type="checkbox" v-model="remarks">
+                      <input type="checkbox" v-model="form.remarks">
                       其他
                     </label>
                   </div>
@@ -70,16 +70,10 @@
                     <DownloadFile 
                       :uri="`${RootUrl}${AccountKey}/ExportDrawed`"
                       styles="is-info"
-                      :status="CurrentStatus.status"
+                      :Data="form"
                       :buttonLoading="buttonLoading"
                       title="导出当前日期数据到文本"
                       v-if="data.length > 0" />
-                    <button 
-                      class="button is-info"
-                      :class="buttonLoading ? 'is-loading' : '' "
-                      @click="pullData">
-                      导出当前日期数据到文本
-                    </button>
                     <button 
                       class="button is-success"
                       :class="buttonLoading ? 'is-loading' : '' "
@@ -162,6 +156,7 @@ import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
 import FormaNumber from '@/components/Other/FormaNumber'
 import ExpTime from '@/components/Other/ExpTime'
+import DownloadFile from '@/components/Other/DownloadFile.vue'
 
 
 import Fetch from '@/helper/fetch'
@@ -170,9 +165,10 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'AccountList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime, DownloadFile },
   setup() {
     let states = reactive({
+      RootUrl: Config.RootUrl,
       AccountKey: "",
       projects: {},
       CurrentDate: "",
@@ -189,12 +185,15 @@ export default defineComponent({
       },
       pageLoading: false,
       limit: Config.Limit,
-      multiple: true,
-      diamond: false,
-      crazy: false,
-      cold: false,
-      precise: false,
-      remarks: false
+      form: {
+        date: "",
+        multiple: true,
+        diamond: false,
+        crazy: false,
+        cold: false,
+        precise: false,
+        remarks: false
+      }
     })
     const router = useRouter()
     onMounted(async() => {
@@ -209,6 +208,7 @@ export default defineComponent({
         const dlist = await GetDate()
         if (states.dateList.length > 0) {
           states.CurrentDate = dlist[0]
+          states.form.date = dlist[0]
           states.loading = false
           GetDateList()
         }else {
@@ -281,6 +281,7 @@ export default defineComponent({
 
     const getDateData = (date) => {
       states.CurrentDate = date
+      states.form.date = date
       GetDateList()
     }
 

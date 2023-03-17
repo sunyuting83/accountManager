@@ -10,12 +10,11 @@ import (
 )
 
 func ExportAccount(c *gin.Context) {
-	var form DeleteList
-	// This will infer what binder to use depending on the content-type header.
-	if err := c.ShouldBind(&form); err != nil {
+	var status string = c.Query("status")
+	if len(status) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  1,
-			"message": err.Error(),
+			"message": "错误的状态值",
 		})
 		return
 	}
@@ -39,7 +38,7 @@ func ExportAccount(c *gin.Context) {
 	)
 
 	for _, item := range statusJson {
-		if item.Status == form.Status {
+		if item.Status == status {
 			if item.Export {
 				hasPower = true
 				break
@@ -56,7 +55,7 @@ func ExportAccount(c *gin.Context) {
 	}
 
 	var account *database.Accounts
-	data, err := account.ExportAccount(projectsID, form.Status)
+	data, err := account.ExportAccount(projectsID, status)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  1,

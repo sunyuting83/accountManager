@@ -30,7 +30,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1HasKey.POST("/PostAccount", utilsUser.UserVerifyMiddleware(), Account.PostAccount)
 		userApiV1HasKey.DELETE("/DeleteAccount", utilsUser.UserVerifyMiddleware(), Account.DeleteAccount)
 		userApiV1HasKey.PUT("/GoBackAccount", utilsUser.UserVerifyMiddleware(), Account.GoBackAccount)
-		userApiV1HasKey.PUT("/ExportAccount", utilsUser.UserVerifyMiddleware(), Account.ExportAccount)
+		userApiV1HasKey.GET("/ExportAccount", utilsUser.UserVerifyMiddleware(), Account.ExportAccount)
 		userApiV1HasKey.GET("/AccountDrawList", utilsUser.UserVerifyMiddleware(), Account.AccountDrawList)
 		userApiV1HasKey.GET("/GetAllDateForDraw", utilsUser.UserVerifyMiddleware(), Account.GetAllDateForAccountDraw)
 		userApiV1HasKey.GET("/AccountDrawDateList", utilsUser.UserVerifyMiddleware(), Account.AccountDrawDateList)
