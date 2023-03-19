@@ -213,10 +213,11 @@ func AddAccount(url, oid string) bool {
 	respByte, _ := io.ReadAll(resp.Body)
 	var request *GetApiRequest
 	json.Unmarshal(respByte, &request)
+	status := true
 	if request.Status == 1 {
-		return false
+		status = false
 	}
-	return true
+	return status
 }
 
 // CheckConfig check config
