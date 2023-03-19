@@ -4,6 +4,7 @@ import (
 	"colaAPI/UsersApi/database"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -55,9 +56,9 @@ func GoBackAccount(c *gin.Context) {
 		})
 		return
 	}
-
+	backToStatusInt, _ := strconv.Atoi(backToStatus)
 	var account *database.Accounts
-	account.BackTo(projectsID, form.Status, backToStatus)
+	account.BackTo(projectsID, form.Status, backToStatusInt)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  0,
 		"message": "退回成功",

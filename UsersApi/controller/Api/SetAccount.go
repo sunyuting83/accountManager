@@ -5,6 +5,7 @@ import (
 	"colaAPI/UsersApi/database"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,6 +24,12 @@ func SetAccount(c *gin.Context) {
 		}
 		c.String(200, "帐号不能为空")
 		return
+	}
+	Path := c.Request.URL.Path
+	PathList := strings.Split(Path, "/")
+	Path = PathList[len(PathList)-1]
+	if len(Path) == 6 {
+		To = GetSavePath(Path)
 	}
 
 	var person Person
@@ -68,4 +75,18 @@ func SetAccount(c *gin.Context) {
 		return
 	}
 	c.String(200, "成功")
+}
+
+func GetSavePath(s string) (to string) {
+	switch s {
+	case "regonefinished":
+		to = "1"
+	case "playonefinished":
+		to = "4"
+	case "billionfinished":
+		to = "7"
+	case "banfinished":
+		to = "5"
+	}
+	return
 }

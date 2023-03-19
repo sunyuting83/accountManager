@@ -44,7 +44,7 @@
                   <DownloadFile 
                     :uri="`${RootUrl}${AccountKey}/ExportAccount`"
                     styles="is-warning is-light"
-                    :Data="{'status': CurrentStatus.status}"
+                    :Data="{'status': CurrentStatus.status, 'excel': false}"
                     :buttonLoading="buttonLoading"
                     :title="`导出${CurrentStatus.title}帐号`"
                     v-if="CurrentStatus.export && data.length > 0" />

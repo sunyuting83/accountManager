@@ -1,9 +1,7 @@
 package database
 
 type Comput struct {
-	ID         uint `gorm:"primaryKey"`
-	UsersID    uint
-	ProjectsID uint
+	ID         uint   `gorm:"primaryKey"`
 	ComputCode string `gorm:"index"`
 	CreatedAt  int64  `gorm:"autoUpdateTime:milli"`
 	UpdatedAt  int64  `gorm:"autoUpdateTime:milli"`

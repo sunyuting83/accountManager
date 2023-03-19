@@ -3,6 +3,7 @@ package router
 import (
 	"colaAPI/UsersApi/controller"
 	Account "colaAPI/UsersApi/controller/Account"
+	Api "colaAPI/UsersApi/controller/Api"
 	Projects "colaAPI/UsersApi/controller/Projects"
 	Users "colaAPI/UsersApi/controller/Users"
 	utilsUser "colaAPI/UsersApi/utils"
@@ -39,6 +40,15 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1HasKey.GET("/GetAllDateForDrawed", utilsUser.UserVerifyMiddleware(), Account.GetAllDateForAccountDrawed)
 		userApiV1HasKey.GET("/AccountDrawedDateList", utilsUser.UserVerifyMiddleware(), Account.AccountDrawedDateList)
 		userApiV1HasKey.GET("/ExportDrawed", utilsUser.UserVerifyMiddleware(), Account.ExportAccountDrawed)
+		userApiV1HasKey.GET("/GetOneAccount", Api.GetOneAccount)
+		userApiV1HasKey.GET("/findregone", Api.GetOneAccount)
+		userApiV1HasKey.GET("/getplayone", Api.GetOneAccount)
+		userApiV1HasKey.GET("/SetAccount", Api.SetAccount)
+		userApiV1HasKey.GET("/regonefinished", Api.SetAccount)
+		userApiV1HasKey.GET("/playonefinished", Api.SetAccount)
+		userApiV1HasKey.GET("/billionfinished", Api.SetAccount)
+		userApiV1HasKey.GET("/banfinished", Api.SetAccount)
+		userApiV1HasKey.GET("/BackToAccount", Api.BackToAccount)
 	}
 	return router
 }

@@ -1,6 +1,8 @@
 package database
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 )
 
@@ -53,7 +55,6 @@ func (account *Accounts) GetInList(ProjectsID string, statusList []string, page,
 	if err = sqlDB.
 		Where("projects_id = ? and new_status IN ?", ProjectsID, statusList).
 		Order("updated_at desc").
-		Order("updated_at desc").
 		Limit(Limit).Offset(p).
 		Find(&accounts).Error; err != nil {
 		return
@@ -100,13 +101,26 @@ func (accounts *Accounts) DeleteAll(projectid string, status string) {
 
 // Reset Password
 func (account *Accounts) AccountUpStatus(status string) {
+	fmt.Println(status)
 	sqlDB.Model(&account).Update("new_status", status)
 }
 
 // Reset Password
-func (account *Accounts) BackTo(projectsID, status, backToStatus string) {
+func (account *Accounts) AccountUpComput(comput uint) {
+	sqlDB.Model(&account).Update("comput_id", comput)
+}
+
+// Reset Password
+func (account *Accounts) BackTo(projectsID, status string, backToStatus int) {
 	sqlDB.Model(&account).
 		Where("projects_id = ? and new_status = ?", projectsID, status).
+		Updates(Accounts{ComputID: uint(0), NewStatus: backToStatus})
+}
+
+// Reset Password
+func (account *Accounts) BackToAcc(projectsID, status string, backToStatus int, comput uint) {
+	sqlDB.Model(&account).
+		Where("projects_id = ? and new_status = ? and comput_id = ?", projectsID, status, comput).
 		Update("new_status", backToStatus)
 }
 
@@ -231,6 +245,16 @@ func GetDateTimeDataDraw(projectsID, GeType string) (re []string, err error) {
 		sql = SQLStart + projectsID + " AND new_status = 108 ORDER BY to_char(to_timestamp(" + d + " / 1000) AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD') DESC"
 	}
 	re, err = RawQueryParseToMap(sqlDB, sql, d)
+	return
+}
+
+func GetOneAccount(ProjectsID, status string) (accounts *Accounts, err error) {
+	fmt.Println(status)
+	if err = sqlDB.
+		Where("projects_id = ? and new_status = ?", ProjectsID, status).
+		First(&accounts).Error; err != nil {
+		return
+	}
 	return
 }
 
