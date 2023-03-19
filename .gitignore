@@ -11,3 +11,5 @@ test/
 UsersApi/usersWeb/node_modules
 UsersApi/usersWeb/yarn.lock
 UsersApi/usersWeb/dist
+colaAPI/Client/cola.exe
+colaAPI/api.txt
