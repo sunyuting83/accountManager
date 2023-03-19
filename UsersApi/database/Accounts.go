@@ -37,8 +37,10 @@ func (accounts *Accounts) GetCount(ProjectsID, Status string) (count int64, err 
 	}
 	return
 }
+func (accounts *Accounts) AddAccount() {
+	sqlDB.Create(&accounts)
+}
 
-// Account List
 func (account *Accounts) GetInCount(ProjectsID string, statusList []string) (count int64, err error) {
 	if err = sqlDB.
 		Model(&account).
