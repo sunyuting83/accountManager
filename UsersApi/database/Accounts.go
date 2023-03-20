@@ -119,6 +119,12 @@ func (account *Accounts) BackTo(projectsID, status string, backToStatus int) {
 		Updates(Accounts{ComputID: uint(0), NewStatus: backToStatus})
 }
 
+func (account *Accounts) UpdataOneAccount(projectsID, username string, accounts Accounts) {
+	sqlDB.Model(&account).
+		Where("projects_id = ? and user_name = ?", projectsID, username).
+		Updates(accounts)
+}
+
 // Reset Password
 func (account *Accounts) BackToAcc(projectsID, status string, backToStatus int, comput uint) {
 	sqlDB.Model(&account).

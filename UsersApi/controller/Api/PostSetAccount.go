@@ -1,9 +1,7 @@
 package controller
 
 import (
-	"bytes"
-	"io"
-	"mime/multipart"
+	"colaAPI/UsersApi/database"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,9 +11,10 @@ import (
 )
 
 type PostAccount struct {
-	Account  string `form:"account" json:"account" xml:"account" binding:"required"`
+	Account  string `form:"account" json:"account" xml:"account"  binding:"required"`
 	Gold     string `form:"gold" json:"gold" xml:"gold"  binding:"required"`
 	Multiple string `form:"multiple" json:"multiple" xml:"multiple"`
+	Cover    string `form:"cover" json:"cover" xml:"cover"`
 	Diamond  string `form:"diamond" json:"diamond" xml:"diamond"`
 	Crazy    string `form:"crazy" json:"crazy" xml:"crazy"`
 	Cold     string `form:"cold" json:"cold" xml:"cold"`
@@ -41,17 +40,6 @@ func PostSetAccount(c *gin.Context) {
 		})
 		return
 	}
-
-	file, header, err := c.Request.FormFile("image")
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  0,
-			"message": "1上传文件失败",
-		})
-		return
-	}
-
-	b, _ := io.ReadAll(file)
 
 	var gold int64
 	if strings.Contains(form.Gold, "亿") {
@@ -91,28 +79,54 @@ func PostSetAccount(c *gin.Context) {
 		gold = n
 	}
 
-	c.String(200, "成功")
-}
+	Multiple, _ := strconv.ParseInt(form.Multiple, 10, 64)
+	Diamond, _ := strconv.Atoi(form.Diamond)
+	Crazy, _ := strconv.Atoi(form.Crazy)
+	Cold, _ := strconv.Atoi(form.Cold)
+	Precise, _ := strconv.Atoi(form.Precise)
 
-func postFile(file multipart.File) {
+	ExpTimeInt := strToDate(form.ExpTime)
+	projectsID, _ := GetProjectsID(c)
 
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, _ := writer.CreateFormFile("image", file)
-
-	io.Copy(part, file)
-	_ = writer.WriteField("name", gold)
-	writer.Close()
-
-	client := &http.Client{
-		Timeout: time.Duration(10 * time.Second),
+	account, err := database.CheckAccount(projectsID, form.Account)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": "帐号不存在",
+		})
+		return
 	}
-	req, _ := http.NewRequest("POST", "http://localhost:13005/set", body)
-	req.Header.Set("Accept", "*/*")
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	req.Header.Set("sec-ch-ua-platform", "Windows")
-	req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36")
-	resp, _ := client.Do(req)
-	defer resp.Body.Close()
-	// return nil
+	updata := database.Accounts{
+		Cover:     form.Cover,
+		TodayGold: gold,
+		Multiple:  Multiple,
+		Diamond:   Diamond,
+		Crazy:     Crazy,
+		Cold:      Cold,
+		Precise:   Precise,
+		Exptime:   ExpTimeInt,
+	}
+
+	timeobj := time.Unix(int64(account.UpdatedAt), 0)
+	olDate := timeobj.Format("20060102")
+	nowTime := time.Now()
+	timeStr := nowTime.Format("20060102")
+	if timeStr > olDate {
+		updata.YesterdayGold = account.TodayGold
+	}
+
+	account.UpdataOneAccount(projectsID, form.Account, updata)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  1,
+		"message": "上传文件成功",
+	})
+}
+func strToDate(date string) (d int64) {
+	var LOC, _ = time.LoadLocation("Asia/Shanghai")
+	res1, err := time.ParseInLocation("2006/01/02 15:04:05", date, LOC)
+	if err != nil {
+		return 0
+	}
+	return res1.Unix()
 }
