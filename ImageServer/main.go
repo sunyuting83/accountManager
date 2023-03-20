@@ -13,6 +13,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// SetConfigMiddleWare set config
+func SetConfigMiddleWare(SECRET_KEY string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("secret_key", SECRET_KEY)
+		c.Writer.Status()
+	}
+}
+
 func main() {
 	OS := runtime.GOOS
 	CurrentPath, _ := utils.GetCurrentPath()
@@ -27,6 +35,7 @@ func main() {
 	gin.SetMode(gin.DebugMode)
 	defer BadgerDB.BadgerDB.Close()
 	app := gin.Default()
+	app.Use(SetConfigMiddleWare(confYaml.SECRET_KEY))
 	app.MaxMultipartMemory = confYaml.FormMemory << 20
 	{
 		app.POST("/set", controller.SetImage)

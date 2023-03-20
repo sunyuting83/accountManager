@@ -36,7 +36,7 @@ func PostSetAccount(c *gin.Context) {
 	if len(form.Gold) <= 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status":  0,
-			"message": "haven't node",
+			"message": "haven't gold",
 		})
 		return
 	}

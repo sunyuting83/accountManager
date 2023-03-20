@@ -11,7 +11,9 @@ import (
 func SetImage(c *gin.Context) {
 	name := c.PostForm("name")
 	sk := c.PostForm("sk")
-	if sk != "Zq9efv8Ebs3DjKMriJeVfkShA7jHY4rm" {
+	secret_key, _ := c.Get("secret_key")
+	SECRET_KEY := secret_key.(string)
+	if sk != SECRET_KEY {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  0,
 			"message": "权限验证失败",
