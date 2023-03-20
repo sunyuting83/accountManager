@@ -15,7 +15,7 @@ func SetImage(c *gin.Context) {
 	SECRET_KEY := secret_key.(string)
 	if sk != SECRET_KEY {
 		c.JSON(http.StatusOK, gin.H{
-			"status":  0,
+			"status":  1,
 			"message": "权限验证失败",
 		})
 		return
@@ -23,7 +23,7 @@ func SetImage(c *gin.Context) {
 	file, _, err := c.Request.FormFile("image")
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"status":  0,
+			"status":  1,
 			"message": "上传文件失败",
 		})
 		return
@@ -32,5 +32,9 @@ func SetImage(c *gin.Context) {
 	b, _ := io.ReadAll(file)
 	var ttl int64 = 60 * 60 * 24 * 30 // ttl以秒为单位
 	BadgerDB.SetWithTTL([]byte(name), b, ttl)
-	c.String(200, "done")
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  0,
+		"message": "上传文件成功",
+	})
 }

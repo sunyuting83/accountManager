@@ -1,5 +1,6 @@
 const CROSUrl = 'https://crossorigin.me/'
 const RootU = 'http://localhost:13003'
+const IMGUri = 'http://localhost:13005/image/'
 const RootUrl = `${RootU}/api/v1/`
 const IndexUrl = `${CROSUrl}${RootUrl}`
 const Name = '帐号'
@@ -49,5 +50,6 @@ export default {
   makePopeData,
   RootU,
   Limit,
-  MakeAccountListUri
+  MakeAccountListUri,
+  IMGUri
 }

@@ -224,7 +224,7 @@
                   </tr>
                 </thead>
                 <tbody class="is-size-7">
-                  <tr v-for="(item, index) in data" :key="item.ID">
+                  <tr v-for="(item, index) in data" :key="item.ID" class="hasimg">
                     <td>
                       <label class="checkbox">
                         <input type="checkbox" v-model="item.check" @click="(e)=>checkBox(e,item.ID)">
@@ -243,7 +243,12 @@
                     <td v-if="item.Price.length > 0">{{item.Price}}</td>
                     <td><ExpTime :DateTime="item.Exptime" /></td>
                     <td><FormaTime :DateTime="item.CreatedAt" /></td>
-                    <td><FormaTime :DateTime="item.UpdatedAt" /></td>
+                    <td class="potd">
+                      <FormaTime :DateTime="item.UpdatedAt" />
+                      <div v-if="item.Cover.length > 0" class="poimg">
+                        <img :src="IMGUri+item.Cover" />
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -308,7 +313,8 @@ export default defineComponent({
         crazy: 0,
         cold: 0,
         precise: 0,
-      }
+      },
+      IMGUri: Config.IMGUri
     })
     const Reload = inject('reload')
     const router = useRouter()
@@ -597,5 +603,16 @@ export default defineComponent({
 .w165 {
   min-width: 100px;
   max-width: 140px;
+}
+.hasimg .potd .poimg {
+  position: absolute;
+  right: 0;
+  min-width: 570px;
+  min-height: 76px;
+  display: none;
+  z-index: 10000;
+}
+.hasimg:hover .potd .poimg {
+  display: block;
 }
 </style>

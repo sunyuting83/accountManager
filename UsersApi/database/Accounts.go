@@ -56,7 +56,7 @@ func (account *Accounts) GetInList(ProjectsID string, statusList []string, page,
 	p := makePage(page, Limit)
 	if err = sqlDB.
 		Where("projects_id = ? and new_status IN ?", ProjectsID, statusList).
-		Order("updated_at desc").
+		Order("today_gold DESC").
 		Limit(Limit).Offset(p).
 		Find(&accounts).Error; err != nil {
 		return
@@ -115,12 +115,15 @@ func (account *Accounts) AccountUpComput(comput uint) {
 // Reset Password
 func (account *Accounts) BackTo(projectsID, status string, backToStatus int) {
 	sqlDB.Model(&account).
+		Select("comput_id", "new_status", "updated_at").
 		Where("projects_id = ? and new_status = ?", projectsID, status).
 		Updates(Accounts{ComputID: uint(0), NewStatus: backToStatus})
 }
 
-func (account *Accounts) UpdataOneAccount(projectsID, username string, accounts Accounts) {
+func (account *Accounts) UpdataOneAccount(projectsID, username string, accounts map[string]interface{}) {
 	sqlDB.Model(&account).
+		Omit("created_at").
+		Select("cover", "today_gold", "multiple", "diamond", "crazy", "cold", "precise", "exptime", "updated_at", "yesterday_gold").
 		Where("projects_id = ? and user_name = ?", projectsID, username).
 		Updates(accounts)
 }
@@ -174,7 +177,7 @@ func GetDateInData(projectsID string, statusList []string, starTime, endTime int
 	p := makePage(page, Limit)
 	if err = sqlDB.
 		Where("projects_id = ? AND new_status IN ? AND updated_at >= ? AND updated_at <= ?", projectsID, statusList, starTime, endTime).
-		Order("updated_at desc").
+		Order("today_gold desc").
 		Limit(Limit).Offset(p).
 		Find(&accounts).Error; err != nil {
 		return

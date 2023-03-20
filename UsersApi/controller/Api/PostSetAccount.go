@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,6 +23,18 @@ type PostAccount struct {
 	ExpTime  string `form:"exptime" json:"exptime" xml:"exptime"`
 }
 
+type SqlData struct {
+	Cover         string `json:"cover" structs:"cover"`
+	TodayGold     int64  `json:"today_gold" structs:"today_gold"`
+	Multiple      int64  `json:"multiple" structs:"multiple"`
+	Diamond       int    `json:"diamond" structs:"diamond"`
+	Crazy         int    `json:"crazy" structs:"crazy"`
+	Cold          int    `json:"cold" structs:"cold"`
+	Precise       int    `json:"precise" structs:"precise"`
+	Exptime       int64  `json:"exptime" structs:"exptime"`
+	YesterdayGold int64  `json:"yesterday_gold" structs:"yesterday_gold"`
+}
+
 func PostSetAccount(c *gin.Context) {
 
 	var form PostAccount
@@ -35,7 +48,7 @@ func PostSetAccount(c *gin.Context) {
 	}
 	if len(form.Gold) <= 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  0,
+			"status":  1,
 			"message": "haven't gold",
 		})
 		return
@@ -96,7 +109,8 @@ func PostSetAccount(c *gin.Context) {
 		})
 		return
 	}
-	updata := database.Accounts{
+
+	updata := &SqlData{
 		Cover:     form.Cover,
 		TodayGold: gold,
 		Multiple:  Multiple,
@@ -115,10 +129,11 @@ func PostSetAccount(c *gin.Context) {
 		updata.YesterdayGold = account.TodayGold
 	}
 
-	account.UpdataOneAccount(projectsID, form.Account, updata)
+	updataMAP := structs.Map(&updata)
+	account.UpdataOneAccount(projectsID, form.Account, updataMAP)
 
 	c.JSON(http.StatusOK, gin.H{
-		"status":  1,
+		"status":  0,
 		"message": "上传文件成功",
 	})
 }

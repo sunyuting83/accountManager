@@ -22,7 +22,7 @@
               <LoadIng></LoadIng>
             </div>
             <div v-else>
-              <div class="field mt-5">
+              <div class="field mt-5" v-if="data.length > 0">
                 <div class="columns flex-wrap is-flex-wrap-wrap">
                   <div class="field is-horizontal ml-3 mr-2">
                     <label class="checkbox mr-4">
@@ -119,7 +119,7 @@
                   </tr>
                 </thead>
                 <tbody class="is-size-7">
-                  <tr v-for="(item, index) in data" :key="item.ID">
+                  <tr v-for="(item, index) in data" :key="item.ID" class="hasimg">
                     <td>{{index + 1}}</td>
                     <td>{{item.UserName}}</td>
                     <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
@@ -133,7 +133,12 @@
                     <td v-if="item.Price.length > 0">{{item.Price}}</td>
                     <td><ExpTime :DateTime="item.Exptime" /></td>
                     <td><FormaTime :DateTime="item.CreatedAt" /></td>
-                    <td><FormaTime :DateTime="item.UpdatedAt" /></td>
+                    <td class="potd">
+                      <FormaTime :DateTime="item.UpdatedAt" />
+                      <div v-if="item.Cover.length > 0" class="poimg">
+                        <img :src="IMGUri+item.Cover" />
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -197,7 +202,8 @@ export default defineComponent({
         precise: false,
         remarks: false,
         excel: false,
-      }
+      },
+      IMGUri: Config.IMGUri,
     })
     const router = useRouter()
     onMounted(async() => {
@@ -295,5 +301,17 @@ export default defineComponent({
 .w165 {
   min-width: 100px;
   max-width: 140px;
+}
+
+.hasimg .potd .poimg {
+  position: absolute;
+  right: 0;
+  min-width: 570px;
+  min-height: 76px;
+  display: none;
+  z-index: 10000;
+}
+.hasimg:hover .potd .poimg {
+  display: block;
 }
 </style>
