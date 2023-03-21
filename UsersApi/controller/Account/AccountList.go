@@ -16,6 +16,7 @@ type Person struct {
 type CacheValue struct {
 	UsersID    string `json:"UsersID"`
 	ProjectsID string `json:"ProjectsID"`
+	ColaAPI    bool   `json:"ColaAPI"`
 }
 
 func AccountList(c *gin.Context) {

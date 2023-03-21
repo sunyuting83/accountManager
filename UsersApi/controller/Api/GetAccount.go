@@ -26,6 +26,7 @@ func GetOneAccount(c *gin.Context) {
 		computid string = c.Query("computid")
 		status   string = c.Query("status")
 		to       string = c.Query("to")
+		gameid   string = c.Query("gameid")
 		IsJson   string = c.DefaultQuery("json", "0")
 		splitStr string = c.DefaultQuery("splitStr", "----")
 	)
@@ -34,6 +35,10 @@ func GetOneAccount(c *gin.Context) {
 	Path = PathList[len(PathList)-1]
 	if strings.Contains(Path, "one") {
 		status, to = GetPath(Path)
+	}
+	if gameid == "14e7110dd307" {
+		status = "8"
+		to = "9"
 	}
 	if len(status) == 0 {
 		if IsJson == "1" {

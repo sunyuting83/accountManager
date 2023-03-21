@@ -1,7 +1,9 @@
 package controller
 
 import (
+	Redis "colaAPI/Redis"
 	"colaAPI/UsersApi/database"
+	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +27,23 @@ func PullAccountDrawList(c *gin.Context) {
 		var acc *database.Accounts
 
 		acc.PullDataUseIn(form.List)
-
+		projectsID, ColaAPI := GetProjects(c)
+		if ColaAPI {
+			Projects, err := database.ProjectsCheckID(projectsID)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"status":  1,
+					"message": err.Error(),
+				})
+				return
+			}
+			Projects = &database.Projects{
+				UserName:  Projects.UserName,
+				Password:  Projects.Password,
+				AccNumber: Projects.AccNumber - len(tempList),
+			}
+			Projects.UpdateProjects(projectsID)
+		}
 		Data := gin.H{
 			"status":  0,
 			"message": "提取成功",
@@ -53,6 +71,25 @@ func RemoveRepeatedList(personList []int) (result []int) {
 		if !repeat && personList[i] != 0 {
 			result = append(result, personList[i])
 		}
+	}
+	return
+}
+
+func GetProjects(c *gin.Context) (projectsID string, ColaAPI bool) {
+	var person Person
+	if err := c.ShouldBindUri(&person); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": err.Error(),
+		})
+		return
+	}
+	var result *CacheValue
+	has := Redis.Get(person.Key)
+	if len(has) != 0 {
+		json.Unmarshal([]byte(has), &result)
+		projectsID = result.ProjectsID
+		ColaAPI = result.ColaAPI
 	}
 	return
 }

@@ -159,8 +159,10 @@ func (account *Accounts) PullDataUseIn(IDs []int) {
 		Update("new_status", "108")
 }
 
-func (account *Accounts) PullDataUseSQL(SQL string) {
-	sqlDB.Exec(SQL)
+func (account *Accounts) PullDataUseSQL(SQL string) (rows int64) {
+	db := sqlDB.Exec(SQL)
+	rows = db.RowsAffected
+	return
 }
 
 func (account *Accounts) GetDateInCount(projectsID string, statusList []string, starTime, endTime int64) (count int64, err error) {

@@ -3,7 +3,6 @@ package controller
 import (
 	"colaAPI/UsersApi/database"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -31,7 +30,7 @@ func PullAccountDrawSelect(c *gin.Context) {
 		return
 	}
 
-	projectsID := GetProjectsID(c)
+	projectsID, ColaAPI := GetProjects(c)
 
 	Projects, err := database.ProjectsCheckID(projectsID)
 	if err != nil {
@@ -55,10 +54,19 @@ func PullAccountDrawSelect(c *gin.Context) {
 	hasStatusStr := strings.Join(hasStatus, ",")
 
 	SQL := MakeSelectSQL(form, hasStatusStr)
-	fmt.Println(SQL)
+	// fmt.Println(SQL)
 	var acc *database.Accounts
 
-	acc.PullDataUseSQL(SQL)
+	rows := acc.PullDataUseSQL(SQL)
+
+	if ColaAPI {
+		Projects = &database.Projects{
+			UserName:  Projects.UserName,
+			Password:  Projects.Password,
+			AccNumber: Projects.AccNumber - int(rows),
+		}
+		Projects.UpdateProjects(projectsID)
+	}
 
 	Data := gin.H{
 		"status":  0,
