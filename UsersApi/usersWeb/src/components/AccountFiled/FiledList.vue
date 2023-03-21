@@ -22,25 +22,7 @@
               <LoadIng></LoadIng>
             </div>
             <div v-else>
-              <div class="columns flex-wrap is-justify-content-space-between mt-1">
-                <div class="field mr-3">
-                  
-                </div>
-                <div class="field mr-3">
-                  <div class="buttons is-horizontal are-small has-addons">
-                    <span v-if="data.length !== 0" class="is-size-7 mr-3">帐号总数 <span class="has-text-danger ml-1">{{data.length}}</span></span>
-                    <DownloadFile 
-                      :uri="`${RootUrl}${AccountKey}/ExportDrawed`"
-                      styles="is-info"
-                      :Data="form"
-                      :buttonLoading="buttonLoading"
-                      title="导出当前日期数据到文本"
-                      ext=".txt"
-                      v-if="data.length > 0" />
-                  </div>
-                </div>
-              </div>
-              <div class="buttons are-small has-addons" v-if="dateList.length > 0">
+              <div class="buttons are-small has-addons mt-1" v-if="dateList.length > 0">
                 <button
                   class="button is-info is-light"
                   v-for="(item,index) in dateList"
