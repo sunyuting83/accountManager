@@ -4,6 +4,7 @@ import ProjectList from '@/components/Project/ProjectList'
 import AccountList from '@/components/Account/AccountList'
 import AccountDraw from '@/components/AccountDraw/AccountList'
 import AccountDrawed from '@/components/AccountDrawed/AccountList'
+import AccountFiled from '@/components/AccountFiled/FiledList'
 
 const routerHistory = createWebHistory()
 
@@ -32,6 +33,11 @@ const constantRoutes = [
     path: '/accountDrawed/:key',
     name: 'accountDrawed',
     component: AccountDrawed
+  },
+  {
+    path: '/accountFiled/:key',
+    name: 'accountFiled',
+    component: AccountFiled
   }
 ]
 

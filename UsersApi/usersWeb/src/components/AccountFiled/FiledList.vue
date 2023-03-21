@@ -5,7 +5,7 @@
       <div class="card events-card">
         <header class="card-header">
           <p class="card-header-title">
-            项目名称：{{projects.ProjectsName}} --- 已提取帐号管理
+            项目名称：{{projects.ProjectsName}} --- 归档管理
           </p>
           <button class="card-header-icon">
             <button class="button is-link is-small" @click="backRouter">
@@ -22,53 +22,13 @@
               <LoadIng></LoadIng>
             </div>
             <div v-else>
-              <div class="field mt-5" v-if="data.length > 0">
-                <div class="columns  flex-wrap is-justify-content-space-between">
-                  <div class="field is-horizontal ml-3 mr-2">
-                    <label class="checkbox mr-4">
-                      <input type="checkbox" v-model="form.multiple">
-                      炮台
-                    </label>
-                  </div>
-                  <div class="field is-horizontal ml-3 mr-2">
-                    <label class="checkbox mr-4">
-                      <input type="checkbox"  v-model="form.diamond">
-                      钻石
-                    </label>
-                  </div>
-                  <div class="field is-horizontal ml-3 mr-2">
-                    <label class="checkbox mr-4">
-                      <input type="checkbox"  v-model="form.crazy">
-                      狂暴
-                    </label>
-                  </div>
-                  <div class="field is-horizontal ml-3 mr-2">
-                    <label class="checkbox mr-4">
-                      <input type="checkbox"  v-model="form.cold">
-                      冰冻
-                    </label>
-                  </div>
-                  <div class="field is-horizontal ml-3 mr-2">
-                    <label class="checkbox mr-4">
-                      <input type="checkbox" v-model="form.precise">
-                      瞄准
-                    </label>
-                  </div>
-                  <div class="field is-horizontal ml-3 mr-2">
-                    <label class="checkbox mr-4">
-                      <input type="checkbox" v-model="form.remarks">
-                      其他
-                    </label>
-                  </div>
-                </div>
-              </div>
               <div class="columns flex-wrap is-justify-content-space-between mt-1">
                 <div class="field mr-3">
-                  <button class="button is-dark is-small" @click="showAccountFiled">查看归档</button>
+                  
                 </div>
                 <div class="field mr-3">
                   <div class="buttons is-horizontal are-small has-addons">
-                    <span v-if="total !== 0" class="is-size-7 mr-3">帐号总数 <span class="has-text-danger ml-1">{{total}}</span></span>
+                    <span v-if="data.length !== 0" class="is-size-7 mr-3">帐号总数 <span class="has-text-danger ml-1">{{data.length}}</span></span>
                     <DownloadFile 
                       :uri="`${RootUrl}${AccountKey}/ExportDrawed`"
                       styles="is-info"
@@ -76,14 +36,6 @@
                       :buttonLoading="buttonLoading"
                       title="导出当前日期数据到文本"
                       ext=".txt"
-                      v-if="data.length > 0" />
-                    <DownloadFile 
-                      :uri="`${RootUrl}${AccountKey}/ExportDrawed`"
-                      styles="is-success"
-                      :Data="form"
-                      :buttonLoading="buttonLoading"
-                      title="导出当前日期数据到Excel"
-                      ext=".xlsx"
                       v-if="data.length > 0" />
                   </div>
                 </div>
@@ -93,9 +45,9 @@
                   class="button is-info is-light"
                   v-for="(item,index) in dateList"
                   :key="index"
-                  :disabled="CurrentDate == item ? true : false"
-                  @click="()=>{getDateData(item)}">
-                  {{item}}
+                  :disabled="CurrentDate == item.FiledName ? true : false"
+                  @click="()=>{getDateData(item.FiledName)}">
+                  {{item.FiledName}}
                 </button>
               </div>
               <div v-if="data.length <= 0">
@@ -174,7 +126,7 @@ import CheckLogin from '@/helper/checkLogin'
 import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
-  name: 'AccountList',
+  name: 'FiledList',
   components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime, DownloadFile },
   setup() {
     let states = reactive({
@@ -219,10 +171,8 @@ export default defineComponent({
         
         const dlist = await GetDate()
         if (states.dateList.length > 0) {
-          states.CurrentDate = dlist[0]
-          states.form.date = dlist[0]
+          states.CurrentDate = dlist[0].FiledName
           states.loading = false
-          GetDateList()
         }else {
           states.loading = false
         }
@@ -235,11 +185,12 @@ export default defineComponent({
     const GetDate = async() => {
       const token = localStorage.getItem("token")
       const data = {}
-      const url = `${Config.RootUrl}${states.AccountKey}/GetAllDateForDrawed`
+      const url = `${Config.RootUrl}${states.AccountKey}/GetFiledList`
       states.loading = true
       const d = await Fetch(url, data, 'GET', token)
       if (d.status == 0) {
         states.dateList = d.dateList
+        states.data = d.data
         return d.dateList
       }else{
         states.data = []
@@ -250,20 +201,17 @@ export default defineComponent({
       }
     }
 
-    const GetDateList = async(page = 1) => {
+    const GetDateList = async() => {
       const token = localStorage.getItem("token")
       const data = {
-        page:page, 
-        limit: states.limit,
         date: states.CurrentDate
       }
-      const url = `${Config.RootUrl}${states.AccountKey}/AccountDrawedDateList`
+      const url = `${Config.RootUrl}${states.AccountKey}/GetOneFiled`
       states.loading = true
       const d = await Fetch(url, data, 'GET', token)
       if (d.status == 0) {
         states.data = d.data
         states.temp = d.data
-        states.total = d.total
         states.projects = d.projects
         states.pageLoading = true
         states.loading = false
@@ -284,19 +232,14 @@ export default defineComponent({
     }
 
     const backRouter = () => {
-      router.push("/project")
-    }
-
-    const showAccountFiled = () => {
-      router.push(`/accountFiled/${states.AccountKey}`)
+      router.push(`/accountDrawed/${states.AccountKey}`)
     }
 
     return {
       ...toRefs(states),
       backRouter,
       getDateData,
-      GetDateList,
-      showAccountFiled
+      GetDateList
     }
   },
 })

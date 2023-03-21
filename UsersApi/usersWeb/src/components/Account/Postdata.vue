@@ -14,7 +14,7 @@
                 <span class="icon has-text-danger">
                   <i class="fa fa-exclamation-triangle"></i>
                 </span>
-                <span>点击{{shownote?'查看':'关闭'}}导入说明</span>
+                <span>点击{{shownote?'关闭':'查看'}}导入说明</span>
               </div>
               <p class="block" v-if="shownote">
                 上传过程中不要关闭页面，并耐心等待<br />

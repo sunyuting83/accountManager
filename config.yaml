@@ -2,19 +2,20 @@ port: "13002"
 SECRET_KEY: Zq9efv8Ebs3DjKMriJeVfkShA7jHY4rm
 AdminPWD: 9r3rfQtagJAG
 FormMemory: 256
+FiledSize: 20
 Database:
   Username: acc_manage
   Password: aaa123123
   DBType: pgsql
-  DBHost: localhost
+  DBHost: 192.168.1.90
   DBProt: "5432"
   DBName: acc_manage
 UsersApi:
   port: "13003"
   SECRET_KEY: NAsUng5HdjVwMuppRSofRppf7xnPm62y
 Redis:
-  Host: localhost:6379
-  Password: 3SuLc0VvzLJm
+  Host: 192.168.1.90:6379
+  Password: zH05aXvMzFpy8vDY
   DB: 1
 ImageServer:
   Host: localhost:13005
