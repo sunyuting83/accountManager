@@ -32,7 +32,7 @@ func GetOneAccount(c *gin.Context) {
 	Path := c.Request.URL.Path
 	PathList := strings.Split(Path, "/")
 	Path = PathList[len(PathList)-1]
-	if len(Path) == 6 {
+	if strings.Contains(Path, "one") {
 		status, to = GetPath(Path)
 	}
 	if len(status) == 0 {
@@ -87,7 +87,7 @@ func GetOneAccount(c *gin.Context) {
 			return
 		}
 		token, err := BadgerDB.Get([]byte(projectsID + ".token"))
-		if err != nil && err.Error() != "Key not found" {
+		if err != nil && err.Error() == "Key not found" {
 			token, err = colaapi.Login(Projects.UserName, Projects.Password)
 			if err != nil {
 				if IsJson == "1" {
@@ -100,7 +100,7 @@ func GetOneAccount(c *gin.Context) {
 				c.String(200, "获取失败")
 				return
 			}
-			BadgerDB.Set([]byte(projectsID+".token"), []byte(token))
+			BadgerDB.SetWithTTL([]byte(projectsID+".token"), []byte(token), 60*60*24)
 		}
 		AccountNumber, APIStatus, err := colaapi.GetOrderListNumber(token)
 		if err != nil {
@@ -127,7 +127,7 @@ func GetOneAccount(c *gin.Context) {
 				c.String(200, "获取失败")
 				return
 			}
-			BadgerDB.Set([]byte(projectsID+".token"), []byte(token))
+			BadgerDB.SetWithTTL([]byte(projectsID+".token"), []byte(token), 60*60*24)
 			AccountNumber, _, err = colaapi.GetOrderListNumber(token)
 			if err != nil {
 				if IsJson == "1" {

@@ -17,6 +17,7 @@ func AddAccount(c *gin.Context) {
 		account := &database.Accounts{
 			ProjectsID: uint(projectsInt),
 			UserName:   Account,
+			NewStatus:  3,
 		}
 		account.AddAccount()
 		c.JSON(http.StatusOK, gin.H{

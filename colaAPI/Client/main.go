@@ -13,6 +13,9 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode"
@@ -20,7 +23,7 @@ import (
 )
 
 type Config struct {
-	APIServer string `yaml:"Host"`
+	APIServer string `yaml:"APIServer"`
 }
 
 type GetApiRequest struct {
@@ -84,18 +87,19 @@ func main() {
 	}
 	token, err := GetToken(confYaml.APIServer)
 	if err != nil {
-		fmt.Println("1")
+		// fmt.Println(err)
+		fmt.Println("1,e")
 		return
 	}
 	qrurl, err := GetPaymentStr(f)
 	if err != nil {
-		fmt.Println("1")
+		fmt.Println("1,e")
 		return
 	}
 	if s == "1" {
 		status, orderID := CreateOrder(token, qrurl)
 		if !status {
-			fmt.Println("1")
+			fmt.Println("1,e")
 			return
 		}
 		var s bool = false
@@ -107,24 +111,23 @@ func main() {
 			time.Sleep(500)
 		}
 		if s {
-			fmt.Println("0")
+			fmt.Println("0,"+orderID)
 			return
 		}
 	}
 	if a != "0" {
 		status := TowOrder(token, qrurl, a)
 		if !status {
-			fmt.Println("1")
+			fmt.Println("1,e")
 			return
 		}
-		fmt.Println("0")
+		fmt.Println("0,o")
 		return
 	}
-	fmt.Println("1")
 }
 
 func TowOrder(token, uri, a string) (status bool) {
-	Params := strings.Join([]string{"and_id=2&o_id", a, "&url=", uri}, "")
+	Params := strings.Join([]string{"and_id=2&o_id=", a, "&url=", uri}, "")
 	URL := "http://tiancaiapi.tablecando.cn/api/Order/twoauth"
 	req, _ := http.NewRequest("POST", URL, strings.NewReader(Params))
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
@@ -142,14 +145,14 @@ func TowOrder(token, uri, a string) (status bool) {
 	var request *TwoAuthRequest
 	json.Unmarshal(respByte, &request)
 	status = false
-	if request.Status == 200 {
+	if request.Status == 205 {
 		status = true
 	}
 	return
 }
 
 func CreateOrder(token, uri string) (status bool, orderid string) {
-	Params := strings.Join([]string{"type=99&projectid=2068&url", uri}, "")
+	Params := strings.Join([]string{"type=99&projectid=2068&url=", uri}, "")
 	URL := "http://tiancaiapi.tablecando.cn/api/Order/CreateOrder"
 	req, _ := http.NewRequest("POST", URL, strings.NewReader(Params))
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
@@ -160,6 +163,7 @@ func CreateOrder(token, uri string) (status bool, orderid string) {
 
 	resp, err := (&http.Client{Timeout: 35 * time.Second}).Do(req)
 	if err != nil {
+		// fmt.Println(err)
 		return false, ""
 	}
 	defer resp.Body.Close()
@@ -168,6 +172,7 @@ func CreateOrder(token, uri string) (status bool, orderid string) {
 	json.Unmarshal(respByte, &request)
 	status = false
 	orderid = ""
+	// fmt.Println(request)
 	if request.Status == 200 {
 		status = true
 		orderid = request.Data.Order.ID
@@ -177,6 +182,7 @@ func CreateOrder(token, uri string) (status bool, orderid string) {
 
 func GetToken(url string) (token string, err error) {
 	URL := strings.Join([]string{url, "GetColaToken"}, "/")
+	// fmt.Println(URL)
 	req, _ := http.NewRequest("GET", URL, nil)
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -189,7 +195,7 @@ func GetToken(url string) (token string, err error) {
 	}
 	defer resp.Body.Close()
 	respByte, _ := io.ReadAll(resp.Body)
-	var request *GetApiRequest
+	var request GetApiRequest
 	json.Unmarshal(respByte, &request)
 	if request.Status == 1 {
 		return "", errors.New(request.Message)
@@ -198,7 +204,9 @@ func GetToken(url string) (token string, err error) {
 }
 
 func AddAccount(url, oid string) bool {
-	URL := strings.Join([]string{url, "AddAccount?account=", oid}, "/")
+	URL := strings.Join([]string{url, "AddAccount?account="}, "/")
+	URL = strings.Join([]string{URL, oid}, "")
+	// fmt.Println(URL)
 	req, _ := http.NewRequest("GET", URL, nil)
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -211,7 +219,7 @@ func AddAccount(url, oid string) bool {
 	}
 	defer resp.Body.Close()
 	respByte, _ := io.ReadAll(resp.Body)
-	var request *GetApiRequest
+	var request GetApiRequest
 	json.Unmarshal(respByte, &request)
 	status := true
 	if request.Status == 1 {
@@ -253,11 +261,13 @@ func GetCurrentPath() (string, error) {
 func GetPaymentStr(fi string) (paymentCodeUrl string, err error) {
 	file, err := os.Open(fi)
 	if err != nil {
+		fmt.Println("a"+err.Error())
 		return "", err
 	}
 	defer file.Close()
 	img, _, err := image.Decode(file)
 	if err != nil {
+		fmt.Println("b"+err.Error())
 		return "", err
 	}
 	// prepare BinaryBitmap
@@ -266,8 +276,9 @@ func GetPaymentStr(fi string) (paymentCodeUrl string, err error) {
 	qrReader := qrcode.NewQRCodeReader()
 	result, err := qrReader.Decode(bmp, nil)
 	if err != nil {
+		fmt.Println("c"+err.Error())
 		return "", err
 	}
 	// fmt.Println(result.String())
-	return result.String(), err
+	return result.String(), nil
 }

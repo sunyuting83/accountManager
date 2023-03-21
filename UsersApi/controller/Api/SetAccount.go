@@ -28,7 +28,7 @@ func SetAccount(c *gin.Context) {
 	Path := c.Request.URL.Path
 	PathList := strings.Split(Path, "/")
 	Path = PathList[len(PathList)-1]
-	if len(Path) == 6 {
+	if strings.Contains(Path, "finished") {
 		To = GetSavePath(Path)
 	}
 

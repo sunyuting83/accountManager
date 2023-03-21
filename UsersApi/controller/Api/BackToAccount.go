@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,6 +37,12 @@ func BackToAccount(c *gin.Context) {
 		}
 		c.String(200, "参数错误")
 		return
+	}
+	Path := c.Request.URL.Path
+	PathList := strings.Split(Path, "/")
+	Path = PathList[len(PathList)-1]
+	if strings.Contains(Path, "clean") {
+		status = GetBackPath(Path)
 	}
 	if len(status) == 0 {
 		if IsJson == "1" {
@@ -102,4 +109,14 @@ func BackToAccount(c *gin.Context) {
 		"status":  0,
 		"message": "退回成功",
 	})
+}
+
+func GetBackPath(s string) (status string) {
+	switch s {
+	case "cleanreg":
+		status = "1"
+	case "cleanpaly":
+		status = "3"
+	}
+	return
 }
