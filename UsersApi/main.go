@@ -26,11 +26,11 @@ func main() {
 		time.Sleep(time.Duration(10) * time.Second)
 		os.Exit(0)
 	}
-	// gin.SetMode(gin.ReleaseMode)
 	orm.InitDB(confYaml)
 	Redis.InitRedis(confYaml.Redis.Host, confYaml.Redis.Password, confYaml.Redis.DB)
 
-	gin.SetMode(gin.DebugMode)
+	// gin.SetMode(gin.DebugMode)
+	gin.SetMode(gin.ReleaseMode)
 	defer orm.Eloquent.Close()
 	defer BadgerDB.BadgerDB.Close()
 	defer Redis.MyRedis.Close()
