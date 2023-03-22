@@ -70,10 +70,12 @@ func main() {
 		f string
 		s string
 		a string
+		p string
 	)
 	flag.StringVar(&f, "f", "0", "file")
 	flag.StringVar(&s, "s", "0", "status")
 	flag.StringVar(&a, "a", "0", "account")
+	flag.StringVar(&p, "p", "2370", "projectid")
 	flag.Parse()
 
 	OS := runtime.GOOS
@@ -97,7 +99,7 @@ func main() {
 		return
 	}
 	if s == "1" {
-		status, orderID := CreateOrder(token, qrurl)
+		status, orderID := CreateOrder(token, qrurl, p)
 		if !status {
 			fmt.Println("1,e")
 			return
@@ -151,8 +153,8 @@ func TowOrder(token, uri, a string) (status bool) {
 	return
 }
 
-func CreateOrder(token, uri string) (status bool, orderid string) {
-	Params := strings.Join([]string{"type=99&projectid=2068&url=", uri}, "")
+func CreateOrder(token, uri, p string) (status bool, orderid string) {
+	Params := strings.Join([]string{"type=99&projectid=", p, "&url=", uri}, "")
 	URL := "http://tiancaiapi.tablecando.cn/api/Order/CreateOrder"
 	req, _ := http.NewRequest("POST", URL, strings.NewReader(Params))
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
