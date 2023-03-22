@@ -6,6 +6,9 @@ import (
 	"flag"
 	"fmt"
 	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"net/http"
 	"os"
@@ -13,9 +16,6 @@ import (
 	"runtime"
 	"strings"
 	"time"
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode"
@@ -71,11 +71,13 @@ func main() {
 		s string
 		a string
 		p string
+		t string
 	)
 	flag.StringVar(&f, "f", "0", "file")
-	flag.StringVar(&s, "s", "0", "status")
+	flag.StringVar(&s, "s", "0", "first")
 	flag.StringVar(&a, "a", "0", "account")
 	flag.StringVar(&p, "p", "2370", "projectid")
+	flag.StringVar(&t, "t", "3", "status")
 	flag.Parse()
 
 	OS := runtime.GOOS
@@ -106,14 +108,14 @@ func main() {
 		}
 		var s bool = false
 		for {
-			s = AddAccount(confYaml.APIServer, orderID)
+			s = AddAccount(confYaml.APIServer, orderID, t)
 			if s {
 				break
 			}
 			time.Sleep(500)
 		}
 		if s {
-			fmt.Println("0,"+orderID)
+			fmt.Println("0," + orderID)
 			return
 		}
 	}
@@ -205,9 +207,9 @@ func GetToken(url string) (token string, err error) {
 	return request.Token, nil
 }
 
-func AddAccount(url, oid string) bool {
+func AddAccount(url, oid, t string) bool {
 	URL := strings.Join([]string{url, "AddAccount?account="}, "/")
-	URL = strings.Join([]string{URL, oid}, "")
+	URL = strings.Join([]string{URL, oid, "&status=", t}, "")
 	// fmt.Println(URL)
 	req, _ := http.NewRequest("GET", URL, nil)
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
@@ -263,13 +265,13 @@ func GetCurrentPath() (string, error) {
 func GetPaymentStr(fi string) (paymentCodeUrl string, err error) {
 	file, err := os.Open(fi)
 	if err != nil {
-		fmt.Println("a"+err.Error())
+		fmt.Println("a" + err.Error())
 		return "", err
 	}
 	defer file.Close()
 	img, _, err := image.Decode(file)
 	if err != nil {
-		fmt.Println("b"+err.Error())
+		fmt.Println("b" + err.Error())
 		return "", err
 	}
 	// prepare BinaryBitmap
@@ -278,7 +280,7 @@ func GetPaymentStr(fi string) (paymentCodeUrl string, err error) {
 	qrReader := qrcode.NewQRCodeReader()
 	result, err := qrReader.Decode(bmp, nil)
 	if err != nil {
-		fmt.Println("c"+err.Error())
+		fmt.Println("c" + err.Error())
 		return "", err
 	}
 	// fmt.Println(result.String())
