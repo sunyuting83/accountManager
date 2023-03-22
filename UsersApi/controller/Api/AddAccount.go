@@ -10,14 +10,15 @@ import (
 
 func AddAccount(c *gin.Context) {
 	var Account string = c.Query("account")
+	var status string = c.DefaultQuery("status", "3")
 	projectsID, ColaAPI := GetProjectsID(c)
 	projectsInt, _ := strconv.Atoi(projectsID)
-
+	NewStatus, _ := strconv.Atoi(status)
 	if ColaAPI {
 		account := &database.Accounts{
 			ProjectsID: uint(projectsInt),
 			UserName:   Account,
-			NewStatus:  3,
+			NewStatus:  NewStatus,
 		}
 		account.AddAccount()
 		c.JSON(http.StatusOK, gin.H{
