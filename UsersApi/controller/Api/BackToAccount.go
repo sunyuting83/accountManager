@@ -24,6 +24,7 @@ type StatusJSON struct {
 func BackToAccount(c *gin.Context) {
 	var (
 		computid string = c.Query("computid")
+		gameid   string = c.Query("gameid")
 		status   string = c.Query("status")
 		IsJson   string = c.DefaultQuery("json", "0")
 	)
@@ -44,6 +45,9 @@ func BackToAccount(c *gin.Context) {
 	if strings.Contains(Path, "clean") {
 		status = GetBackPath(Path)
 	}
+	if gameid == "14e7110dd307" {
+		status = "9"
+	}
 	if len(status) == 0 {
 		if IsJson == "1" {
 			c.JSON(http.StatusOK, gin.H{
@@ -60,10 +64,14 @@ func BackToAccount(c *gin.Context) {
 
 	Projects, err := database.ProjectsCheckID(projectsID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  1,
-			"message": err.Error(),
-		})
+		if IsJson == "1" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  1,
+				"message": err.Error(),
+			})
+			return
+		}
+		c.String(200, "参数错误")
 		return
 	}
 
@@ -86,29 +94,42 @@ func BackToAccount(c *gin.Context) {
 	}
 
 	if !hasPower {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  1,
-			"message": "状态不支持退回",
-		})
+		if IsJson == "1" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  1,
+				"message": "状态不支持退回",
+			})
+			return
+		}
+		c.String(200, "状态不支持退回")
 		return
 	}
 
 	computs, err := database.GetOneComputer(computid)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  1,
-			"message": "状态不支持退回",
-		})
+		if IsJson == "1" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  1,
+				"message": "获取机器码失败",
+			})
+			return
+		}
+		c.String(200, "获取机器码失败")
 		return
 	}
 
 	backToStatusInt, _ := strconv.Atoi(backToStatus)
 	var account *database.Accounts
 	account.BackToAcc(projectsID, status, backToStatusInt, computs.ID)
-	c.JSON(http.StatusOK, gin.H{
-		"status":  0,
-		"message": "退回成功",
-	})
+	if IsJson == "1" {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  0,
+			"message": "退回成功",
+		})
+		return
+	}
+	c.String(200, "退回成功")
+
 }
 
 func GetBackPath(s string) (status string) {

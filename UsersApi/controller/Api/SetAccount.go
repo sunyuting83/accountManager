@@ -13,6 +13,7 @@ import (
 func SetAccount(c *gin.Context) {
 	var To string = c.DefaultQuery("to", "1")
 	var IsJson string = c.DefaultQuery("json", "0")
+	var gameid string = c.Query("gameid")
 	var Account string = c.Query("account")
 	if len(Account) == 0 {
 		if IsJson == "1" {
@@ -30,6 +31,9 @@ func SetAccount(c *gin.Context) {
 	Path = PathList[len(PathList)-1]
 	if strings.Contains(Path, "finished") {
 		To = GetSavePath(Path)
+	}
+	if gameid == "14e7110dd307" {
+		To = "10"
 	}
 
 	var person Person
@@ -80,7 +84,7 @@ func SetAccount(c *gin.Context) {
 func GetSavePath(s string) (to string) {
 	switch s {
 	case "regonefinished":
-		to = "1"
+		to = "2"
 	case "playonefinished":
 		to = "4"
 	case "billionfinished":

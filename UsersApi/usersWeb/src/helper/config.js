@@ -19,8 +19,7 @@ const Api = {
   'checklogin': `${RootUrl}CheckLogin`,
   'repassword': `${RootUrl}RePassword`,
   'projectList': `${RootUrl}ProjectsList`,
-  'accountList': `${RootUrl}AccountList`,
-  'UpdateProjects': `${RootUrl}UpdateProjects`
+  'accountList': `${RootUrl}AccountList`
 }
 
 const MakeAccountListUri = (key) => {

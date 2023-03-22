@@ -52,7 +52,7 @@
                         <button class="button is-success is-small" @click="()=>{showAccount(item.Key)}">帐号管理</button>
                         <button class="button is-info is-small" @click="()=>{showAccountDraw(item.Key)}">提号管理</button>
                         <button class="button is-primary is-small" @click="()=>{showAccountDrawed(item.Key)}">已提取帐号</button>
-                        <button class="button is-warning is-small" v-if="item.ColaAPI" @click="()=>{showModifyModal(item.ID)}">修改项目</button>
+                        <button class="button is-warning is-small" v-if="item.ColaAPI" @click="()=>{showModifyModal(item.Key)}">修改项目</button>
                       </div>
                     </td>
                   </tr>
@@ -193,7 +193,7 @@ export default defineComponent({
         case 6:
           states.modifyStatus = false
           states.data = states.data.map((el)=>{
-            console.log(el.ID, e.data.ID)
+            // console.log(el.ID, e.data.ID)
             if (el.ID == e.data.ID) {
               return el = e.data
             }
@@ -213,8 +213,9 @@ export default defineComponent({
       if (states.userLoading) states.openAddModal.active = true
     }
     const showModifyModal = async(id) => {
+      // console.log(id)
       states.openModifyModal.Project = states.data.filter((e) => {
-        return e.ID == id
+        return e.Key == id
       })[0]
       states.openModifyModal.active = true
       states.modifyStatus = true

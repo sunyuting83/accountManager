@@ -73,13 +73,14 @@ export default defineComponent ({
   },
   setup(props){
     let StatusJSON = JSON.parse(props.showData.Project.StatusJSON)
-    console.log(StatusJSON)
+    // console.log(StatusJSON)
     let haStatus = false
     if (StatusJSON.length > 0) haStatus = true
     let _data = reactive({
       loading: false,
       form:{
         ID: props.showData.Project.ID,
+        Key: props.showData.Project.Key,
         ProjectName: props.showData.Project.ProjectsName,
         UserName: props.showData.Project.UserName,
         UserNameErr: false,
@@ -125,7 +126,8 @@ export default defineComponent ({
         ColaAPI: String(ColaAPI),
         StatusJSON: StatusJSON
       }
-      const d = await Fetch(Config.Api.UpdateProjects, data, "PUT", token)
+      const url = `${Config.RootUrl}${_data.form.Key}/UpdateProjects`
+      const d = await Fetch(url, data, "PUT", token)
       if (d.status === 0) {
         cleanState()
         closErr()
