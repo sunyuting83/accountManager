@@ -18,6 +18,13 @@ func GetColaToken(c *gin.Context) {
 			})
 			return
 		}
+		if len(token) == 0 {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "get token failed",
+			})
+			return
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"status":  0,
 			"message": "get token succeeded",
