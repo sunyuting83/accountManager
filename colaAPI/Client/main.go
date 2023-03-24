@@ -90,11 +90,15 @@ func main() {
 		os.Exit(0)
 	}
 	token, err := GetToken(confYaml.APIServer)
-	if err != nil {
-		// fmt.Println(err)
-		fmt.Println("1,e")
-		return
+	if err != nil || len(token) == 0 {
+		token, err = ColaLogin(confYaml.APIServer)
+		if err != nil || len(token) == 0 {
+			// fmt.Println(err)
+			fmt.Println("1,e")
+			return
+		}
 	}
+	// fmt.Println(token)
 	qrurl, err := GetPaymentStr(f)
 	if err != nil {
 		fmt.Println("1,e")
@@ -186,6 +190,30 @@ func CreateOrder(token, uri, p string) (status bool, orderid string) {
 
 func GetToken(url string) (token string, err error) {
 	URL := strings.Join([]string{url, "GetColaToken"}, "/")
+	// fmt.Println(URL)
+	req, _ := http.NewRequest("GET", URL, nil)
+	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("X-Requested-With", "XMLHttpRequest")
+	req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
+
+	resp, err := (&http.Client{Timeout: 35 * time.Second}).Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	respByte, _ := io.ReadAll(resp.Body)
+	var request GetApiRequest
+	json.Unmarshal(respByte, &request)
+	if request.Status == 1 {
+		return "", errors.New(request.Message)
+	}
+	return request.Token, nil
+}
+
+
+func ColaLogin(url string) (token string, err error) {
+	URL := strings.Join([]string{url, "ColaLogin"}, "/")
 	// fmt.Println(URL)
 	req, _ := http.NewRequest("GET", URL, nil)
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")

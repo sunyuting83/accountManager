@@ -92,7 +92,7 @@ func GetOneAccount(c *gin.Context) {
 			return
 		}
 		token, err := BadgerDB.Get([]byte(projectsID + ".token"))
-		if err != nil || len(token) == 0 {
+		if err != nil && err.Error() == "Key not found" {
 			token, err = colaapi.Login(Projects.UserName, Projects.Password)
 			if err != nil {
 				if IsJson == "1" {
