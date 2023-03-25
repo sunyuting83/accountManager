@@ -66,6 +66,15 @@ func GetAdminList(page, Limit int) (manages *[]Manager, err error) {
 	return
 }
 
+// Admin List
+func GetHasUsersID(manager_id uint) (manages *Manager, err error) {
+	if err = sqlDB.
+		Where(&Manager{ID: manager_id}).Preload("Users").Find(&manages).Error; err != nil {
+		return
+	}
+	return
+}
+
 // Reset Password
 func (manager *Manager) ResetPassword(username string) (manage Manager, err error) {
 	// time.Sleep(time.Duration(100) * time.Millisecond)

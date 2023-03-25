@@ -33,6 +33,15 @@ func (projects *Projects) GetCount() (count int64, err error) {
 	}
 	return
 }
+func (projects *Projects) GetCountWithIn(UsersIDs []int) (count int64, err error) {
+	if err = sqlDB.
+		Model(&projects).
+		Where("users_id IN ?", UsersIDs).
+		Count(&count).Error; err != nil {
+		return
+	}
+	return
+}
 
 // Admin List
 func GetProjectsList(page, Limit int) (projects *[]Projects, err error) {
@@ -40,6 +49,20 @@ func GetProjectsList(page, Limit int) (projects *[]Projects, err error) {
 	if err = sqlDB.
 		Model(&Projects{}).
 		Preload("Users").
+		Order("projects.id desc").
+		Limit(Limit).Offset(p).
+		Find(&projects).Error; err != nil {
+		return
+	}
+	return
+}
+
+func GetProjectsListWithIn(page, Limit int, UsersIDs []int) (projects *[]Projects, err error) {
+	p := makePage(page, Limit)
+	if err = sqlDB.
+		Model(&Projects{}).
+		Preload("Users").
+		Where("users_id IN ?", UsersIDs).
 		Order("projects.id desc").
 		Limit(Limit).Offset(p).
 		Find(&projects).Error; err != nil {
