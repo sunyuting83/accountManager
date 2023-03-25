@@ -109,18 +109,22 @@ func main() {
 		time.Sleep(time.Duration(10) * time.Second)
 		os.Exit(0)
 	}
+	// get token from API Server
 	token, err := GetToken(confYaml.APIServer)
 	if err != nil || len(token) == 0 {
-		var colaRequest *ColaAccountRequest
+		// haven't token, so create Login for cola
+		var colaRequest ColaAccountRequest
 		LoginStatus := false
 		for {
-			colaRequest, err = GetColaAccount(confYaml.APIServer)
-			if err == nil || colaRequest.Status == 0 {
+			// get cola username and password an token
+			// if has a active at server, wait it done.
+			colaRequest, _ = GetColaAccount(confYaml.APIServer)
+			if colaRequest.Status == 0 {
 				LoginStatus = true
 				token = colaRequest.Token
 				break
 			}
-			time.Sleep(1000)
+			time.Sleep(time.Duration(10) * time.Second)
 		}
 		if LoginStatus && len(token) == 0 {
 			token, err = ColaLogin(colaRequest)
@@ -141,18 +145,19 @@ func main() {
 	if s == "1" {
 		status, orderID := CreateOrder(token, qrurl, p)
 		if !status {
+			SetColaToken(confYaml.APIServer, "")
 			fmt.Println("1,e")
 			return
 		}
-		var s bool = false
+		var sa bool = false
 		for {
-			s = AddAccount(confYaml.APIServer, orderID, t)
-			if s {
+			sa = AddAccount(confYaml.APIServer, orderID, t)
+			if sa {
 				break
 			}
-			time.Sleep(500)
+			time.Sleep(time.Duration(1) * time.Second)
 		}
-		if s {
+		if sa {
 			fmt.Println("0," + orderID)
 			return
 		}
@@ -160,6 +165,7 @@ func main() {
 	if a != "0" {
 		status := TowOrder(token, qrurl, a)
 		if !status {
+			SetColaToken(confYaml.APIServer, "")
 			fmt.Println("1,e")
 			return
 		}
@@ -245,7 +251,7 @@ func GetToken(url string) (token string, err error) {
 	return request.Token, nil
 }
 
-func GetColaAccount(url string) (request *ColaAccountRequest, err error) {
+func GetColaAccount(url string) (request ColaAccountRequest, err error) {
 	URL := strings.Join([]string{url, "ColaAccount"}, "/")
 	// fmt.Println(URL)
 	req, _ := http.NewRequest("GET", URL, nil)
@@ -256,20 +262,20 @@ func GetColaAccount(url string) (request *ColaAccountRequest, err error) {
 
 	resp, err := (&http.Client{Timeout: 35 * time.Second}).Do(req)
 	if err != nil {
-		return nil, err
+		return request, err
 	}
 	defer resp.Body.Close()
 	respByte, _ := io.ReadAll(resp.Body)
 	json.Unmarshal(respByte, &request)
 	if request.Status == 1 {
-		return nil, errors.New(request.Message)
+		return request, errors.New(request.Message)
 	}
-	return
+	return request, nil
 }
 func SetColaToken(url, token string) {
 	URL := strings.Join([]string{url, "SetColaToken"}, "/")
 	Params := strings.Join([]string{"token=", token}, "")
-	req, _ := http.NewRequest("POST", URL, strings.NewReader(Params))
+	req, _ := http.NewRequest("PUT", URL, strings.NewReader(Params))
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("X-Requested-With", "XMLHttpRequest")
@@ -277,7 +283,7 @@ func SetColaToken(url, token string) {
 	_, _ = (&http.Client{Timeout: 35 * time.Second}).Do(req)
 }
 
-func ColaLogin(colaRequest *ColaAccountRequest) (token string, err error) {
+func ColaLogin(colaRequest ColaAccountRequest) (token string, err error) {
 	u := "Member/login"
 	url := strings.Join([]string{"http://tiancaiapi.tablecando.cn/api/", u}, "")
 

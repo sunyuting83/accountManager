@@ -43,14 +43,9 @@ func GetColaAccount(c *gin.Context) {
 	projectsID, ColaAPI := GetProjectsID(c)
 	if ColaAPI {
 		account, err := BadgerDB.Get([]byte(projectsID + ".account"))
-		if err != nil && err.Error() != "Key not found" {
-			c.JSON(http.StatusOK, gin.H{
-				"status":  1,
-				"message": "haven't project ID",
-			})
-			return
-		}
-		if err.Error() == "Key not found" {
+		// fmt.Println(account)
+		if err != nil && err.Error() == "Key not found" {
+			// fmt.Println(err)
 			BadgerDB.Set([]byte(projectsID+".account"), []byte("true"))
 		}
 		if account == "true" {
@@ -69,6 +64,7 @@ func GetColaAccount(c *gin.Context) {
 			return
 		}
 		token, _ := BadgerDB.Get([]byte(projectsID + ".token"))
+		BadgerDB.Set([]byte(projectsID+".account"), []byte("true"))
 		c.JSON(http.StatusOK, gin.H{
 			"status":   0,
 			"message":  "get token succeeded",
@@ -84,9 +80,23 @@ func GetColaAccount(c *gin.Context) {
 	})
 }
 
+func DeleteCola(c *gin.Context) {
+	projectsID, _ := GetProjectsID(c)
+	BadgerDB.Delete([]byte(projectsID + ".account"))
+	// fmt.Println(err)
+	has, _ := BadgerDB.Get([]byte(projectsID + ".account"))
+	// fmt.Println(err)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  1,
+		"message": "haven't power",
+		"has":     has,
+	})
+}
+
 func SetColaToken(c *gin.Context) {
 	projectsID, ColaAPI := GetProjectsID(c)
 	if ColaAPI {
+		BadgerDB.Delete([]byte(projectsID + ".token"))
 		BadgerDB.Set([]byte(projectsID+".account"), []byte("false"))
 		token := c.PostForm("token")
 		if len(token) == 0 {

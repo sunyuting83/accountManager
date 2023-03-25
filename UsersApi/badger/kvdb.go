@@ -110,11 +110,11 @@ func Has(key []byte) (bool, error) {
 }
 
 func Delete(key []byte) error {
-	wb := BadgerDB.NewWriteBatch()
-	defer wb.Cancel()
-	return wb.Delete(key)
+	err := BadgerDB.Update(func(txn *badger.Txn) error {
+		return txn.Delete(key)
+	})
+	return err
 }
-
 func IteratorKeysAndValues() {
 
 	err := BadgerDB.View(func(txn *badger.Txn) error {
