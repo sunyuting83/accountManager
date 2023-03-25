@@ -68,6 +68,8 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1HasKey.GET("/AddAccount", Api.AddAccount)
 		userApiV1HasKey.POST("/PostSetAccount", Api.PostSetAccount)
 		userApiV1HasKey.GET("/ColaLogin", Api.ColaLogin)
+		userApiV1HasKey.GET("/ColaAccount", Api.GetColaAccount)
+		userApiV1HasKey.PUT("/SetColaToken", Api.SetColaToken)
 	}
 	return router
 }

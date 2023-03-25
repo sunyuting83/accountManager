@@ -37,6 +37,13 @@ type CreateRequest struct {
 	Msg    string `json:"msg"`
 	Data   Data   `json:"data"`
 }
+type ColaAccountRequest struct {
+	Status   int    `json:"status"`
+	Message  string `json:"message"`
+	UserName string `json:"username"`
+	Password string `json:"password"`
+	Token    string `json:"token"`
+}
 
 type TwoAuthRequest struct {
 	Status int    `json:"status"`
@@ -65,6 +72,19 @@ type Data struct {
 	Order   Order  `json:"order"`
 }
 
+type RequestLogin struct {
+	Status string `json:"status"`
+	Msg    string `json:"msg"`
+	Data   struct {
+		MemberID      string `json:"member_id"`
+		MemberUser    string `json:"member_user"`
+		AgentID       string `json:"agent_id"`
+		MemberBalance string `json:"member_balance"`
+		MemberState   string `json:"member_state"`
+	} `json:"data"`
+	Token string `json:"token"`
+}
+
 func main() {
 	var (
 		f string
@@ -91,11 +111,25 @@ func main() {
 	}
 	token, err := GetToken(confYaml.APIServer)
 	if err != nil || len(token) == 0 {
-		token, err = ColaLogin(confYaml.APIServer)
-		if err != nil || len(token) == 0 {
-			// fmt.Println(err)
-			fmt.Println("1,e")
-			return
+		var colaRequest *ColaAccountRequest
+		LoginStatus := false
+		for {
+			colaRequest, err = GetColaAccount(confYaml.APIServer)
+			if err == nil || colaRequest.Status == 0 {
+				LoginStatus = true
+				token = colaRequest.Token
+				break
+			}
+			time.Sleep(1000)
+		}
+		if LoginStatus && len(token) == 0 {
+			token, err = ColaLogin(colaRequest)
+			if err != nil || len(token) == 0 {
+				SetColaToken(confYaml.APIServer, token)
+				fmt.Println("1,e")
+				return
+			}
+			SetColaToken(confYaml.APIServer, token)
 		}
 	}
 	// fmt.Println(token)
@@ -211,9 +245,8 @@ func GetToken(url string) (token string, err error) {
 	return request.Token, nil
 }
 
-
-func ColaLogin(url string) (token string, err error) {
-	URL := strings.Join([]string{url, "ColaLogin"}, "/")
+func GetColaAccount(url string) (request *ColaAccountRequest, err error) {
+	URL := strings.Join([]string{url, "ColaAccount"}, "/")
 	// fmt.Println(URL)
 	req, _ := http.NewRequest("GET", URL, nil)
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
@@ -223,16 +256,51 @@ func ColaLogin(url string) (token string, err error) {
 
 	resp, err := (&http.Client{Timeout: 35 * time.Second}).Do(req)
 	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	respByte, _ := io.ReadAll(resp.Body)
+	json.Unmarshal(respByte, &request)
+	if request.Status == 1 {
+		return nil, errors.New(request.Message)
+	}
+	return
+}
+func SetColaToken(url, token string) {
+	URL := strings.Join([]string{url, "SetColaToken"}, "/")
+	Params := strings.Join([]string{"token=", token}, "")
+	req, _ := http.NewRequest("POST", URL, strings.NewReader(Params))
+	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("X-Requested-With", "XMLHttpRequest")
+	req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
+	_, _ = (&http.Client{Timeout: 35 * time.Second}).Do(req)
+}
+
+func ColaLogin(colaRequest *ColaAccountRequest) (token string, err error) {
+	u := "Member/login"
+	url := strings.Join([]string{"http://tiancaiapi.tablecando.cn/api/", u}, "")
+
+	Params := strings.Join([]string{"member_user=", colaRequest.UserName, "&member_pwd=", colaRequest.Password}, "")
+	req, _ := http.NewRequest("POST", url, strings.NewReader(Params))
+	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("X-Requested-With", "XMLHttpRequest")
+	req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
+
+	resp, err := (&http.Client{Timeout: 35 * time.Second}).Do(req)
+	var request *RequestLogin
+	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
 	respByte, _ := io.ReadAll(resp.Body)
-	var request GetApiRequest
+
 	json.Unmarshal(respByte, &request)
-	if request.Status == 1 {
-		return "", errors.New(request.Message)
+	if request.Status == "200" {
+		token = request.Token
 	}
-	return request.Token, nil
+	return
 }
 
 func AddAccount(url, oid, t string) bool {

@@ -2,7 +2,6 @@ package controller
 
 import (
 	Redis "colaAPI/Redis"
-	colaapi "colaAPI/UsersApi/ColaAPI"
 	BadgerDB "colaAPI/UsersApi/badger"
 	"colaAPI/UsersApi/database"
 	"encoding/json"
@@ -77,81 +76,48 @@ func GetOneAccount(c *gin.Context) {
 			comput.ComputerInsert()
 		}
 	}
-
 	if ColaAPI {
 		Projects, err := database.ProjectsCheckID(projectsID)
 		if err != nil {
 			if IsJson == "1" {
-				c.JSON(http.StatusOK, gin.H{
+				c.JSON(http.StatusBadRequest, gin.H{
 					"status":  1,
-					"message": "haven't project ID",
+					"message": "get projects failed",
 				})
 				return
 			}
-			c.String(200, "没有了")
+			c.String(200, "出错了")
 			return
 		}
-		token, err := BadgerDB.Get([]byte(projectsID + ".token"))
-		if err != nil && err.Error() == "Key not found" {
-			token, err = colaapi.Login(Projects.UserName, Projects.Password)
-			if err != nil {
-				if IsJson == "1" {
-					c.JSON(http.StatusOK, gin.H{
-						"status":  1,
-						"message": "login failed",
-					})
-					return
-				}
-				c.String(200, "获取失败")
-				return
+		var statusJson []*StatusJSON
+		json.Unmarshal([]byte(Projects.StatusJSON), &statusJson)
+
+		var (
+			hasStatus []string
+		)
+		for _, item := range statusJson {
+			if item.Status != "8" && item.Status != "9" && item.Status != "10" && item.Status != "108" {
+				hasStatus = append(hasStatus, item.Status)
 			}
-			BadgerDB.SetWithTTL([]byte(projectsID+".token"), []byte(token), 60*60*24)
 		}
-		AccountNumber, APIStatus, err := colaapi.GetOrderListNumber(token)
+		var acc *database.Accounts
+		count, err := acc.GetInCount(projectsID, hasStatus)
 		if err != nil {
 			if IsJson == "1" {
 				c.JSON(http.StatusOK, gin.H{
 					"status":  1,
-					"message": "api failed",
+					"message": "get count failed",
 				})
 				return
 			}
-			c.String(200, "获取失败")
+			c.String(200, "出错了")
 			return
 		}
-		if APIStatus == "1101" || APIStatus == "201" {
-			token, err = colaapi.Login(Projects.UserName, Projects.Password)
-			if err != nil {
-				if IsJson == "1" {
-					c.JSON(http.StatusOK, gin.H{
-						"status":  1,
-						"message": "login failed",
-					})
-					return
-				}
-				c.String(200, "获取失败")
-				return
-			}
-			BadgerDB.SetWithTTL([]byte(projectsID+".token"), []byte(token), 60*60*24)
-			AccountNumber, _, err = colaapi.GetOrderListNumber(token)
-			if err != nil {
-				if IsJson == "1" {
-					c.JSON(http.StatusOK, gin.H{
-						"status":  1,
-						"message": "api failed",
-					})
-					return
-				}
-				c.String(200, "获取失败")
-				return
-			}
-		}
-		if AccountNumber <= Projects.AccNumber {
+		if count <= int64(Projects.AccNumber) {
 			if IsJson == "1" {
 				c.JSON(http.StatusOK, gin.H{
 					"status":  0,
 					"message": "first",
-					"token":   token,
 				})
 				return
 			}
@@ -160,7 +126,6 @@ func GetOneAccount(c *gin.Context) {
 			return
 		}
 	}
-
 	account, err := database.GetOneAccount(projectsID, status)
 	if err != nil {
 		if IsJson == "1" {
