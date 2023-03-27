@@ -161,10 +161,10 @@ func GetOneAccount(c *gin.Context) {
 	}
 	AccountString := strings.Join([]string{account.UserName, account.Password}, splitStr)
 	if len(account.PhoneNumber) != 0 {
-		AccountString = strings.Join([]string{account.PhoneNumber}, splitStr)
+		AccountString = strings.Join([]string{AccountString, account.PhoneNumber}, splitStr)
 	}
 	if len(account.PhonePassword) != 0 {
-		AccountString = strings.Join([]string{account.PhonePassword}, splitStr)
+		AccountString = strings.Join([]string{AccountString, account.PhonePassword}, splitStr)
 	}
 	c.String(200, AccountString)
 }

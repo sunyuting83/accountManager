@@ -1,8 +1,6 @@
 package database
 
 import (
-	"fmt"
-
 	"gorm.io/gorm"
 )
 
@@ -103,7 +101,7 @@ func (accounts *Accounts) DeleteAll(projectid string, status string) {
 
 // Reset Password
 func (account *Accounts) AccountUpStatus(status string) {
-	fmt.Println(status)
+	// fmt.Println(status)
 	sqlDB.Model(&account).Update("new_status", status)
 }
 
@@ -262,7 +260,7 @@ func GetDateTimeDataDraw(projectsID, GeType string) (re []string, err error) {
 }
 
 func GetOneAccount(ProjectsID, status string) (accounts *Accounts, err error) {
-	fmt.Println(status)
+	// fmt.Println(status)
 	if err = sqlDB.
 		Where("projects_id = ? and new_status = ?", ProjectsID, status).
 		First(&accounts).Error; err != nil {
