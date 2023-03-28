@@ -26,7 +26,7 @@
                 <div class="buttons are-small has-addons">
                   <span class="f-1" v-for="(item,index) in statusList" :key="item.status" >
                     <button class="button" v-if="item.status !== '108'" :class="item.status === CurrentStatus.status?'is-success':''" @click="()=>{pushToData(index)}">
-                      {{item.title}}
+                      {{item.title}}({{item.status}})
                     </button>
                   </span>
                 </div>
@@ -41,9 +41,13 @@
                     退回{{CurrentStatus.title}}帐号
                   </button>
                   <PopoButton :message="`删除${CurrentStatus.title}帐号`" color="is-danger"  :loading="buttonLoading" :callBack="deleteAccount" v-if="CurrentStatus.delete && data.length > 0"></PopoButton>
-                  <button class="button is-small is-warning is-light" :class="buttonLoading?'is-loading':''" @click="ExportAccount" v-if="CurrentStatus.export && data.length > 0">
-                    导出{{CurrentStatus.title}}帐号
-                  </button>
+                  <DownloadFile 
+                    :uri="`${RootUrl}${AccountKey}/ExportAccount`"
+                    styles="is-warning is-light"
+                    :Data="{'status': CurrentStatus.status, 'excel': false}"
+                    :buttonLoading="buttonLoading"
+                    :title="`导出${CurrentStatus.title}帐号`"
+                    v-if="CurrentStatus.export && data.length > 0" />
                 </div>
                 </div>
               </div>
@@ -74,7 +78,7 @@
                 </thead>
                 <tbody class="is-size-7">
                   <tr v-for="(item, index) in data" :key="item.ID">
-                    <td>{{index}}</td>
+                    <td>{{index + 1}}</td>
                     <td>{{item.UserName}}</td>
                     <td v-if="item.Password.length > 0">{{item.Password}}</td>
                     <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
@@ -88,9 +92,9 @@
                     <td>{{item.Precise}}</td>
                     <td v-if="item.Remarks.length > 0" class="w165">{{item.Remarks}}</td>
                     <td v-if="item.Price.length > 0">{{item.Price}}</td>
-                    <td><FormaTime v-if="item.Exptime !== 0" :DateTime="item.Exptime"></FormaTime></td>
-                    <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
-                    <td><FormaTime :DateTime="item.UpdatedAt"></FormaTime></td>
+                    <td><ExpTime :DateTime="item.Exptime" /></td>
+                    <td><FormaTime :DateTime="item.CreatedAt" /></td>
+                    <td><FormaTime :DateTime="item.UpdatedAt" /></td>
                   </tr>
                 </tbody>
               </table>
@@ -122,6 +126,8 @@ import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
 import FormaNumber from '@/components/Other/FormaNumber'
 import PopoButton from '@/components/Other/PopoButton'
+import ExpTime from '@/components/Other/ExpTime.vue'
+import DownloadFile from '@/components/Other/DownloadFile.vue'
 
 
 import Fetch from '@/helper/fetch'
@@ -130,7 +136,7 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'AccountList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, PostData, PopoButton, FormaNumber },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, PostData, PopoButton, FormaNumber, ExpTime, DownloadFile },
   setup() {
     let states = reactive({
       AccountKey: "",
@@ -140,6 +146,7 @@ export default defineComponent({
       loading: false,
       data: [],
       total: 0,
+      RootUrl: "",
       username: "",
       buttonLoading: false,
       postStatus: false,
@@ -159,7 +166,8 @@ export default defineComponent({
     onMounted(async() => {
       document.title = `${Config.GlobalTitle}-帐号管理`
       const data = await CheckLogin()
-      states.AccountKey = router.currentRoute._value.params.id
+      states.AccountKey = router.currentRoute._value.params.key
+      states.RootUrl = Config.RootUrl
       if (data == 0) {
         const username = localStorage.getItem('user')
         states.username = username
@@ -188,9 +196,8 @@ export default defineComponent({
         page:page, 
         limit: states.limit,
         status: status,
-        projectsID: states.AccountKey
       }
-      const url = `${Config.Api.accountList}`
+      const url = `${Config.RootUrl}${states.AccountKey}/AccountList`
       states.loading = true
       const d = await Fetch(url, data, 'GET', token)
       if (d.status == 0) {
@@ -207,6 +214,7 @@ export default defineComponent({
         states.page = []
         states.projects = {}
         states.loading = false
+        states.pageLoading = false
       }
     }
     /**
@@ -307,77 +315,6 @@ export default defineComponent({
       }
     }
 
-    const ExportAccount = async() => {
-      const d = await exportFile()
-      download(d)
-    }
-
-    const exportFile = () => {
-      const token = localStorage.getItem("token")
-      let status = states.CurrentStatus.status
-
-      const url = `${Config.RootUrl}${states.AccountKey}/ExportAccount`
-      let requestConfig = {
-        method: "put",
-        responseType: "blob"
-      }
-      Object.defineProperty(requestConfig, 'body', {
-          value: JSON.stringify({
-          status: status,
-        })
-      })
-      requestConfig.headers = new Headers({
-        Accept: '*/*',
-      })
-      requestConfig.headers.append("Content-Type","application/json;charset=UTF-8")
-      requestConfig.headers.append('Authorization',`Bearer ${token}`)
-      return new Promise((resolve) => {
-        fetch(url, requestConfig)
-          .then(res => {
-            if(res.ok) {
-              resolve(res.text())
-            }else {
-              resolve({
-                status: 1,
-                message: "访问出错"
-              })
-            }
-          })
-          .catch((err) => {
-            resolve({
-              status: 1,
-              message: err.message
-            })
-          })
-      })
-    }
-    const download = (data) => {
-        if (!data) {
-            return
-        }
-        // const contentType = data.type
-        // const fileName = contentType.split('filename=')[1]
-        let url = window.URL.createObjectURL(new Blob([data]))
-        let link = document.createElement('a')
-        link.style.display = 'none'
-        link.href = url
-        link.id='Adownload'
-        const date = new Date(),
-            Y = date.getFullYear(),
-            M = date.getMonth(),
-            D = date.getDate(),
-            h = date.getHours(),
-            m = date.getMinutes(),
-            s = date.getSeconds(),
-            fileName = `${String(Y)}${String(M)}${String(D)}${String(h)}${String(m)}${String(s)}.txt`
-        // console.log(fileName)
-        link.setAttribute('download', fileName)
-        
-        document.body.appendChild(link)
-        link.click()
-        document.getElementById('Adownload').remove();
-    }
-
     return {
       ...toRefs(states),
       ShowMessage,
@@ -387,8 +324,7 @@ export default defineComponent({
       pushToData,
       showPostModal,
       deleteAccount,
-      backTo,
-      ExportAccount
+      backTo
     }
   },
 })

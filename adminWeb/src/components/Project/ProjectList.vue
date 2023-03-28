@@ -59,7 +59,9 @@
                     <td>{{item.AccNumber}}</td>
                     <td>
                       <div class="buttons">
-                        <button class="button is-success is-small" @click="()=>{showAccount(item.ID)}">帐号管理</button>
+                        <button class="button is-success is-small" @click="()=>{showAccount(item.Key)}">帐号管理</button>
+                        <button class="button is-info is-small" @click="()=>{showAccountDraw(item.Key)}">提号管理</button>
+                        <button class="button is-primary is-small" @click="()=>{showAccountDrawed(item.Key)}">已提取帐号</button>
                         <button class="button is-warning is-small" @click="()=>{showModifyModal(item.ID)}">修改项目</button>
                         <PopoButton
                           :message="item.NewStatus === 0?'锁定':'解锁'" color="is-info" :callBack="()=>{lockIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
@@ -290,8 +292,15 @@ export default defineComponent({
       }
     }
 
-    const showAccount = (id) => {
-      router.push(`/account/${id}`)
+    const showAccount = (key) => {
+      router.push(`/account/${key}`)
+    }
+
+    const showAccountDraw = (id) => {
+      router.push(`/accountDraw/${id}/gold`)
+    }
+    const showAccountDrawed = (id) => {
+      router.push(`/accountDrawed/${id}`)
     }
 
     return {
@@ -303,7 +312,9 @@ export default defineComponent({
       deleteIt,
       GetData,
       showAccount,
-      showModifyModal
+      showModifyModal,
+      showAccountDraw,
+      showAccountDrawed
     }
   },
 })

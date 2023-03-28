@@ -1,6 +1,8 @@
 package database
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Accounts struct {
 	ID            uint `gorm:"primaryKey"`
@@ -33,8 +35,10 @@ func (accounts *Accounts) GetCount(ProjectsID, Status string) (count int64, err 
 	}
 	return
 }
+func (accounts *Accounts) AddAccount() {
+	sqlDB.Create(&accounts)
+}
 
-// Account List
 func (account *Accounts) GetInCount(ProjectsID string, statusList []string) (count int64, err error) {
 	if err = sqlDB.
 		Model(&account).
@@ -50,8 +54,7 @@ func (account *Accounts) GetInList(ProjectsID string, statusList []string, page,
 	p := makePage(page, Limit)
 	if err = sqlDB.
 		Where("projects_id = ? and new_status IN ?", ProjectsID, statusList).
-		Order("updated_at desc").
-		Order("updated_at desc").
+		Order("today_gold DESC").
 		Limit(Limit).Offset(p).
 		Find(&accounts).Error; err != nil {
 		return
@@ -98,13 +101,35 @@ func (accounts *Accounts) DeleteAll(projectid string, status string) {
 
 // Reset Password
 func (account *Accounts) AccountUpStatus(status string) {
+	// fmt.Println(status)
 	sqlDB.Model(&account).Update("new_status", status)
 }
 
 // Reset Password
-func (account *Accounts) BackTo(projectsID, status, backToStatus string) {
+func (account *Accounts) AccountUpComput(comput uint) {
+	sqlDB.Model(&account).Update("comput_id", comput)
+}
+
+// Reset Password
+func (account *Accounts) BackTo(projectsID, status string, backToStatus int) {
 	sqlDB.Model(&account).
+		Select("comput_id", "new_status", "updated_at").
 		Where("projects_id = ? and new_status = ?", projectsID, status).
+		Updates(Accounts{ComputID: uint(0), NewStatus: backToStatus})
+}
+
+func (account *Accounts) UpdataOneAccount(projectsID, username string, accounts map[string]interface{}) {
+	sqlDB.Model(&account).
+		Omit("created_at").
+		Select("cover", "today_gold", "multiple", "diamond", "crazy", "cold", "precise", "exptime", "updated_at", "yesterday_gold").
+		Where("projects_id = ? and user_name = ?", projectsID, username).
+		Updates(accounts)
+}
+
+// Reset Password
+func (account *Accounts) BackToAcc(projectsID, status string, backToStatus int, comput uint) {
+	sqlDB.Model(&account).
+		Where("projects_id = ? and new_status = ? and comput_id = ?", projectsID, status, comput).
 		Update("new_status", backToStatus)
 }
 
@@ -132,8 +157,10 @@ func (account *Accounts) PullDataUseIn(IDs []int) {
 		Update("new_status", "108")
 }
 
-func (account *Accounts) PullDataUseSQL(SQL string) {
-	sqlDB.Exec(SQL)
+func (account *Accounts) PullDataUseSQL(SQL string) (rows int64) {
+	db := sqlDB.Exec(SQL)
+	rows = db.RowsAffected
+	return
 }
 
 func (account *Accounts) GetDateInCount(projectsID string, statusList []string, starTime, endTime int64) (count int64, err error) {
@@ -150,7 +177,7 @@ func GetDateInData(projectsID string, statusList []string, starTime, endTime int
 	p := makePage(page, Limit)
 	if err = sqlDB.
 		Where("projects_id = ? AND new_status IN ? AND updated_at >= ? AND updated_at <= ?", projectsID, statusList, starTime, endTime).
-		Order("updated_at desc").
+		Order("today_gold desc").
 		Limit(Limit).Offset(p).
 		Find(&accounts).Error; err != nil {
 		return
@@ -172,8 +199,18 @@ func GetDatedInData(projectsID string, starTime, endTime int64, page, Limit int)
 	p := makePage(page, Limit)
 	if err = sqlDB.
 		Where("projects_id = ? AND new_status = ? AND updated_at >= ? AND updated_at <= ?", projectsID, "108", starTime, endTime).
-		Order("updated_at desc").
+		Order("today_gold desc").
 		Limit(Limit).Offset(p).
+		Find(&accounts).Error; err != nil {
+		return
+	}
+	return
+}
+
+func ExportAccountDrawed(projectsID string, starTime, endTime int64) (accounts []*Accounts, err error) {
+	if err = sqlDB.
+		Where("projects_id = ? AND new_status = ? AND updated_at >= ? AND updated_at <= ?", projectsID, "108", starTime, endTime).
+		Order("today_gold desc").
 		Find(&accounts).Error; err != nil {
 		return
 	}
@@ -219,6 +256,16 @@ func GetDateTimeDataDraw(projectsID, GeType string) (re []string, err error) {
 		sql = SQLStart + projectsID + " AND new_status = 108 ORDER BY to_char(to_timestamp(" + d + " / 1000) AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD') DESC"
 	}
 	re, err = RawQueryParseToMap(sqlDB, sql, d)
+	return
+}
+
+func GetOneAccount(ProjectsID, status string) (accounts *Accounts, err error) {
+	// fmt.Println(status)
+	if err = sqlDB.
+		Where("projects_id = ? and new_status = ?", ProjectsID, status).
+		First(&accounts).Error; err != nil {
+		return
+	}
 	return
 }
 

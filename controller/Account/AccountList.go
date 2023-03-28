@@ -1,35 +1,48 @@
 package controller
 
 import (
+	Redis "colaAPI/Redis"
 	"colaAPI/database"
+	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
+type Person struct {
+	Key string `uri:"key" binding:"required"`
+}
+type CacheValue struct {
+	UsersID    string `json:"UsersID"`
+	ProjectsID string `json:"ProjectsID"`
+	ColaAPI    bool   `json:"ColaAPI"`
+}
+
 func AccountList(c *gin.Context) {
 	var page string = c.DefaultQuery("page", "0")
-	var projectsID string = c.DefaultQuery("projectsID", "0")
 	var Status string = c.DefaultQuery("status", "0")
 	var Limit string = c.DefaultQuery("limit", "100")
 	pageInt, _ := strconv.Atoi(page)
 	LimitInt, _ := strconv.Atoi(Limit)
+
+	projectsID := GetProjectsID(c)
+
 	var account *database.Accounts
 	count, err := account.GetCount(projectsID, Status)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
-			"message": "失败",
+			"message": "haven't project",
 		})
 		return
 	}
-	ProjectsID, _ := strconv.Atoi(projectsID)
-	Projects, err := database.ProjectsCheckID(int64(ProjectsID))
+	ProjectsID, _ := strconv.ParseInt(projectsID, 10, 64)
+	Projects, err := database.ProjectsCheckID(ProjectsID)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
-			"message": "失败",
+			"message": "haven't project ID",
 		})
 		return
 	}
@@ -37,7 +50,7 @@ func AccountList(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
-			"message": "失败",
+			"message": "haven't project list",
 		})
 		return
 	}
@@ -48,4 +61,22 @@ func AccountList(c *gin.Context) {
 		"projects": Projects,
 	}
 	c.JSON(http.StatusOK, Data)
+}
+
+func GetProjectsID(c *gin.Context) (projectsID string) {
+	var person Person
+	if err := c.ShouldBindUri(&person); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": err.Error(),
+		})
+		return
+	}
+	var result *CacheValue
+	has := Redis.Get(person.Key)
+	if len(has) != 0 {
+		json.Unmarshal([]byte(has), &result)
+		projectsID = result.ProjectsID
+	}
+	return
 }
