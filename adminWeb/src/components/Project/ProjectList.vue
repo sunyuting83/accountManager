@@ -64,7 +64,7 @@
                         <button class="button is-primary is-small" @click="()=>{showAccountDrawed(item.Key)}">已提取帐号</button>
                         <button class="button is-warning is-small" @click="()=>{showModifyModal(item.ID)}">修改项目</button>
                         <PopoButton
-                          :message="item.NewStatus === 0?'锁定':'解锁'" color="is-info" :callBack="()=>{lockIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
+                          :message="item.NewStatus === 0?'锁定':'解锁'" color="is-dark" :callBack="()=>{lockIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
                         <PopoButton message="删除" color="is-danger" :callBack="()=>{deleteIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
                       </div>
                     </td>
