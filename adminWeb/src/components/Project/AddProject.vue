@@ -69,6 +69,10 @@
                   <input type="text" class="input inputWidth1 is-small" :disabled="item.callback ? false: true" v-model="item.backto">
                   状态
                 </label>
+                <label class="checkbox mr-4">
+                  <input type="checkbox" v-model="item.ignore">
+                  忽略主库
+                </label>
               </div>
             </div>
             <div class="column">
@@ -176,7 +180,8 @@ export default defineComponent ({
           "backto":   "",
           "export":   true,
           "import": true,
-          "pull": false
+          "pull": false,
+          "ignore": false,
         },{
           "status": "1",
           "title":"注册中状态",
@@ -185,7 +190,8 @@ export default defineComponent ({
           "backto":   "0",
           "export":   false,
           "import": false,
-          "pull": false
+          "pull": false,
+          "ignore": false,
         },{
           "status": "2",
           "title":"注册完成状态",
@@ -194,7 +200,8 @@ export default defineComponent ({
           "backto":   "",
           "export":   false,
           "import": true,
-          "pull": true
+          "pull": true,
+          "ignore": false,
         },{
           "status": "3",
           "title":"游戏中状态",
@@ -203,7 +210,8 @@ export default defineComponent ({
           "backto":   "2",
           "export":   false,
           "import": false,
-          "pull": true
+          "pull": true,
+          "ignore": false,
         },{
           "status": "4",
           "title":"游戏完成状态",
@@ -212,7 +220,8 @@ export default defineComponent ({
           "backto":   "2",
           "export":   false,
           "import": false,
-          "pull": true
+          "pull": true,
+          "ignore": false,
         },{
           "status": "5",
           "title":"封号状态",
@@ -221,7 +230,8 @@ export default defineComponent ({
           "backto":   "",
           "export":   true,
           "import": false,
-          "pull": false
+          "pull": false,
+          "ignore": true,
         },{
           "status": "6",
           "title":"旧帐号状态",
@@ -230,7 +240,8 @@ export default defineComponent ({
           "backto":   "",
           "export":   true,
           "import": false,
-          "pull": false
+          "pull": false,
+          "ignore": true,
         },{
           "status": "7",
           "title":"备用状态",
@@ -239,7 +250,8 @@ export default defineComponent ({
           "backto":   "",
           "export":   true,
           "import": false,
-          "pull": false
+          "pull": false,
+          "ignore": true,
         },{
           "status": "8",
           "title":"未使用身份证",
@@ -248,7 +260,8 @@ export default defineComponent ({
           "backto":   "",
           "export":   true,
           "import": true,
-          "pull": false
+          "pull": false,
+          "ignore": true,
         },{
           "status": "9",
           "title":"使用中身份证",
@@ -257,7 +270,8 @@ export default defineComponent ({
           "backto":   "8",
           "export":   false,
           "import": false,
-          "pull": false
+          "pull": false,
+          "ignore": true,
         },{
           "status": "10",
           "title":"已使用身份证",
@@ -266,7 +280,8 @@ export default defineComponent ({
           "backto":   "8",
           "export":   true,
           "import": false,
-          "pull": false
+          "pull": false,
+          "ignore": true,
         },{
           "status": "108",
           "title":"提号状态",
@@ -275,7 +290,28 @@ export default defineComponent ({
           "backto":   "",
           "export":   true,
           "import": false,
-          "pull": false
+          "pull": false,
+          "ignore": true,
+        },{
+          "status": "11",
+          "title":"IP地址",
+          "delete":   true,
+          "callback": false,
+          "backto":   "",
+          "export":   true,
+          "import": true,
+          "pull": false,
+          "ignore": true,
+        },{
+          "status": "12",
+          "title":"已使用IP",
+          "delete":   false,
+          "callback": true,
+          "backto":   "11",
+          "export":   false,
+          "import": false,
+          "pull": false,
+          "ignore": true,
         }
       ],
         hastatus: false

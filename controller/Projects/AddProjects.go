@@ -41,6 +41,7 @@ type StatusJSON struct {
 	Export   bool   `json:"export"`
 	Import   bool   `json:"import"`
 	Pull     bool   `json:"pull"`
+	Igonre   bool   `json:"igonre"`
 }
 
 func AddProjects(c *gin.Context) {
@@ -181,6 +182,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				Export:   true,
 				Import:   true,
 				Pull:     false,
+				Igonre:   false,
 			},
 			{
 				Status:   "1",
@@ -191,6 +193,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				Export:   false,
 				Import:   false,
 				Pull:     false,
+				Igonre:   false,
 			},
 			{
 				Status:   "2",
@@ -201,6 +204,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				Export:   false,
 				Import:   true,
 				Pull:     true,
+				Igonre:   false,
 			},
 			{
 				Status:   "3",
@@ -211,6 +215,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				Export:   false,
 				Import:   false,
 				Pull:     true,
+				Igonre:   false,
 			},
 			{
 				Status:   "4",
@@ -221,6 +226,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				Export:   false,
 				Import:   false,
 				Pull:     true,
+				Igonre:   false,
 			},
 			{
 				Status:   "5",
@@ -231,6 +237,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				Export:   true,
 				Import:   false,
 				Pull:     false,
+				Igonre:   false,
 			},
 			{
 				Status:   "6",
@@ -241,6 +248,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				Export:   true,
 				Import:   false,
 				Pull:     false,
+				Igonre:   false,
 			},
 			{
 				Status:   "7",
@@ -251,6 +259,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				Export:   true,
 				Import:   false,
 				Pull:     false,
+				Igonre:   false,
 			},
 			{
 				Status:   "8",
@@ -260,6 +269,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				BackTo:   "",
 				Export:   true,
 				Import:   true,
+				Igonre:   true,
 			},
 			{
 				Status:   "9",
@@ -269,6 +279,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				BackTo:   "8",
 				Export:   false,
 				Import:   false,
+				Igonre:   true,
 			},
 			{
 				Status:   "10",
@@ -278,6 +289,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				BackTo:   "8",
 				Export:   true,
 				Import:   false,
+				Igonre:   true,
 			},
 			{
 				Status:   "108",
@@ -288,6 +300,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				Export:   true,
 				Import:   false,
 				Pull:     false,
+				Igonre:   true,
 			},
 		}
 		Sjsons, _ = json.Marshal(&Sjson)

@@ -56,6 +56,10 @@
                   <input type="text" class="input inputWidth1 is-small" :disabled="item.callback ? false: true" v-model="item.backto">
                   状态
                 </label>
+                <label class="checkbox mr-4">
+                  <input type="checkbox" v-model="item.igonre">
+                  忽略主库
+                </label>
               </div>
             </div>
             <div class="column">

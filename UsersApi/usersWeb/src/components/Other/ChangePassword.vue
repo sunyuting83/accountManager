@@ -106,9 +106,8 @@ export default defineComponent ({
         username: username,
         password: rpawsd
       }
-      const _this = props
-      let url = Config.Api.reUserPassword
-      if (_this.Admin) url = Config.Api.repassword
+      // const _this = props
+      let url = Config.Api.repassword
       const d = await Fetch(url, data, "put", token)
       if (d.status === 0) {
         _data.form.passErr = false

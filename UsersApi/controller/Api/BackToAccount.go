@@ -19,6 +19,7 @@ type StatusJSON struct {
 	Export   bool   `json:"export"`
 	Import   bool   `json:"import"`
 	Pull     bool   `json:"pull"`
+	Igonre   bool   `json:"igonre"`
 }
 
 func BackToAccount(c *gin.Context) {

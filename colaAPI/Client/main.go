@@ -92,12 +92,14 @@ func main() {
 		a string
 		p string
 		t string
+		r string
 	)
 	flag.StringVar(&f, "f", "0", "file")
 	flag.StringVar(&s, "s", "0", "first")
 	flag.StringVar(&a, "a", "0", "account")
 	flag.StringVar(&p, "p", "2370", "projectid")
 	flag.StringVar(&t, "t", "3", "status")
+	flag.StringVar(&r, "r", "0", "remarks")
 	flag.Parse()
 
 	OS := runtime.GOOS
@@ -151,7 +153,7 @@ func main() {
 		}
 		var sa bool = false
 		for {
-			sa = AddAccount(confYaml.APIServer, orderID, t)
+			sa = AddAccount(confYaml.APIServer, orderID, t, r)
 			if sa {
 				break
 			}
@@ -309,9 +311,9 @@ func ColaLogin(colaRequest ColaAccountRequest) (token string, err error) {
 	return
 }
 
-func AddAccount(url, oid, t string) bool {
+func AddAccount(url, oid, t, r string) bool {
 	URL := strings.Join([]string{url, "AddAccount?account="}, "/")
-	URL = strings.Join([]string{URL, oid, "&status=", t}, "")
+	URL = strings.Join([]string{URL, oid, "&status=", t, "&remarks=", r}, "")
 	// fmt.Println(URL)
 	req, _ := http.NewRequest("GET", URL, nil)
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")

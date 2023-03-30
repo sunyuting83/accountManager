@@ -76,56 +76,69 @@ func GetOneAccount(c *gin.Context) {
 			comput.ComputerInsert()
 		}
 	}
-	if ColaAPI {
-		Projects, err := database.ProjectsCheckID(projectsID)
-		if err != nil {
-			if IsJson == "1" {
-				c.JSON(http.StatusBadRequest, gin.H{
-					"status":  1,
-					"message": "get projects failed",
-				})
-				return
-			}
-			c.String(200, "出错了")
-			return
-		}
-		var statusJson []*StatusJSON
-		json.Unmarshal([]byte(Projects.StatusJSON), &statusJson)
+	Projects, err := database.ProjectsCheckID(projectsID)
+	var (
+		statusJson   []*StatusJSON
+		ignoreMaster bool
+	)
+	json.Unmarshal([]byte(Projects.StatusJSON), &statusJson)
 
-		var (
-			hasStatus []string
-		)
-		for _, item := range statusJson {
-			if item.Status != "8" && item.Status != "9" && item.Status != "10" && item.Status != "108" {
-				hasStatus = append(hasStatus, item.Status)
-			}
-		}
-		var acc *database.Accounts
-		count, err := acc.GetInCount(projectsID, hasStatus)
-		if err != nil {
-			if IsJson == "1" {
-				c.JSON(http.StatusOK, gin.H{
-					"status":  1,
-					"message": "get count failed",
-				})
-				return
-			}
-			c.String(200, "出错了")
-			return
-		}
-		if count <= int64(Projects.AccNumber) {
-			if IsJson == "1" {
-				c.JSON(http.StatusOK, gin.H{
-					"status":  0,
-					"message": "first",
-				})
-				return
-			}
-			// data := strings.Join([]string{"首次扫码", token}, splitStr)
-			c.String(200, "首次扫码")
-			return
+	for _, item := range statusJson {
+		if item.Status == status {
+			ignoreMaster = item.Igonre
 		}
 	}
+
+	if ColaAPI {
+		if !ignoreMaster {
+			if err != nil {
+				if IsJson == "1" {
+					c.JSON(http.StatusBadRequest, gin.H{
+						"status":  1,
+						"message": "get projects failed",
+					})
+					return
+				}
+				c.String(200, "出错了")
+				return
+			}
+
+			var (
+				hasStatus []string
+			)
+			for _, item := range statusJson {
+				if !item.Igonre {
+					hasStatus = append(hasStatus, item.Status)
+				}
+			}
+			var acc *database.Accounts
+			count, err := acc.GetInCount(projectsID, hasStatus)
+			if err != nil {
+				if IsJson == "1" {
+					c.JSON(http.StatusOK, gin.H{
+						"status":  1,
+						"message": "get count failed",
+					})
+					return
+				}
+				c.String(200, "出错了")
+				return
+			}
+			if count <= int64(Projects.AccNumber) {
+				if IsJson == "1" {
+					c.JSON(http.StatusOK, gin.H{
+						"status":  0,
+						"message": "first",
+					})
+					return
+				}
+				// data := strings.Join([]string{"首次扫码", token}, splitStr)
+				c.String(200, "首次扫码")
+				return
+			}
+		}
+	}
+
 	account, err := database.GetOneAccount(projectsID, status)
 	if err != nil {
 		if IsJson == "1" {

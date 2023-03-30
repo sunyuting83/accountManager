@@ -11,6 +11,7 @@ import (
 func AddAccount(c *gin.Context) {
 	var Account string = c.Query("account")
 	var status string = c.DefaultQuery("status", "3")
+	var remarks string = c.Query("remarks")
 	projectsID, ColaAPI := GetProjectsID(c)
 	projectsInt, _ := strconv.Atoi(projectsID)
 	NewStatus, _ := strconv.Atoi(status)
@@ -19,6 +20,7 @@ func AddAccount(c *gin.Context) {
 			ProjectsID: uint(projectsInt),
 			UserName:   Account,
 			NewStatus:  NewStatus,
+			Remarks:    remarks,
 		}
 		account.AddAccount()
 		c.JSON(http.StatusOK, gin.H{
