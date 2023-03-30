@@ -11,6 +11,7 @@ import (
 	_ "image/png"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -145,6 +146,7 @@ func main() {
 		return
 	}
 	if s == "1" {
+		// AddAccount(confYaml.APIServer, "38588302", t, r)
 		status, orderID := CreateOrder(token, qrurl, p)
 		if !status {
 			SetColaToken(confYaml.APIServer, "")
@@ -230,8 +232,8 @@ func CreateOrder(token, uri, p string) (status bool, orderid string) {
 	return
 }
 
-func GetToken(url string) (token string, err error) {
-	URL := strings.Join([]string{url, "GetColaToken"}, "/")
+func GetToken(uri string) (token string, err error) {
+	URL := strings.Join([]string{uri, "GetColaToken"}, "/")
 	// fmt.Println(URL)
 	req, _ := http.NewRequest("GET", URL, nil)
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
@@ -253,8 +255,8 @@ func GetToken(url string) (token string, err error) {
 	return request.Token, nil
 }
 
-func GetColaAccount(url string) (request ColaAccountRequest, err error) {
-	URL := strings.Join([]string{url, "ColaAccount"}, "/")
+func GetColaAccount(uri string) (request ColaAccountRequest, err error) {
+	URL := strings.Join([]string{uri, "ColaAccount"}, "/")
 	// fmt.Println(URL)
 	req, _ := http.NewRequest("GET", URL, nil)
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
@@ -274,8 +276,8 @@ func GetColaAccount(url string) (request ColaAccountRequest, err error) {
 	}
 	return request, nil
 }
-func SetColaToken(url, token string) {
-	URL := strings.Join([]string{url, "SetColaToken"}, "/")
+func SetColaToken(uri, token string) {
+	URL := strings.Join([]string{uri, "SetColaToken"}, "/")
 	Params := strings.Join([]string{"token=", token}, "")
 	req, _ := http.NewRequest("PUT", URL, strings.NewReader(Params))
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
@@ -287,10 +289,10 @@ func SetColaToken(url, token string) {
 
 func ColaLogin(colaRequest ColaAccountRequest) (token string, err error) {
 	u := "Member/login"
-	url := strings.Join([]string{"http://tiancaiapi.tablecando.cn/api/", u}, "")
+	uri := strings.Join([]string{"http://tiancaiapi.tablecando.cn/api/", u}, "")
 
 	Params := strings.Join([]string{"member_user=", colaRequest.UserName, "&member_pwd=", colaRequest.Password}, "")
-	req, _ := http.NewRequest("POST", url, strings.NewReader(Params))
+	req, _ := http.NewRequest("POST", uri, strings.NewReader(Params))
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("X-Requested-With", "XMLHttpRequest")
@@ -311,9 +313,11 @@ func ColaLogin(colaRequest ColaAccountRequest) (token string, err error) {
 	return
 }
 
-func AddAccount(url, oid, t, r string) bool {
-	URL := strings.Join([]string{url, "AddAccount?account="}, "/")
-	URL = strings.Join([]string{URL, oid, "&status=", t, "&remarks=", r}, "")
+func AddAccount(uri, oid, t, r string) bool {
+	rUrlStr := url.QueryEscape(r)
+
+	URL := strings.Join([]string{uri, "AddAccount?account="}, "/")
+	URL = strings.Join([]string{URL, oid, "&status=", t, "&remarks=", rUrlStr}, "")
 	// fmt.Println(URL)
 	req, _ := http.NewRequest("GET", URL, nil)
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
@@ -329,6 +333,7 @@ func AddAccount(url, oid, t, r string) bool {
 	respByte, _ := io.ReadAll(resp.Body)
 	var request GetApiRequest
 	json.Unmarshal(respByte, &request)
+	// fmt.Println(request)
 	status := true
 	if request.Status == 1 {
 		status = false

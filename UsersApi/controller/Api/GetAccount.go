@@ -85,7 +85,7 @@ func GetOneAccount(c *gin.Context) {
 
 	for _, item := range statusJson {
 		if item.Status == status {
-			ignoreMaster = item.Igonre
+			ignoreMaster = item.Ignore
 		}
 	}
 
@@ -107,7 +107,7 @@ func GetOneAccount(c *gin.Context) {
 				hasStatus []string
 			)
 			for _, item := range statusJson {
-				if !item.Igonre {
+				if !item.Ignore {
 					hasStatus = append(hasStatus, item.Status)
 				}
 			}

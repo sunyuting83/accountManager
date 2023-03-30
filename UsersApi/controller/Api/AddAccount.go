@@ -27,6 +27,7 @@ func AddAccount(c *gin.Context) {
 			"status":  0,
 			"message": "adding account successfully",
 		})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":  1,

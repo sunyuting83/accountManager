@@ -435,7 +435,9 @@ export default defineComponent ({
         "delete":   false,
         "callback": false,
         "backto":   "",
-        "export":   false
+        "export":   false,
+        "pull": false,
+        "ignore": true,
       }]
     }
 

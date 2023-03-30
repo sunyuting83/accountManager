@@ -57,7 +57,7 @@
                   状态
                 </label>
                 <label class="checkbox mr-4">
-                  <input type="checkbox" v-model="item.igonre">
+                  <input type="checkbox" v-model="item.ignore">
                   忽略主库
                 </label>
               </div>
@@ -142,7 +142,7 @@ export default defineComponent ({
   },
   setup(props){
     let StatusJSON = JSON.parse(props.showData.Project.StatusJSON)
-    console.log(StatusJSON)
+    // console.log(StatusJSON)
     let haStatus = false
     if (StatusJSON.length > 0) haStatus = true
     let _data = reactive({
