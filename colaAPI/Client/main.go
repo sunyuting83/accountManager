@@ -116,6 +116,7 @@ func main() {
 	token, err := GetToken(confYaml.APIServer)
 	if err != nil || len(token) == 0 {
 		// haven't token, so create Login for cola
+		DelColaToken(confYaml.APIServer)
 		var colaRequest ColaAccountRequest
 		LoginStatus := false
 		for {
@@ -253,6 +254,29 @@ func GetToken(uri string) (token string, err error) {
 		return "", errors.New(request.Message)
 	}
 	return request.Token, nil
+}
+
+func DelColaToken(uri string) bool {
+	URL := strings.Join([]string{uri, "DeleteCola"}, "/")
+	// fmt.Println(URL)
+	req, _ := http.NewRequest("DELETE", URL, nil)
+	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("X-Requested-With", "XMLHttpRequest")
+	req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
+
+	resp, err := (&http.Client{Timeout: 35 * time.Second}).Do(req)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	respByte, _ := io.ReadAll(resp.Body)
+	var request GetApiRequest
+	json.Unmarshal(respByte, &request)
+	if request.Status == 1 {
+		return false
+	}
+	return true
 }
 
 func GetColaAccount(uri string) (request ColaAccountRequest, err error) {

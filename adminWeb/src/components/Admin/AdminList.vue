@@ -25,34 +25,36 @@
               <div v-if="data.length <= 0">
                 <EmptyEd></EmptyEd>
               </div>
-              <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left	" v-else>
-                <thead>
-                  <tr>
-                    <td width="35%">用户名</td>
-                    <td>状态</td>
-                    <td>创建时间</td>
-                    <td width="30%">操作</td>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(item) in data" :key="item.ID">
-                    <td>{{item.UserName}}</td>
-                    <td>
-                      <span class="has-text-success" v-if="item.NewStatus === 0">正常</span>
-                      <span class="has-text-danger" v-else>锁定</span>
-                    </td>
-                    <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
-                    <td>
-                      <div class="buttons">
-                        <button class="button is-success is-small" @click="()=>{showModel(item.UserName)}" v-if="item.ID !== 1">修改密码</button>
-                        <PopoButton
-                          :message="item.NewStatus === 0?'锁定':'解锁'" color="is-info" :callBack="()=>{lockIt(item.ID)}" v-if="item.UserName !== username && item.ID !== 1"></PopoButton>
-                        <PopoButton message="删除" color="is-danger" :callBack="()=>{deleteIt(item.ID)}" v-if="item.UserName !== username && item.ID !== 1"></PopoButton>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-container" v-else>
+                <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left	">
+                  <thead>
+                    <tr>
+                      <td width="35%">用户名</td>
+                      <td>状态</td>
+                      <td>创建时间</td>
+                      <td width="30%">操作</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item) in data" :key="item.ID">
+                      <td>{{item.UserName}}</td>
+                      <td>
+                        <span class="has-text-success" v-if="item.NewStatus === 0">正常</span>
+                        <span class="has-text-danger" v-else>锁定</span>
+                      </td>
+                      <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
+                      <td>
+                        <div class="buttons">
+                          <button class="button is-success is-small" @click="()=>{showModel(item.UserName)}" v-if="item.ID !== 1">修改密码</button>
+                          <PopoButton
+                            :message="item.NewStatus === 0?'锁定':'解锁'" color="is-info" :callBack="()=>{lockIt(item.ID)}" v-if="item.UserName !== username && item.ID !== 1"></PopoButton>
+                          <PopoButton message="删除" color="is-danger" :callBack="()=>{deleteIt(item.ID)}" v-if="item.UserName !== username && item.ID !== 1"></PopoButton>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

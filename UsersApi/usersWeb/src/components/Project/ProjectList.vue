@@ -17,47 +17,49 @@
               <div v-if="data.length <= 0">
                 <EmptyEd></EmptyEd>
               </div>
-              <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left" v-else>
-                <thead>
-                  <tr>
-                    <td width="8%">项目名称</td>
-                    <td>Key</td>
-                    <td>状态</td>
-                    <td>可乐API</td>
-                    <td>创建时间</td>
-                    <td>用户名</td>
-                    <td>密码</td>
-                    <td>帐号数</td>
-                    <td width="25%">操作</td>
-                  </tr>
-                </thead>
-                <tbody class=" is-size-7">
-                  <tr v-for="(item) in data" :key="item.ID">
-                    <td>{{item.ProjectsName}}</td>
-                    <td>{{item.Key}}</td>
-                    <td>
-                      <span class="has-text-success" v-if="item.NewStatus === 0">正常</span>
-                      <span class="has-text-danger" v-else>锁定</span>
-                    </td>
-                    <td>
-                      <span class="has-text-success" v-if="item.ColaAPI">是</span>
-                      <span class="has-text-danger" v-else>否</span>
-                    </td>
-                    <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
-                    <td>{{item.UserName}}</td>
-                    <td>{{item.Password}}</td>
-                    <td>{{item.AccNumber}}</td>
-                    <td>
-                      <div class="buttons">
-                        <button class="button is-success is-small" @click="()=>{showAccount(item.Key)}">帐号管理</button>
-                        <button class="button is-info is-small" @click="()=>{showAccountDraw(item.Key)}">提号管理</button>
-                        <button class="button is-primary is-small" @click="()=>{showAccountDrawed(item.Key)}">已提取帐号</button>
-                        <button class="button is-warning is-small" v-if="item.ColaAPI" @click="()=>{showModifyModal(item.Key)}">修改项目</button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-container" v-else>
+                <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left">
+                  <thead>
+                    <tr>
+                      <td width="8%">项目名称</td>
+                      <td>Key</td>
+                      <td>状态</td>
+                      <td>可乐API</td>
+                      <td>创建时间</td>
+                      <td>用户名</td>
+                      <td>密码</td>
+                      <td>帐号数</td>
+                      <td width="25%">操作</td>
+                    </tr>
+                  </thead>
+                  <tbody class=" is-size-7">
+                    <tr v-for="(item) in data" :key="item.ID">
+                      <td>{{item.ProjectsName}}</td>
+                      <td>{{item.Key}}</td>
+                      <td>
+                        <span class="has-text-success" v-if="item.NewStatus === 0">正常</span>
+                        <span class="has-text-danger" v-else>锁定</span>
+                      </td>
+                      <td>
+                        <span class="has-text-success" v-if="item.ColaAPI">是</span>
+                        <span class="has-text-danger" v-else>否</span>
+                      </td>
+                      <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
+                      <td>{{item.UserName}}</td>
+                      <td>{{item.Password}}</td>
+                      <td>{{item.AccNumber}}</td>
+                      <td>
+                        <div class="buttons">
+                          <button class="button is-success is-small" @click="()=>{showAccount(item.Key)}">帐号管理</button>
+                          <button class="button is-info is-small" @click="()=>{showAccountDraw(item.Key)}">提号管理</button>
+                          <button class="button is-primary is-small" @click="()=>{showAccountDrawed(item.Key)}">已提取帐号</button>
+                          <button class="button is-warning is-small" v-if="item.ColaAPI" @click="()=>{showModifyModal(item.Key)}">修改项目</button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

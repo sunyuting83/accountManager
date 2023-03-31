@@ -81,15 +81,18 @@ func GetColaAccount(c *gin.Context) {
 }
 
 func DeleteCola(c *gin.Context) {
-	projectsID, _ := GetProjectsID(c)
-	BadgerDB.Delete([]byte(projectsID + ".account"))
-	// fmt.Println(err)
-	has, _ := BadgerDB.Get([]byte(projectsID + ".account"))
-	// fmt.Println(err)
+	projectsID, ColaAPI := GetProjectsID(c)
+	if ColaAPI {
+		BadgerDB.Delete([]byte(projectsID + ".account"))
+		c.JSON(http.StatusOK, gin.H{
+			"status":  0,
+			"message": "delete token succeeded",
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":  1,
 		"message": "haven't power",
-		"has":     has,
 	})
 }
 

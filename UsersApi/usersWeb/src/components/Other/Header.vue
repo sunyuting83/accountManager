@@ -5,8 +5,13 @@
         <span class="navbar-item brand-text">
           <img :src="logo">Account Manage
         </span>
+        <span role="button" class="navbar-burger" :class="isActive ? 'is-active' : ''" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" @click="toogleMenu">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </span>
       </div>
-      <div id="navMenu" class="navbar-menu">
+      <div id="navMenu" class="navbar-menu"  :class="isActive ? 'is-active' : ''">
         <div class="navbar-start">
           <router-link class="navbar-item" :class="path === 'project'?'is-active':''" to="/project">
             项目管理
@@ -21,32 +26,32 @@
             已提取帐号管理
           </a>
         </div>
-      </div>
-      <div class="navbar-end">
-        <div class="navbar-item">
-          <div class="field is-grouped">
-            <div class="navbar-item has-dropdown is-hoverable">
-              <span class="navbar-link">
-                <span class="icon">
-                  <i class="fa fa-user-circle-o"></i>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="field is-grouped">
+              <div class="navbar-item has-dropdown is-hoverable">
+                <span class="navbar-link">
+                  <span class="icon">
+                    <i class="fa fa-user-circle-o"></i>
+                  </span>
+                  <span>
+                  用户中心
+                  </span>
                 </span>
-                <span>
-                用户中心
-                </span>
-              </span>
-          
-              <div class="navbar-dropdown">
-                <div class="dropdown-item">
-                  <p>当前登陆用户 <strong>{{openModal.username}}</strong> <br /><span class="is-size-7">努力刷号賺錢</span></p>
+            
+                <div class="navbar-dropdown">
+                  <div class="dropdown-item">
+                    <p>当前登陆用户 <strong>{{openModal.username}}</strong> <br /><span class="is-size-7">努力刷号賺錢</span></p>
+                  </div>
+                  <hr class="dropdown-divider">
+                  <a class="navbar-item" @click="showModel">
+                    修改密码
+                  </a>
+                  <hr class="navbar-divider">
+                  <a class="navbar-item" @click="LogOut">
+                    退出登陆
+                  </a>
                 </div>
-                <hr class="dropdown-divider">
-                <a class="navbar-item" @click="showModel">
-                  修改密码
-                </a>
-                <hr class="navbar-divider">
-                <a class="navbar-item" @click="LogOut">
-                  退出登陆
-                </a>
               </div>
             </div>
           </div>
@@ -85,6 +90,7 @@ export default defineComponent({
         active: false,
         message: ""
       },
+      isActive: false
     })
     states.openModal.username = localStorage.getItem('user')
     // console.log(states.openModal.username)
@@ -98,12 +104,16 @@ export default defineComponent({
     const ShowMessage =(e) =>{
       states.openerr = e
     }
+    const toogleMenu = () => {
+      states.isActive = !states.isActive
+    }
     return {
       ...toRefs(states),
       LogOut,
       router,
       showModel,
-      ShowMessage
+      ShowMessage,
+      toogleMenu
     }
   }
 })

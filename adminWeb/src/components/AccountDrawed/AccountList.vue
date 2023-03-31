@@ -101,49 +101,51 @@
               <div v-if="data.length <= 0">
                 <EmptyEd></EmptyEd>
               </div>
-              <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left" v-else>
-                <thead class="is-size-7">
-                  <tr>
-                    <td>序号</td>
-                    <td>帐号</td>
-                    <td v-if="data[0].PhoneNumber.length > 0">手机号</td>
-                    <td>今日金币</td>
-                    <td>昨日金币</td>
-                    <td>炮台</td>
-                    <td>钻石</td>
-                    <td>狂暴</td>
-                    <td>冰冻</td>
-                    <td>瞄准</td>
-                    <td v-if="data[0].Price.length > 0">价格</td>
-                    <td>过期时间</td>
-                    <td>创建时间</td>
-                    <td>更新时间</td>
-                  </tr>
-                </thead>
-                <tbody class="is-size-7">
-                  <tr v-for="(item, index) in data" :key="item.ID" class="hasimg">
-                    <td>{{index + 1}}</td>
-                    <td>{{item.UserName}}</td>
-                    <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
-                    <td><FormaNumber :Numbers="item.TodayGold" /></td>
-                    <td><FormaNumber :Numbers="item.YesterdayGold" /></td>
-                    <td><FormaNumber :Numbers="item.Multiple" /></td>
-                    <td>{{item.Diamond}}</td>
-                    <td>{{item.Crazy}}</td>
-                    <td>{{item.Cold}}</td>
-                    <td>{{item.Precise}}</td>
-                    <td v-if="item.Price.length > 0">{{item.Price}}</td>
-                    <td><ExpTime :DateTime="item.Exptime" /></td>
-                    <td><FormaTime :DateTime="item.CreatedAt" /></td>
-                    <td class="potd">
-                      <FormaTime :DateTime="item.UpdatedAt" />
-                      <div v-if="item.Cover.length > 0" class="poimg">
-                        <img :src="IMGUri+item.Cover" />
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-container" v-else>
+                <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left">
+                  <thead class="is-size-7">
+                    <tr>
+                      <td>序号</td>
+                      <td>帐号</td>
+                      <td v-if="data[0].PhoneNumber.length > 0">手机号</td>
+                      <td>今日金币</td>
+                      <td>昨日金币</td>
+                      <td>炮台</td>
+                      <td>钻石</td>
+                      <td>狂暴</td>
+                      <td>冰冻</td>
+                      <td>瞄准</td>
+                      <td v-if="data[0].Price.length > 0">价格</td>
+                      <td>过期时间</td>
+                      <td>创建时间</td>
+                      <td>更新时间</td>
+                    </tr>
+                  </thead>
+                  <tbody class="is-size-7">
+                    <tr v-for="(item, index) in data" :key="item.ID" class="hasimg">
+                      <td>{{index + 1}}</td>
+                      <td>{{item.UserName}}</td>
+                      <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
+                      <td><FormaNumber :Numbers="item.TodayGold" /></td>
+                      <td><FormaNumber :Numbers="item.YesterdayGold" /></td>
+                      <td><FormaNumber :Numbers="item.Multiple" /></td>
+                      <td>{{item.Diamond}}</td>
+                      <td>{{item.Crazy}}</td>
+                      <td>{{item.Cold}}</td>
+                      <td>{{item.Precise}}</td>
+                      <td v-if="item.Price.length > 0">{{item.Price}}</td>
+                      <td><ExpTime :DateTime="item.Exptime" /></td>
+                      <td><FormaTime :DateTime="item.CreatedAt" /></td>
+                      <td class="potd">
+                        <FormaTime :DateTime="item.UpdatedAt" />
+                        <div v-if="item.Cover.length > 0" class="poimg">
+                          <img :src="IMGUri+item.Cover" />
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
