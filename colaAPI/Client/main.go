@@ -114,6 +114,7 @@ func main() {
 	}
 	// get token from API Server
 	token, err := GetToken(confYaml.APIServer)
+	// fmt.Println(token)
 	if err != nil || len(token) == 0 {
 		// haven't token, so create Login for cola
 		DelColaToken(confYaml.APIServer)
@@ -123,6 +124,7 @@ func main() {
 			// get cola username and password an token
 			// if has a active at server, wait it done.
 			colaRequest, _ = GetColaAccount(confYaml.APIServer)
+			fmt.Println(colaRequest)
 			if colaRequest.Status == 0 {
 				LoginStatus = true
 				token = colaRequest.Token
@@ -132,6 +134,7 @@ func main() {
 		}
 		if LoginStatus && len(token) == 0 {
 			token, err = ColaLogin(colaRequest)
+			// fmt.Println(token)
 			if err != nil || len(token) == 0 {
 				SetColaToken(confYaml.APIServer, token)
 				fmt.Println("1,e")
@@ -142,6 +145,7 @@ func main() {
 	}
 	// fmt.Println(token)
 	qrurl, err := GetPaymentStr(f)
+	fmt.Println(qrurl)
 	if err != nil {
 		fmt.Println("1,e")
 		return
@@ -169,6 +173,7 @@ func main() {
 	}
 	if a != "0" {
 		status := TowOrder(token, qrurl, a)
+		fmt.Println(status)
 		if !status {
 			SetColaToken(confYaml.APIServer, "")
 			fmt.Println("1,e")
@@ -281,7 +286,7 @@ func DelColaToken(uri string) bool {
 
 func GetColaAccount(uri string) (request ColaAccountRequest, err error) {
 	URL := strings.Join([]string{uri, "ColaAccount"}, "/")
-	// fmt.Println(URL)
+	fmt.Println(URL)
 	req, _ := http.NewRequest("GET", URL, nil)
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -294,7 +299,9 @@ func GetColaAccount(uri string) (request ColaAccountRequest, err error) {
 	}
 	defer resp.Body.Close()
 	respByte, _ := io.ReadAll(resp.Body)
+	fmt.Println(string(respByte))
 	json.Unmarshal(respByte, &request)
+	fmt.Println(request.Message, request.UserName, request.Password)
 	if request.Status == 1 {
 		return request, errors.New(request.Message)
 	}
@@ -331,6 +338,7 @@ func ColaLogin(colaRequest ColaAccountRequest) (token string, err error) {
 	respByte, _ := io.ReadAll(resp.Body)
 
 	json.Unmarshal(respByte, &request)
+	fmt.Println(request)
 	if request.Status == "200" {
 		token = request.Token
 	}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -53,7 +54,7 @@ func PullAccountDrawSelect(c *gin.Context) {
 	}
 	hasStatusStr := strings.Join(hasStatus, ",")
 
-	SQL := MakeSelectSQL(form, hasStatusStr)
+	SQL := MakeSelectSQL(form, hasStatusStr, projectsID)
 	// fmt.Println(SQL)
 	var acc *database.Accounts
 
@@ -75,8 +76,10 @@ func PullAccountDrawSelect(c *gin.Context) {
 	c.JSON(http.StatusOK, Data)
 }
 
-func MakeSelectSQL(filter Filter, hasStatusStr string) (SQL string) {
-	SQL = "UPDATE accounts SET new_status = 108 WHERE new_status IN ("
+func MakeSelectSQL(filter Filter, hasStatusStr, projectsID string) (SQL string) {
+	nowTime := time.Now().Unix() * 1000
+	TimeStr := strconv.FormatInt(nowTime, 10)
+	SQL = "UPDATE accounts SET updated_at = " + TimeStr + ", new_status = 108 WHERE projects_id = " + projectsID + " AND new_status IN ("
 	SQL = strings.Join([]string{SQL, hasStatusStr, ") AND "}, "")
 	if filter.MinGold > 0 {
 		MinGold := strconv.FormatInt(filter.MinGold, 10)
