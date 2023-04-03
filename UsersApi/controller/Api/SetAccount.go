@@ -69,6 +69,17 @@ func SetAccount(c *gin.Context) {
 		c.String(200, "帐号不存在")
 		return
 	}
+	if account.NewStatus == 108 {
+		if IsJson == "1" {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": err.Error(),
+			})
+			return
+		}
+		c.String(200, "帐号不存在")
+		return
+	}
 	account.AccountUpStatus(To)
 	if IsJson == "1" {
 		Data := gin.H{
