@@ -16,7 +16,7 @@ func AddAccount(c *gin.Context) {
 		remarks  string = c.Query("remarks")
 		IsJson   string = c.DefaultQuery("json", "0")
 	)
-	projectsID, ColaAPI := GetProjectsID(c)
+	projectsID, _ := GetProjectsID(c)
 	projectsInt, _ := strconv.Atoi(projectsID)
 	NewStatus, _ := strconv.Atoi(status)
 	if len(Account) == 0 {
@@ -31,27 +31,38 @@ func AddAccount(c *gin.Context) {
 		return
 	}
 
-	account := &database.Accounts{
-		ProjectsID: uint(projectsInt),
-		UserName:   Account,
-		Password:   Password,
-		NewStatus:  NewStatus,
-	}
-	if ColaAPI {
-		account = &database.Accounts{
+	_, err := database.CheckOneAccount(projectsID, Account)
+	if err != nil && err.Error() == "record not found" {
+		account := &database.Accounts{
 			ProjectsID: uint(projectsInt),
 			UserName:   Account,
+			Password:   Password,
 			NewStatus:  NewStatus,
-			Remarks:    remarks,
 		}
+		if len(Password) != 0 {
+			account.Password = Password
+		}
+		if len(remarks) != 0 {
+			account.Remarks = remarks
+		}
+		account.AddAccount()
+		if IsJson == "1" {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  0,
+				"message": "adding account successfully",
+			})
+			return
+		}
+		c.String(200, "添加成功")
+		return
 	}
-	account.AddAccount()
 	if IsJson == "1" {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  0,
-			"message": "adding account successfully",
+			"message": "account is has",
 		})
 		return
 	}
-	c.String(200, "添加成功")
+	c.String(200, "帐号已存在")
+
 }
