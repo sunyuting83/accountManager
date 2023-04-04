@@ -73,7 +73,6 @@
                       <td v-if="data[0].Remarks.length > 0">其他</td>
                       <td v-if="data[0].Price.length > 0">价格</td>
                       <td>过期时间</td>
-                      <td>创建时间</td>
                       <td>更新时间</td>
                     </tr>
                   </thead>
@@ -94,7 +93,6 @@
                       <td v-if="item.Remarks.length > 0" class="w165">{{item.Remarks}}</td>
                       <td v-if="item.Price.length > 0">{{item.Price}}</td>
                       <td><ExpTime :DateTime="item.Exptime" /></td>
-                      <td><FormaTime :DateTime="item.CreatedAt" /></td>
                       <td><FormaTime :DateTime="item.UpdatedAt" /></td>
                     </tr>
                   </tbody>

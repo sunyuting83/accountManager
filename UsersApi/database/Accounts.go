@@ -93,10 +93,23 @@ func CheckAccount(projectsid, account string) (accounts *Accounts, err error) {
 	return
 }
 
+func CheckOneAccount(projectsid, account string) (accounts *Accounts, err error) {
+	if err = sqlDB.First(&accounts, "projects_id = ? and user_name = ? and new_status != ?", projectsid, account, "108").Error; err != nil {
+		return
+	}
+	return
+}
+
 // Delete Admin
 func (accounts *Accounts) DeleteAll(projectid string, status string) {
 	// time.Sleep(time.Duration(100) * time.Millisecond)
 	sqlDB.Where("projects_id = ? and new_status = ?", projectid, status).Delete(&accounts)
+}
+
+// Delete Admin
+func (accounts *Accounts) DeleteOne(projectid string, account string) {
+	// time.Sleep(time.Duration(100) * time.Millisecond)
+	sqlDB.Where("projects_id = ? and user_name = ? and new_status != ?", projectid, account, "108").Delete(&accounts)
 }
 
 // Reset Password

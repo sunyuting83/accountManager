@@ -117,7 +117,6 @@
                       <td>瞄准</td>
                       <td v-if="data[0].Price.length > 0">价格</td>
                       <td>过期时间</td>
-                      <td>创建时间</td>
                       <td>更新时间</td>
                     </tr>
                   </thead>
@@ -135,7 +134,6 @@
                       <td>{{item.Precise}}</td>
                       <td v-if="item.Price.length > 0">{{item.Price}}</td>
                       <td><ExpTime :DateTime="item.Exptime" /></td>
-                      <td><FormaTime :DateTime="item.CreatedAt" /></td>
                       <td class="potd">
                         <FormaTime :DateTime="item.UpdatedAt" />
                         <div v-if="item.Cover.length > 0" class="poimg">
