@@ -7,7 +7,13 @@
           <p class="card-header-title">
             项目列表
           </p>
-          <button class="card-header-icon">
+          <button class="buttons card-header-icon">
+            <button class="button is-info is-small" @click="ShowCola">
+              <span class="icon is-small">
+                <i class="fa" :class="showCola?'fa-eye-slash':'fa-eye'"></i>
+              </span>
+              <span>{{showCola?"隐藏":"显示"}}可乐</span>
+            </button>
             <button class="button is-link is-small" @click="showAddModel">
               <span class="icon is-small">
                 <i class="fa fa-plus"></i>
@@ -37,9 +43,9 @@
                       <td>状态</td>
                       <td>可乐API</td>
                       <td>创建时间</td>
-                      <td>用户名</td>
-                      <td>密码</td>
-                      <td>帐号数</td>
+                      <td v-if="showCola">用户名</td>
+                      <td v-if="showCola">密码</td>
+                      <td v-if="showCola">帐号数</td>
                       <td width="25%">操作</td>
                     </tr>
                   </thead>
@@ -59,9 +65,9 @@
                         <span class="has-text-danger" v-else>否</span>
                       </td>
                       <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
-                      <td>{{item.UserName}}</td>
-                      <td>{{item.Password}}</td>
-                      <td>{{item.AccNumber}}</td>
+                      <td v-if="showCola">{{item.UserName}}</td>
+                      <td v-if="showCola">{{item.Password}}</td>
+                      <td v-if="showCola">{{item.AccNumber}}</td>
                       <td>
                         <div class="buttons">
                           <button class="button is-success is-small" @click="()=>{showAccount(item.Key)}">帐号管理</button>
@@ -128,6 +134,7 @@ export default defineComponent({
         UserData: [],
         GamesData: [],
       },
+      showCola: false,
       total: 0,
       username: "",
       userid: "",
@@ -331,6 +338,10 @@ export default defineComponent({
       router.push(`/accountDrawed/${id}`)
     }
 
+    const ShowCola = () => {
+      states.showCola = !states.showCola
+    }
+
     return {
       ...toRefs(states),
       ShowMessage,
@@ -342,7 +353,8 @@ export default defineComponent({
       showAccount,
       showModifyModal,
       showAccountDraw,
-      showAccountDrawed
+      showAccountDrawed,
+      ShowCola
     }
   },
 })
