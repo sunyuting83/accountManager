@@ -46,7 +46,7 @@
                   <tbody class=" is-size-7">
                     <tr v-for="(item) in data" :key="item.ID">
                       <td>{{item.ProjectsName}}</td>
-                      <td>{{item.Users.UserName}}</td>
+                      <td>{{item.Users.UserName}}<br />{{item.Users.Remarks.length > 0 ? item.Users.Remarks : "" }}</td>
                       <td>{{item.Games.GameName}}</td>
                       <td v-if="username === 'admin' && userid === '1'">{{item.Users.Manager.UserName}}</td>
                       <td>{{item.Key}}</td>

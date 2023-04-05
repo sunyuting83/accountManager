@@ -31,6 +31,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64, Users_SECRET_K
 		router.GET("/adminlist", controller.Index)
 		router.GET("/userlist", controller.Index)
 		router.GET("/project", controller.Index)
+		router.GET("/gameslist", controller.Index)
 		router.GET("/account/:key", controller.Index)
 		router.GET("/accountDraw/:key/:type", controller.Index)
 		router.GET("/accountDrawed/:key", controller.Index)

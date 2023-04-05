@@ -151,17 +151,18 @@ func (account *Accounts) ExportAccount(projectsID, status string) (accounts []*A
 	// SELECT DISTINCT DATE(updated_at / 1000, 'unixepoch','localtime') FROM accounts WHERE new_status IN (2,3,4,5)
 }
 
-func PullDataUseIn(IDs []int) (accounts []*Accounts, err error) {
+func PullDataUseIn(IDs []int, projectsID string) (accounts []*Accounts, err error) {
 	sqlDB.
 		Model(&accounts).
 		Clauses(clause.Returning{}).
-		Where("id IN ?", IDs).
+		Where("projects_id = ? AND id IN ?", projectsID, IDs).
 		Update("new_status", "108")
 	return
 }
 
 func (account *Accounts) PullDataUseSQL(SQL string) (rows int64) {
 	db := sqlDB.Exec(SQL)
+	// rows, err = sqlDB.Raw(SQL).Rows()
 	rows = db.RowsAffected
 	return
 }

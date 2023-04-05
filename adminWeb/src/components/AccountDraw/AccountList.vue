@@ -636,7 +636,8 @@ export default defineComponent({
       pullData,
       pullSelectData,
       pushRouterToDrawed,
-      closeModal
+      closeModal,
+      ShowMessage
     }
   },
 })

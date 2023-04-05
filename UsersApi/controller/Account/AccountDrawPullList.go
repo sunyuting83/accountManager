@@ -3,8 +3,11 @@ package controller
 import (
 	Redis "colaAPI/Redis"
 	"colaAPI/UsersApi/database"
+	"colaAPI/UsersApi/utils"
 	"encoding/json"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,10 +27,37 @@ func PullAccountDrawList(c *gin.Context) {
 	}
 	tempList := RemoveRepeatedList(form.List)
 	if len(tempList) != 0 {
-		var acc *database.Accounts
-
-		acc.PullDataUseIn(form.List)
+		AdminID := utils.GetCurrentUserID(c)
+		user, err := database.UserCheckID(int64(AdminID))
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "get admin failed",
+			})
+			return
+		}
 		projectsID, ColaAPI := GetProjects(c)
+		ProjectsID, _ := strconv.ParseInt(projectsID, 10, 64)
+		upData, err := database.PullDataUseIn(form.List, projectsID)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": err,
+			})
+			return
+		}
+
+		upDataJsonStr, _ := json.Marshal(&upData)
+
+		d := time.Now()
+		date := d.Format("2006-01-02_15:04:05")
+		draw := &database.DrawLogs{
+			ProjectsID: uint(ProjectsID),
+			Data:       string(upDataJsonStr),
+			LogName:    date,
+			DrawUser:   user.UserName,
+		}
+		draw.AddDrawLogs()
 		if ColaAPI {
 			Projects, err := database.ProjectsCheckID(projectsID)
 			if err != nil {
@@ -47,6 +77,7 @@ func PullAccountDrawList(c *gin.Context) {
 		Data := gin.H{
 			"status":  0,
 			"message": "提取成功",
+			"data":    upData,
 		}
 		c.JSON(http.StatusOK, Data)
 		return

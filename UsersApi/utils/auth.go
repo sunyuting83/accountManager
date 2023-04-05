@@ -71,6 +71,27 @@ func UserVerifyMiddleware() gin.HandlerFunc {
 	}
 }
 
+func GetCurrentUserID(c *gin.Context) uint {
+	token := c.GetHeader("Authorization")
+	secret_key, _ := c.Get("secret_key")
+	SECRET_KEY := secret_key.(string)
+	token = token[7:]
+	return GetUserID(SECRET_KEY, token)
+}
+
+func GetUserID(s, a string) uint {
+	AEStoken, err := DecryptByAes(a, []byte(s))
+	if err != nil {
+		return 0
+	}
+	token, err := BadgerDB.GetToken(AEStoken)
+	if err != nil {
+		return 0
+	}
+	json.Unmarshal(token, &result)
+	return result.UserID
+}
+
 // UserVerifyMiddleware Verify middleware
 func UserProjectsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {

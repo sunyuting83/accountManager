@@ -220,6 +220,7 @@
                       <td>瞄准</td>
                       <td v-if="data[0].Price.length > 0">价格</td>
                       <td>过期时间</td>
+                      <td>创建时间</td>
                       <td>更新时间</td>
                     </tr>
                   </thead>
@@ -242,6 +243,7 @@
                       <td>{{item.Precise}}</td>
                       <td v-if="item.Price.length > 0">{{item.Price}}</td>
                       <td><ExpTime :DateTime="item.Exptime" /></td>
+                      <td><FormaTime :DateTime="item.CreatedAt" /></td>
                       <td class="potd">
                         <FormaTime :DateTime="item.UpdatedAt" />
                         <div v-if="item.Cover.length > 0" class="poimg">
@@ -262,6 +264,10 @@
     <NotIfication
       :showData="openerr">
     </NotIfication>
+    <RenewalCard
+      :showData="openModal"
+      :Close="closeModal"
+      :ShowMessage="ShowMessage" />
   </div>
 </template>
 <script>
@@ -275,6 +281,7 @@ import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
 import FormaNumber from '@/components/Other/FormaNumber'
 import ExpTime from '@/components/Other/ExpTime'
+import RenewalCard from '@/components/Other/Renewal'
 
 
 import Fetch from '@/helper/fetch'
@@ -283,7 +290,7 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'AccountList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime, RenewalCard },
   setup() {
     let states = reactive({
       AccountKey: "",
@@ -302,6 +309,12 @@ export default defineComponent({
         active: false,
         message: "",
         color: ""
+      },
+      openModal:{
+        active: false,
+        message: "",
+        title: "",
+        data: "",
       },
       pageLoading: false,
       limit: Config.Limit,
@@ -489,6 +502,40 @@ export default defineComponent({
         })
       }
     }
+    const makeNumberINT = (n) =>{
+      let x = "0"
+      if ((n+"").length >= 9 && n !== 0) {
+        const a = Math.floor(n / 100000000)
+        x = `${a}`
+      }else if (n === 123) {
+        x = "识别错误"
+      }else{
+        if (n !== 0 ) {
+          const a = Math.floor(n / 10000)
+          x = `${a}`
+        }
+      }
+      return x
+    }
+
+    const makeData = (data) => {
+      let d = []
+      data.forEach((el) => {
+        d = [...d, `${el.UserName}\t${el.Password}\t${makeNumberINT(el.TodayGold)}\t${el.Multiple}`]
+      })
+      const x = d.join("\r\n")
+      return x
+    }
+
+    const closeModal = () => {
+      states.checkTemp = []
+      const AccountType = router.currentRoute._value.params.type
+      if (AccountType == 'date') {
+        GetDateList()
+      }else {
+        GetGoldData()
+      }
+    }
 
     const pullData = async() => {
       const list = states.checkTemp
@@ -511,15 +558,12 @@ export default defineComponent({
         if (d.status == 0) {
           states.loading = false
           states.buttonLoading = false
-          e.color = 'is-success'
-          e.message = d.message
-          ShowMessage(e)
-          const AccountType = router.currentRoute._value.params.type
-          if (AccountType == 'date') {
-            GetDateList()
-          }else {
-            GetGoldData()
-          }
+          // here
+          const data = makeData(d.data)
+          states.openModal.active = true
+          states.openModal.title = "提取成功"
+          states.openModal.message = "成功提取帐号，点击复制到剪切板再关闭此弹窗。"
+          states.openModal.data = data
         }else{
           states.checkTemp = []
           states.loading = false
@@ -591,7 +635,9 @@ export default defineComponent({
       checkall,
       pullData,
       pullSelectData,
-      pushRouterToDrawed
+      pushRouterToDrawed,
+      closeModal,
+      ShowMessage
     }
   },
 })
@@ -600,10 +646,7 @@ export default defineComponent({
 .f-1 {
   margin-left: -1px;
 }
-.w165 {
-  min-width: 100px;
-  max-width: 140px;
-}
+
 .hasimg .potd .poimg {
   position: absolute;
   right: 0;

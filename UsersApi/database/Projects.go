@@ -10,6 +10,7 @@ type Projects struct {
 	NewStatus    int `gorm:"index"`
 	Accounts     []Accounts
 	Filed        []Filed
+	DrawLogs     []DrawLogs
 	Key          string
 	Remarks      string
 	AccNumber    int

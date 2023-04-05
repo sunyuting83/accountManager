@@ -36,7 +36,9 @@ func PullAccountDrawList(c *gin.Context) {
 			})
 			return
 		}
-		upData, err := database.PullDataUseIn(form.List)
+		projectsID, ColaAPI := GetProjects(c)
+		ProjectsID, _ := strconv.ParseInt(projectsID, 10, 64)
+		upData, err := database.PullDataUseIn(form.List, projectsID)
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  1,
@@ -47,8 +49,6 @@ func PullAccountDrawList(c *gin.Context) {
 
 		upDataJsonStr, _ := json.Marshal(&upData)
 
-		projectsID, ColaAPI := GetProjects(c)
-		ProjectsID, _ := strconv.ParseInt(projectsID, 10, 64)
 		d := time.Now()
 		date := d.Format("2006-01-02_15:04:05")
 		draw := &database.DrawLogs{
