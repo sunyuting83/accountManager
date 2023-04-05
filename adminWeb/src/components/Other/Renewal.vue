@@ -3,12 +3,11 @@
     <div class="modal-background"></div>
     <div class="modal-card">
       <header class="modal-card-head">
-        <p class="modal-card-title">帐号信息</p>
+        <p class="modal-card-title">{{showData.title}}</p>
         <button class="delete" aria-label="close" @click="closErr"></button>
       </header>
       <section class="modal-card-body">
-        <p>帐号：{{showData.account.accountgs}}</p>
-        <p>密码：{{showData.account.password}}</p>
+        <p>{{showData.message}}</p>
       </section>
       <footer class="modal-card-foot">
         <button class="button is-success" @click="copyAccount">复制到剪切板</button>
@@ -30,28 +29,28 @@ export default defineComponent ({
         type: Boolean,
         default: false
       },
-      account: {
-        accountgs: {
-        type: String
-        },
-        password: {
-          type: String
-        },
+      message: {
+        type: String,
       },
-      atest : {
+      title: {
+        type: String,
+      },
+      data : {
         type: String
       }
     },
-    ShowMessage:Function
+    ShowMessage:Function,
+    Close:Function,
   },
   setup(props){
     const closErr = () => {
       const _this = props
       _this.showData.active = false
+      props.Close()
     }
     const copyAccount = async() => {
       const p = props
-      await toClipboard(p.showData.atest)
+      await toClipboard(p.showData.data)
       const d = {
         active: true,
         message: "复制帐号成功",

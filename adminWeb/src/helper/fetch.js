@@ -1,4 +1,4 @@
-export default async (url = '', params = {}, method = 'GET', token = '') => {
+export default async (url = '', params = {}, method = 'GET', token = '', d = false, excel = false) => {
   method = method.toUpperCase()
   // 此处规定get请求的参数使用时放在data中，如同post请求
   if (method === 'GET') {
@@ -16,28 +16,56 @@ export default async (url = '', params = {}, method = 'GET', token = '') => {
   let requestConfig = {
     method: method,
   }
-
+  if (d) {
+    requestConfig['responseType'] = "blob"
+  }
+  // console.log(params)
+  // console.log(Object.hasOwnProperty.call(params, "files"))
   if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
-    requestConfig.headers = {
-      Accept: '*/*',
-      'Content-Type': 'application/json;charset=UTF-8',
+    if (!Object.hasOwnProperty.call(params, "files")) {
+      requestConfig.headers = {
+        Accept: '*/*',
+        'Content-Type': 'application/json;charset=UTF-8',
+      }
+      Object.defineProperty(requestConfig, 'body', {
+        value: JSON.stringify(params)
+      })
+    }else {
+      requestConfig.headers = {
+        Accept: '*/*',
+        'Content-Type': 'multipart/form-data',
+      }
+      requestConfig.processData = false
+      const formData = new FormData()
+      for (const key in params) {
+        formData.append(key,params[key])
+      }
+      // Object.defineProperty(requestConfig, 'body', formData)
+      requestConfig.body = formData
     }
-    Object.defineProperty(requestConfig, 'body', {
-      value: JSON.stringify(params)
-    })
   }
   if (token !== null && token.length > 8) {
     requestConfig.headers = new Headers({
       Accept: '*/*',
-      'Content-Type': 'application/json;charset=UTF-8',
     })
+    if (!Object.hasOwnProperty.call(params, "files")) {
+      requestConfig.headers.append("Content-Type","application/json;charset=UTF-8")
+    }
     requestConfig.headers.append('Authorization',`Bearer ${token}`)
   }
   return new Promise((resolve) => {
     fetch(url, requestConfig)
       .then(res => {
         if(res.ok) {
-          return res.json()
+          if (d) {
+            if (excel) {
+              return res.blob()
+            }else {
+              return res.text()
+            }
+          }else {
+            return res.json()
+          }
         }else {
           resolve({
             status: 1,

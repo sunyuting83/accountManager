@@ -19,6 +19,7 @@ type Projects struct {
 	ColaAPI      bool
 	Users        Users
 	Games        Games
+	DrawLogs     []DrawLogs
 	CreatedAt    int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt    int64 `gorm:"autoUpdateTime:milli"`
 }

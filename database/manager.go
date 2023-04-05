@@ -31,6 +31,13 @@ func CheckUserName(username string) (manager *Manager, err error) {
 	return
 }
 
+func CheckUserID(id uint) (manager *Manager, err error) {
+	if err = sqlDB.First(&manager, "id = ? ", id).Error; err != nil {
+		return
+	}
+	return
+}
+
 // Get Count
 func (manager *Manager) GetCount() (count int64, err error) {
 	if err = sqlDB.Model(&manager).Count(&count).Error; err != nil {

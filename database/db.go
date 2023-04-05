@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -31,7 +30,7 @@ func InitDB(pwd string, confYaml *utils.Config) {
 
 	// SetConnMaxLifetime 设置了连接可复用的最大时间。
 	Eloquent.SetConnMaxLifetime(time.Hour)
-	sqlDB.AutoMigrate(&Users{}, &Games{}, &Projects{}, &Comput{}, &Accounts{}, &Filed{}, &Manager{})
+	sqlDB.AutoMigrate(&Users{}, &Games{}, &Projects{}, &DrawLogs{}, &Comput{}, &Accounts{}, &Filed{}, &Manager{})
 
 	var (
 		manager *Manager
@@ -56,16 +55,6 @@ func GetDB(confYaml *utils.Config) {
 		sqlDB, _ = gorm.Open(postgres.New(postgres.Config{
 			DSN:                  DNString,
 			PreferSimpleProtocol: true, // disables implicit prepared statement usage
-		}), &gorm.Config{})
-	case "mysql":
-		DNString := strings.Join([]string{confYaml.Database.Username, ":", confYaml.Database.Password, "@tcp(", confYaml.Database.DBHost, ":", confYaml.Database.DBProt, ")/", confYaml.Database.DBName, "?charset=utf8&parseTime=True&loc=Local"}, "")
-		sqlDB, _ = gorm.Open(mysql.New(mysql.Config{
-			DSN:                       DNString, // DSN data source name
-			DefaultStringSize:         256,
-			DisableDatetimePrecision:  true,
-			DontSupportRenameIndex:    true,
-			DontSupportRenameColumn:   true,
-			SkipInitializeWithVersion: false,
 		}), &gorm.Config{})
 	case "sqlite":
 		CurrentPath, _ := utils.GetCurrentPath()

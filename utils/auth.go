@@ -41,6 +41,27 @@ func AdminVerifyMiddleware() gin.HandlerFunc {
 	}
 }
 
+func GetCurrentAdminID(c *gin.Context) uint {
+	token := c.GetHeader("Authorization")
+	secret_key, _ := c.Get("secret_key")
+	SECRET_KEY := secret_key.(string)
+	token = token[7:]
+	return GetAdminID(SECRET_KEY, token)
+}
+
+func GetAdminID(s, a string) uint {
+	AEStoken, err := DecryptByAes(a, []byte(s))
+	if err != nil {
+		return 0
+	}
+	token, err := BadgerDB.GetToken(AEStoken)
+	if err != nil {
+		return 0
+	}
+	json.Unmarshal(token, &result)
+	return result.UserID
+}
+
 // CheckToken is a check token function
 func CheckToken(s, a string) bool {
 	AEStoken, err := DecryptByAes(a, []byte(s))

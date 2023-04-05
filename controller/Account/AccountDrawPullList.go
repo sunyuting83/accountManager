@@ -3,9 +3,11 @@ package controller
 import (
 	Redis "colaAPI/Redis"
 	"colaAPI/database"
+	"colaAPI/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,12 +27,38 @@ func PullAccountDrawList(c *gin.Context) {
 	}
 	tempList := RemoveRepeatedList(form.List)
 	if len(tempList) != 0 {
-		var acc *database.Accounts
+		AdminID := utils.GetCurrentAdminID(c)
+		user, err := database.CheckUserID(AdminID)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "get admin failed",
+			})
+			return
+		}
+		upData, err := database.PullDataUseIn(form.List)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": err,
+			})
+			return
+		}
 
-		acc.PullDataUseIn(form.List)
+		upDataJsonStr, _ := json.Marshal(&upData)
+
 		projectsID, ColaAPI := GetProjects(c)
+		ProjectsID, _ := strconv.ParseInt(projectsID, 10, 64)
+		d := time.Now()
+		date := d.Format("2006-01-02_15:04:05")
+		draw := &database.DrawLogs{
+			ProjectsID: uint(ProjectsID),
+			Data:       string(upDataJsonStr),
+			LogName:    date,
+			DrawUser:   user.UserName,
+		}
+		draw.AddDrawLogs()
 		if ColaAPI {
-			ProjectsID, _ := strconv.ParseInt(projectsID, 10, 64)
 			Projects, err := database.ProjectsCheckID(ProjectsID)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{
@@ -48,6 +76,7 @@ func PullAccountDrawList(c *gin.Context) {
 		}
 		Data := gin.H{
 			"status":  0,
+			"data":    upData,
 			"message": "提取成功",
 		}
 		c.JSON(http.StatusOK, Data)

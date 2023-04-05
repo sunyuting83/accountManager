@@ -41,7 +41,7 @@ export default defineComponent({
     const ext = _this.ext
     const ExportAccount = async() => {
       let d
-      if (ext === "."){
+      if (ext === ".txt"){
         d = await Fetch(url, Data, 'GET', token, true)
       }else {
         Data.excel = true
