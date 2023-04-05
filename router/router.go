@@ -4,6 +4,7 @@ import (
 	"colaAPI/controller"
 	Account "colaAPI/controller/Account"
 	Admin "colaAPI/controller/Admin"
+	Games "colaAPI/controller/Games"
 	Projects "colaAPI/controller/Projects"
 	User "colaAPI/controller/User"
 	utils "colaAPI/utils"
@@ -47,6 +48,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64, Users_SECRET_K
 		adminapiv1.GET("/UserList", utils.AdminVerifyMiddleware(), User.UsersList)
 		adminapiv1.GET("/UsersAllList", utils.AdminVerifyMiddleware(), User.UsersAllList)
 		adminapiv1.PUT("/UpStatusUser", utils.AdminVerifyMiddleware(), User.UpStatusUser)
+		adminapiv1.PUT("/SetUserRemarks", utils.AdminVerifyMiddleware(), User.SetUserRemarks)
 		adminapiv1.GET("/aaa", utils.AdminVerifyMiddleware(), controller.Index)
 		adminapiv1.POST("/AddProjects", utils.AdminVerifyMiddleware(), Projects.AddProjects)
 		adminapiv1.DELETE("/DelProjects", utils.AdminVerifyMiddleware(), Projects.DeleteProjects)
@@ -68,6 +70,10 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64, Users_SECRET_K
 		adminApiV1HasKey.GET("/ExportDrawed", utils.AdminVerifyMiddleware(), Account.ExportAccountDrawed)
 		adminApiV1HasKey.GET("/GetFiledList", utils.AdminVerifyMiddleware(), Account.GetFiledList)
 		adminApiV1HasKey.GET("/GetOneFiled", utils.AdminVerifyMiddleware(), Account.GetOneFiled)
+		adminapiv1.POST("/AddGame", utils.AdminVerifyMiddleware(), Games.AddGame)
+		adminapiv1.DELETE("/DelGame", utils.AdminVerifyMiddleware(), Games.DeleteGame)
+		adminapiv1.GET("/GamesList", utils.AdminVerifyMiddleware(), Games.GamesList)
+		adminapiv1.GET("/GamesAllList", utils.AdminVerifyMiddleware(), Games.GamesAllList)
 	}
 
 	return router

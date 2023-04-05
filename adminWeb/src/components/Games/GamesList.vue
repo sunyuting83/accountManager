@@ -5,14 +5,14 @@
       <div class="card events-card">
         <header class="card-header">
           <p class="card-header-title">
-            用户列表
+            游戏列表
           </p>
           <button class="card-header-icon">
             <button class="button is-link is-small" @click="showAddModel">
               <span class="icon is-small">
                 <i class="fa fa-plus"></i>
               </span>
-              <span>添加用户</span>
+              <span>添加游戏</span>
             </button>
           </button>
         </header>
@@ -29,32 +29,18 @@
                 <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left	">
                   <thead>
                     <tr>
-                      <td width="15%">用户名</td>
-                      <td>备注</td>
-                      <td>状态</td>
-                      <td v-if="userid == '1'">所属管理员</td>
+                      <td width="35%">游戏名</td>
                       <td>创建时间</td>
                       <td width="30%">操作</td>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item) in data" :key="item.ID">
-                      <td>{{item.UserName}}</td>
-                      <td>
-                        <input class="input is-link is-small" type="Remarks" :placeholder=item.Remarks @blur="(e)=>{setRemarks(item.ID,e)}" />
-                      </td>
-                      <td>
-                        <span class="has-text-success" v-if="item.NewStatus === 0">正常</span>
-                        <span class="has-text-danger" v-else>锁定</span>
-                      </td>
-                      <td  v-if="userid == '1'">{{item.Manager.UserName}}</td>
+                      <td>{{item.GameName}}</td>
                       <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
                       <td>
                         <div class="buttons">
-                          <button class="button is-success is-small" @click="()=>{showModel(item.UserName)}">修改密码</button>
-                          <PopoButton
-                            :message="item.NewStatus === 0?'锁定':'解锁'" color="is-info" :callBack="()=>{lockIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
-                          <PopoButton message="删除" color="is-danger" :callBack="()=>{deleteIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
+                          <PopoButton message="删除" color="is-danger" :callBack="()=>{deleteIt(item.ID)}"></PopoButton>
                         </div>
                       </td>
                     </tr>
@@ -71,12 +57,12 @@
     <ChangePassword
       :showData="openModal"
       :ShowMessage="ShowMessage"
-      :Admin="false">
+      :Admin="true">
     </ChangePassword>
-    <AddUser
+    <AddGame
       :showData="openAddModal"
       :ShowMessage="ShowMessage">
-    </AddUser>
+    </AddGame>
     <NotIfication
       :showData="openerr">
     </NotIfication>
@@ -88,9 +74,8 @@ import { useRouter } from 'vue-router'
 import ManageHeader from '@/components/Other/Header'
 import LoadIng from '@/components/Other/Loading'
 import EmptyEd from '@/components/Other/Empty'
-import ChangePassword from "@/components/Other/ChangePassword"
 import NotIfication from "@/components/Other/Notification"
-import AddUser from "@/components/User/AddUser"
+import AddGame from "@/components/Games/AddGame"
 import PopoButton from '@/components/Other/PopoButton'
 import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
@@ -101,15 +86,14 @@ import CheckLogin from '@/helper/checkLogin'
 import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
-  name: 'UserList',
-  components: { ManageHeader, LoadIng, EmptyEd, ChangePassword, NotIfication, AddUser, PopoButton, PaginAtion, FormaTime },
+  name: 'GamesList',
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, AddGame, PopoButton, PaginAtion, FormaTime },
   setup() {
     let states = reactive({
       loading: false,
       data: [],
       total: 0,
       username: "",
-      userid:"",
       openModal:{
         active: false,
         username: ""
@@ -127,13 +111,11 @@ export default defineComponent({
     })
     const router = useRouter()
     onMounted(async() => {
-      document.title = `${Config.GlobalTitle}-用户管理`
+      document.title = `${Config.GlobalTitle}-游戏管理`
       const data = await CheckLogin()
       if (data == 0) {
         const username = localStorage.getItem('user')
-        const userid = localStorage.getItem('userid')
         states.username = username
-        states.userid = userid
         GetData()
       }else{
         setStorage(false)
@@ -142,13 +124,13 @@ export default defineComponent({
     })
     const GetData = async(page = 1) => {
       const token = localStorage.getItem("token")
-      const d = await Fetch(Config.Api.userList, {page:page, limit: states.limit}, 'GET', token)
+      const d = await Fetch(Config.Api.GamesList, {page:page, limit: states.limit}, 'GET', token)
       states.loading = true
-      states.pageLoading = true
+      states.pageLoading = false
       if (d.status == 0) {
         states.data = d.data
         states.total = d.total
-        states.pageLoading = true
+      states.pageLoading = true
         states.loading = false
       }else{
         states.data = []
@@ -187,14 +169,6 @@ export default defineComponent({
             return e.ID !== id
           })
           break;
-        case 4:
-          states.data = states.data.map((el)=>{
-            if(el.ID == id) {
-              el.Remarks = e.remarks
-            }
-            return el
-          })
-          break;
         default:
           break;
       }
@@ -208,7 +182,7 @@ export default defineComponent({
     }
     const lockIt = async(id) => {
       const token = localStorage.getItem("token")
-      const d = await Fetch(Config.Api.upuserstatus, {id: id}, 'PUT', token)
+      const d = await Fetch(Config.Api.upstatus, {id: id}, 'PUT', token)
       if (d.status == 0) {
         const data = {
           active: true,
@@ -227,7 +201,7 @@ export default defineComponent({
     }
     const deleteIt = async(id) => {
       const token = localStorage.getItem("token")
-      const d = await Fetch(Config.Api.deluser, {id: id}, 'DELETE', token)
+      const d = await Fetch(Config.Api.deladmin, {id: id}, 'DELETE', token)
       if (d.status == 0) {
         const data = {
           active: true,
@@ -244,40 +218,6 @@ export default defineComponent({
         ShowMessage(data, 0)
       }
     }
-    const setRemarks = async(id,e) => {
-      const Value = e.target.value
-      if (Value.length >= 2) {
-        const token = localStorage.getItem("token")
-        const params = {
-          id: id,
-          remarks: Value
-        }
-        const d = await Fetch(Config.Api.setRemarks, params, 'PUT', token)
-        if (d.status == 0) {
-          const data = {
-            active: true,
-            message: d.message,
-            color: 'is-success'
-          }
-          ShowMessage(data, 4, d.id)
-        }else{
-          const data = {
-            active: true,
-            message: d.message,
-            color: 'is-danger',
-            remarks: Value,
-          }
-          ShowMessage(data, 0)
-        }
-      }else{
-        const data = {
-          active: true,
-          message: "备注必须大于4个字符",
-          color: 'is-danger'
-        }
-        ShowMessage(data, 0)
-      }
-    }
 
     return {
       ...toRefs(states),
@@ -286,8 +226,7 @@ export default defineComponent({
       showAddModel,
       lockIt,
       deleteIt,
-      GetData,
-      setRemarks
+      GetData
     }
   },
 })

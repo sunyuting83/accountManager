@@ -60,6 +60,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1HasKey.GET("/DeleteAccount", Api.DeleteAccount)
 		userApiV1HasKey.POST("/PostSetAccount", Api.PostSetAccount)
 		userApiV1HasKey.GET("/CheckAccount", Api.CheckAccount)
+		userApiV1HasKey.GET("/CheckAccounts", Api.CheckAccountForStatus)
 		userApiV1HasKey.GET("/findregone", Api.GetOneAccount)
 		userApiV1HasKey.GET("/getplayone", Api.GetOneAccount)
 		userApiV1HasKey.GET("/SetAccount", Api.SetAccount)

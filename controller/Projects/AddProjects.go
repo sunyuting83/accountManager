@@ -18,6 +18,7 @@ import (
 
 type Projects struct {
 	UsersID      string `form:"usersid" json:"usersid" xml:"usersid"  binding:"required"`
+	GameID       string `form:"gameid" json:"gameid" xml:"gameid"  binding:"required"`
 	ProjectsName string `form:"ProjectsName" json:"ProjectsName" xml:"ProjectsName"  binding:"required"`
 	UserName     string `form:"username" json:"username" xml:"username"`
 	Password     string `form:"password" json:"password" xml:"password"`
@@ -60,6 +61,13 @@ func AddProjects(c *gin.Context) {
 		})
 		return
 	}
+	if len(form.GameID) <= 0 || form.GameID == "0" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status":  1,
+			"message": "haven't gameid",
+		})
+		return
+	}
 	if len(form.ProjectsName) < 6 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status":  1,
@@ -98,10 +106,12 @@ func AddProjects(c *gin.Context) {
 		}
 	}
 	UsersIDInt := StrToUInt(form.UsersID)
+	GamesIDInt := StrToUInt(form.GameID)
 
 	projects := &database.Projects{
 		UsersID:      UsersIDInt,
 		ProjectsName: form.ProjectsName,
+		GamesID:      GamesIDInt,
 		UserName:     form.UserName,
 		Password:     form.Password,
 		AccNumber:    form.AccNumber,

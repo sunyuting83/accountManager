@@ -19,6 +19,9 @@
           <router-link class="navbar-item" :class="path === 'project'?'is-active':''" to="/project">
             项目管理
           </router-link>
+          <router-link class="navbar-item" v-if="userid === '1'" :class="path === 'gameslist'?'is-active':''" to="/gameslist">
+            游戏管理
+          </router-link>
         </div>
         <div class="navbar-end">
           <div class="navbar-item">
@@ -87,9 +90,11 @@ export default defineComponent({
         active: false,
         message: ""
       },
-      isActive: false
+      isActive: false,
+      userid: "0"
     })
     states.openModal.username = localStorage.getItem('user')
+    states.userid = localStorage.getItem('userid')
     // console.log(states.openModal.username)
     const LogOut =() =>{
       setStorage(false)

@@ -31,6 +31,8 @@
                     <tr>
                       <td width="8%">项目名称</td>
                       <td>所属用户</td>
+                      <td>所属游戏</td>
+                      <td v-if="username === 'admin' && userid === '1'">所属管理员</td>
                       <td>Key</td>
                       <td>状态</td>
                       <td>可乐API</td>
@@ -45,6 +47,8 @@
                     <tr v-for="(item) in data" :key="item.ID">
                       <td>{{item.ProjectsName}}</td>
                       <td>{{item.Users.UserName}}</td>
+                      <td>{{item.Games.GameName}}</td>
+                      <td v-if="username === 'admin' && userid === '1'">{{item.Users.Manager.UserName}}</td>
                       <td>{{item.Key}}</td>
                       <td>
                         <span class="has-text-success" v-if="item.NewStatus === 0">正常</span>
@@ -80,10 +84,10 @@
       <PaginAtion v-if="data.length >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
     </div>
     <AddProject
-      v-if="userLoading"
+      v-if="userLoading && GamesLoading"
       :showData="openAddModal"
       :ShowMessage="ShowMessage"
-      :UserData="UserData">
+      :AddData="AddData">
     </AddProject>
     <ModifyProject
       v-if="modifyStatus"
@@ -120,10 +124,15 @@ export default defineComponent({
     let states = reactive({
       loading: false,
       data: [],
-      UserData: [],
+      AddData: {
+        UserData: [],
+        GamesData: [],
+      },
       total: 0,
       username: "",
+      userid: "",
       userLoading: false,
+      GamesLoading: false,
       modifyStatus: false,
       openModal:{
         active: false,
@@ -151,6 +160,7 @@ export default defineComponent({
       if (data == 0) {
         const username = localStorage.getItem('user')
         states.username = username
+        states.userid = localStorage.getItem('userid')
         GetData()
       }else{
         setStorage(false)
@@ -187,6 +197,7 @@ export default defineComponent({
         case 1:
           states.data = [...states.data, e.data]
           states.userLoading = false
+          states.GamesLoading = false
           break;
         case 2:
           states.data = states.data.map((e)=>{
@@ -207,7 +218,9 @@ export default defineComponent({
           break;
         case 4:
           states.userLoading = false
-          states.UserData = []
+          states.GamesLoading = false
+          states.AddData.UserData = []
+          states.AddData.GamesData = []
           break;
         case 5:
           states.modifyStatus = false
@@ -232,8 +245,9 @@ export default defineComponent({
       states.openModal.username = username
     }
     const showAddModel = async() => {
-      states.UserData = await getUserData()
-      if (states.userLoading) states.openAddModal.active = true
+      await getUserData()
+      await getGamesData()
+      if (states.userLoading && states.GamesLoading) states.openAddModal.active = true
     }
     const showModifyModal = async(id) => {
       states.openModifyModal.Project = states.data.filter((e) => {
@@ -243,15 +257,27 @@ export default defineComponent({
       states.modifyStatus = true
       // console.log(states.openModifyModal.Project)
     }
+    const getGamesData = async() => {
+      const token = localStorage.getItem("token")
+      const d = await Fetch(Config.Api.GamesAllList, {}, 'GET', token)
+      // console.log(d)
+      if (d.status == 0) {
+        states.AddData.GamesData = d.data
+        states.GamesLoading = true
+      }else{
+        states.AddData.GamesData = []
+        states.GamesLoading = false
+      }
+    }
     const getUserData = async() => {
       const token = localStorage.getItem("token")
       const d = await Fetch(Config.Api.UsersAllList, {}, 'GET', token)
       // console.log(d)
       if (d.status == 0) {
-        states.UserData = d.data
+        states.AddData.UserData = d.data
         states.userLoading = true
       }else{
-        states.UserData = []
+        states.AddData.UserData = []
         states.userLoading = false
       }
     }

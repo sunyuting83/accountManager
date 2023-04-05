@@ -7,11 +7,36 @@
         <button class="delete" aria-label="close" @click="closErr" v-if="loading ? false : true"></button>
       </header>
       <section class="modal-card-body">
-        <div class="field" v-if="data.length !== 0">
-          <div class="select is-normal">
-            <select v-model="form.UserID">
-              <option v-for="(item) in data" :key="item.ID" :value="item.ID">{{item.UserName}}</option>
-            </select>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">选择所属用户</label>
+          </div>
+          <div class="field-body">
+            <div class="field is-narrow">
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select v-model="form.UserID">
+                    <option v-for="(item) in AddData.UserData" :key="item.ID" :value="item.ID">{{item.UserName}}（{{item.Remarks.length > 0 ? item.Remarks : "" }}）</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">选择所属游戏</label>
+          </div>
+          <div class="field-body">
+            <div class="field is-narrow">
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select v-model="form.GameID">
+                    <option v-for="(item) in AddData.GamesData" :key="item.ID" :value="item.ID">{{item.GameName}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="field">
@@ -149,13 +174,16 @@ export default defineComponent ({
       }
     },
     ShowMessage:Function,
-    UserData: Array
+    AddData: {
+      UserData: Array,
+      GamesData: Array,
+    }
+    
   },
   setup(props){
     let _data = reactive({
       loading: false,
       userLoading: false,
-      data: props.UserData,
       form:{
         ProjectsName: "",
         ProjectsNameErr: false,
@@ -171,6 +199,7 @@ export default defineComponent ({
         accNumberErrMessage: '',
         cola: false,
         UserID: 0,
+        GameID: 0,
         StatusJSON: [
         {
           "status": "0",
@@ -326,7 +355,8 @@ export default defineComponent ({
         active: false,
         message: "",
         color: 'is-success',
-        data: []
+        data: [],
+        gameData: [],
       }, 4)
     }
     const onSubmit = async() => {
@@ -335,6 +365,7 @@ export default defineComponent ({
     const postData = async() => {
       const ProjectsName = _data.form.ProjectsName
       const UserID = _data.form.UserID
+      const GameID = _data.form.GameID
       const ColaAPI = _data.form.cola
       const UserName = _data.form.UserName
       const Password = _data.form.Password
@@ -345,6 +376,7 @@ export default defineComponent ({
       const token = localStorage.getItem("token")
       let data = {
         usersid : String(UserID),
+        gameid: String(GameID),
         ProjectsName: ProjectsName,
         username: UserName,
         password: Password,
@@ -383,8 +415,11 @@ export default defineComponent ({
       _data.form.accNumber = ""
       _data.form.accNumberErr = false
       _data.form.accNumberErrMessage = ""
+      _data.form.UserID = 0
+      _data.form.GameID = 0
       _data.form.cola = false
       _data.data = []
+      _data.gameData = []
       _data.loading = false
       _data.hastatus = false
       _data.form.StatusJSON = []

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"colaAPI/UsersApi/database"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -31,7 +32,30 @@ func AddAccount(c *gin.Context) {
 		return
 	}
 
-	_, err := database.CheckOneAccount(projectsID, Account)
+	acc, err := database.CheckOneAccount(projectsID, Account)
+	if err != nil && err.Error() != "record not found" {
+		fmt.Println(err.Error())
+		if IsJson == "1" {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "database error",
+			})
+			return
+		}
+		c.String(200, "数据库错误")
+		return
+	}
+	if acc.ID > 0 {
+		if IsJson == "1" {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "has account",
+			})
+			return
+		}
+		c.String(200, "帐号已存在")
+		return
+	}
 	if err != nil && err.Error() == "record not found" {
 		account := &database.Accounts{
 			ProjectsID: uint(projectsInt),
@@ -58,11 +82,10 @@ func AddAccount(c *gin.Context) {
 	}
 	if IsJson == "1" {
 		c.JSON(http.StatusOK, gin.H{
-			"status":  0,
-			"message": "account is has",
+			"status":  1,
+			"message": "database error",
 		})
 		return
 	}
-	c.String(200, "帐号已存在")
-
+	c.String(200, "数据库错误")
 }

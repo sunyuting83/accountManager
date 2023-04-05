@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AppIndex from '@/components/Index/Index'
 import AdminList from '@/components/Admin/AdminList'
+import GamesList from '@/components/Games/GamesList'
 import UserList from '@/components/User/UserList'
 import ProjectList from '@/components/Project/ProjectList'
 import AccountList from '@/components/Account/AccountList'
@@ -20,6 +21,11 @@ const constantRoutes = [
     path: '/adminlist',
     name: 'adminlist',
     component: AdminList
+  },
+  {
+    path: '/gameslist',
+    name: 'gameslist',
+    component: GamesList
   },
   {
     path: '/userlist',

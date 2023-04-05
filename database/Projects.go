@@ -18,6 +18,7 @@ type Projects struct {
 	AccNumber    int
 	ColaAPI      bool
 	Users        Users
+	Games        Games
 	CreatedAt    int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt    int64 `gorm:"autoUpdateTime:milli"`
 }
@@ -50,6 +51,8 @@ func GetProjectsList(page, Limit int) (projects *[]Projects, err error) {
 	if err = sqlDB.
 		Model(&Projects{}).
 		Preload("Users").
+		Preload("Users.Manager").
+		Preload("Games").
 		Order("projects.id desc").
 		Limit(Limit).Offset(p).
 		Find(&projects).Error; err != nil {
@@ -63,6 +66,7 @@ func GetProjectsListWithIn(page, Limit int, UsersIDs []int) (projects *[]Project
 	if err = sqlDB.
 		Model(&Projects{}).
 		Preload("Users").
+		Preload("Games").
 		Where("users_id IN ?", UsersIDs).
 		Order("projects.id desc").
 		Limit(Limit).Offset(p).

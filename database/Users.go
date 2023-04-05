@@ -54,7 +54,7 @@ func GetUsersList(page, Limit int, manager_id uint) (user *[]Users, err error) {
 		if err = sqlDB.
 			Model(&Users{}).
 			Preload("Manager").
-			Select("id, user_name, new_status, manager_id, created_at").
+			Select("id, user_name, new_status, manager_id, remarks, created_at").
 			Order("users.id desc").
 			Limit(Limit).Offset(p).
 			Find(&user).Error; err != nil {
@@ -62,7 +62,7 @@ func GetUsersList(page, Limit int, manager_id uint) (user *[]Users, err error) {
 		}
 	} else {
 		if err = sqlDB.
-			Select("id, user_name, new_status, manager_id, created_at").
+			Select("id, user_name, new_status, manager_id, remarks, created_at").
 			Where("manager_id = ?", manager_id).
 			Order("id desc").
 			Limit(Limit).Offset(p).
@@ -110,9 +110,13 @@ func (user *Users) UserUpStatusAdmin(status int) {
 	sqlDB.Model(&user).Update("new_status", status)
 }
 
+func (user *Users) SetUserRemarks(remarks string) {
+	sqlDB.Model(&user).Update("remarks", remarks)
+}
+
 // api
 
-func UserCheckUser(username, password string) (user *Users, err error) {
+func UserCheckUser(username int, password string) (user *Users, err error) {
 	if err = sqlDB.First(&user, "user_name = ? AND new_status = ? AND password = ?", username, "0", password).Error; err != nil {
 		return
 	}

@@ -100,6 +100,13 @@ func CheckOneAccount(projectsid, account string) (accounts *Accounts, err error)
 	return
 }
 
+func CheckAccountForStatus(projectsid, account, status string) (accounts *Accounts, err error) {
+	if err = sqlDB.First(&accounts, "projects_id = ? and user_name = ? and new_status = ?", projectsid, account, status).Error; err != nil {
+		return
+	}
+	return
+}
+
 // Delete Admin
 func (accounts *Accounts) DeleteAll(projectid string, status string) {
 	// time.Sleep(time.Duration(100) * time.Millisecond)
