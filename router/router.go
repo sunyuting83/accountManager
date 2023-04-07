@@ -37,6 +37,8 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64, Users_SECRET_K
 		router.GET("/accountDraw/:key/:type", controller.Index)
 		router.GET("/accountDrawed/:key", controller.Index)
 		router.GET("/accountFiled/:key", controller.Index)
+		router.GET("/drawLog/:key", controller.Index)
+		router.GET("/drawData/:id", controller.Index)
 		adminapiv1.POST("/AddAdmin", utils.AdminVerifyMiddleware(), Admin.AddAdmin)
 		adminapiv1.PUT("/RePassword", utils.AdminVerifyMiddleware(), Admin.ResetPassword)
 		adminapiv1.DELETE("/DelAdmin", utils.AdminVerifyMiddleware(), Admin.DeleteAdmin)

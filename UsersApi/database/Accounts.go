@@ -324,9 +324,6 @@ func GetDateTimeData(projectsID, statusList, GeType string) (re []string, err er
 	if DBType == "pgsql" {
 		SQLStart = "SELECT DISTINCT to_char(to_timestamp(" + d + " / 1000) AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD') FROM accounts WHERE projects_id = "
 	}
-	if DBType == "mysql" {
-		SQLStart = "SELECT DISTINCT DATE_FORMAT(from_unixtime(" + d + ` / 1000) ,'%Y-%m-%d') FROM accounts WHERE projects_id = `
-	}
 	sql := SQLStart + projectsID + " AND new_status IN (" + statusList + ") ORDER BY " + d + " DESC"
 	if DBType == "pgsql" {
 		sql = SQLStart + projectsID + " AND new_status IN (" + statusList + ") ORDER BY to_char(to_timestamp(" + d + " / 1000) AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD') DESC"
@@ -343,9 +340,6 @@ func GetDateTimeDataDraw(projectsID, GeType string) (re []string, err error) {
 	SQLStart := "SELECT DISTINCT DATE(" + d + " / 1000 ,'unixepoch','localtime') FROM accounts WHERE projects_id = "
 	if DBType == "pgsql" {
 		SQLStart = "SELECT DISTINCT to_char(to_timestamp(" + d + " / 1000) AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD') FROM accounts WHERE projects_id = "
-	}
-	if DBType == "mysql" {
-		SQLStart = "SELECT DISTINCT DATE_FORMAT(from_unixtime(" + d + ` / 1000) ,'%Y-%m-%d') FROM accounts WHERE projects_id = `
 	}
 	sql := SQLStart + projectsID + " AND new_status = 108 ORDER BY " + d + " DESC"
 	// fmt.Println(sql)
@@ -415,9 +409,6 @@ func RawQueryParseToMap(db *gorm.DB, query, date string) ([]string, error) {
 	DateFunction := "DATE(" + date + " / 1000 ,'unixepoch','localtime')"
 	if DBType == "pgsql" {
 		DateFunction = "to_char"
-	}
-	if DBType == "mysql" {
-		DateFunction = "DATE_FORMAT(from_unixtime(" + date + ` / 1000) ,'%Y-%m-%d')`
 	}
 	for index := range list {
 		for _, column := range columns {

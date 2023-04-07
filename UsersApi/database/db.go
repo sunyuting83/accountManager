@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -40,16 +39,6 @@ func GetDB(confYaml *utils.Config) {
 		sqlDB, _ = gorm.Open(postgres.New(postgres.Config{
 			DSN:                  DNString,
 			PreferSimpleProtocol: true, // disables implicit prepared statement usage
-		}), &gorm.Config{})
-	case "mysql":
-		DNString := strings.Join([]string{confYaml.Database.Username, ":", confYaml.Database.Password, "@tcp(", confYaml.Database.DBHost, ":", confYaml.Database.DBProt, ")/", confYaml.Database.DBName, "?charset=utf8&parseTime=True&loc=Local"}, "")
-		sqlDB, _ = gorm.Open(mysql.New(mysql.Config{
-			DSN:                       DNString, // DSN data source name
-			DefaultStringSize:         256,
-			DisableDatetimePrecision:  true,
-			DontSupportRenameIndex:    true,
-			DontSupportRenameColumn:   true,
-			SkipInitializeWithVersion: false,
 		}), &gorm.Config{})
 	case "sqlite":
 		CurrentPath, _ := utils.GetCurrentPath()
