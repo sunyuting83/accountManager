@@ -2,27 +2,17 @@ package controller
 
 import (
 	"colaAPI/UsersApi/database"
+	"colaAPI/UsersApi/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-type Filter struct {
-	MinGold  int64 `form:"mingold" json:"mingold" xml:"mingold"  binding:"required"`
-	MaxGold  int64 `form:"maxgold" json:"maxgold" xml:"maxgold"  binding:"required"`
-	Multiple int64 `form:"multiple" json:"multiple" xml:"multiple"  binding:"required"`
-	Diamond  int64 `form:"diamond" json:"diamond" xml:"diamond"`
-	Crazy    int64 `form:"crazy" json:"crazy" xml:"crazy"`
-	Cold     int64 `form:"cold" json:"cold" xml:"cold"`
-	Precise  int64 `form:"precise" json:"precise" xml:"precise"`
-}
-
 func PullAccountDrawSelect(c *gin.Context) {
-	var form Filter
+	var form utils.Filter
 	if err := c.ShouldBind(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  1,
@@ -32,6 +22,7 @@ func PullAccountDrawSelect(c *gin.Context) {
 	}
 
 	projectsID, ColaAPI := GetProjects(c)
+	ProjectsID, _ := strconv.ParseInt(projectsID, 10, 64)
 
 	Projects, err := database.ProjectsCheckID(projectsID)
 	if err != nil {
@@ -52,30 +43,71 @@ func PullAccountDrawSelect(c *gin.Context) {
 			hasStatus = append(hasStatus, item.Status)
 		}
 	}
-	hasStatusStr := strings.Join(hasStatus, ",")
 
-	SQL := MakeSelectSQL(form, hasStatusStr, projectsID)
-	// fmt.Println(SQL)
-	var acc *database.Accounts
+	rows, _ := database.GetDataUseScopes(form, hasStatus, projectsID)
 
-	rows := acc.PullDataUseSQL(SQL)
-
-	if ColaAPI {
-		Projects = &database.Projects{
-			UserName:  Projects.UserName,
-			Password:  Projects.Password,
-			AccNumber: Projects.AccNumber - int(rows),
+	if len(rows) != 0 {
+		IDs := make([]int, len(rows))
+		for _, item := range rows {
+			IDs = append(IDs, int(item.ID))
 		}
-		Projects.UpdateProjects(projectsID)
+		AdminID := utils.GetCurrentUserID(c)
+		user, err := database.UserCheckID(int64(AdminID))
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "get admin failed",
+			})
+			return
+		}
+		upData, err := database.PullDataUseIn(IDs)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": err,
+			})
+			return
+		}
+
+		upDataJsonStr, _ := json.Marshal(&upData)
+
+		d := time.Now()
+		date := d.Format("2006-01-02_15:04:05")
+		draw := &database.DrawLogs{
+			ProjectsID: uint(ProjectsID),
+			Data:       string(upDataJsonStr),
+			LogName:    date,
+			DrawUser:   user.UserName,
+		}
+		draw.AddDrawLogs()
+		if ColaAPI {
+			Projects = &database.Projects{
+				UserName:  Projects.UserName,
+				Password:  Projects.Password,
+				AccNumber: Projects.AccNumber - int(len(rows)),
+			}
+			Projects.UpdateProjects(projectsID)
+		}
+
+		Data := gin.H{
+			"status":  0,
+			"message": "提取成功",
+			"data":    rows,
+		}
+		c.JSON(http.StatusOK, Data)
+		return
 	}
 
+	empty := make([]string, 0)
 	Data := gin.H{
-		"status":  0,
-		"message": "提取成功",
+		"status":  1,
+		"message": "没有符合条件的帐号",
+		"data":    empty,
 	}
 	c.JSON(http.StatusOK, Data)
 }
 
+/*
 func MakeSelectSQL(filter Filter, hasStatusStr, projectsID string) (SQL string) {
 	nowTime := time.Now().Unix() * 1000
 	TimeStr := strconv.FormatInt(nowTime, 10)
@@ -119,3 +151,4 @@ func MakeSelectSQL(filter Filter, hasStatusStr, projectsID string) (SQL string) 
 	SQL = strings.TrimRight(SQL, " AND ")
 	return
 }
+*/

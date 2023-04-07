@@ -45,6 +45,16 @@ type RedisConfig struct {
 	DB       int    `yaml:"DB"`
 }
 
+type Filter struct {
+	MinGold  int64 `form:"mingold" json:"mingold" xml:"mingold"  binding:"required"`
+	MaxGold  int64 `form:"maxgold" json:"maxgold" xml:"maxgold"  binding:"required"`
+	Multiple int64 `form:"multiple" json:"multiple" xml:"multiple"  binding:"required"`
+	Diamond  int64 `form:"diamond" json:"diamond" xml:"diamond"`
+	Crazy    int64 `form:"crazy" json:"crazy" xml:"crazy"`
+	Cold     int64 `form:"cold" json:"cold" xml:"cold"`
+	Precise  int64 `form:"precise" json:"precise" xml:"precise"`
+}
+
 // GetCurrentPath Get Current Path
 func GetCurrentPath() (string, error) {
 	path, err := os.Executable()

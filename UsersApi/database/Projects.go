@@ -3,6 +3,7 @@ package database
 type Projects struct {
 	ID           uint `gorm:"primaryKey"`
 	UsersID      uint
+	GamesID      uint
 	ProjectsName string
 	UserName     string
 	Password     string
@@ -15,6 +16,7 @@ type Projects struct {
 	Remarks      string
 	AccNumber    int
 	ColaAPI      bool
+	Games        Games
 	CreatedAt    int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt    int64 `gorm:"autoUpdateTime:milli"`
 }
@@ -31,6 +33,7 @@ func (projects *Projects) GetCount(userid int64) (count int64, err error) {
 func GetProjectsList(userid int64, page, Limit int) (projects *[]Projects, err error) {
 	p := makePage(page, Limit)
 	if err = sqlDB.
+		Preload("Games").
 		Where("users_id = ?", userid).
 		Order("projects.id desc").
 		Limit(Limit).Offset(p).

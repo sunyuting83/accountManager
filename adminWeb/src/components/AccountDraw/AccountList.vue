@@ -178,13 +178,11 @@
                     </div>
                   </div>
                   <div class="field ml-3">
-                    <button
-                      class="button is-primary is-small"
-                      :class="buttonLoading ? 'is-loading' : '' "
-                      :disabled="data.length > 0 && Filter.mingold > 0 ?false:true"
-                      @click="pullSelectData">
-                      按条件提取
-                    </button>
+                    <PopoButton
+                      message="按条件提取" 
+                      color="is-primary" 
+                      :callBack="pullSelectData" 
+                      v-if="data.length > 0 && Filter.mingold > 0" ></PopoButton>
                   </div>
                 </div>
               </div>
@@ -220,12 +218,11 @@
                       <td>瞄准</td>
                       <td v-if="data[0].Price.length > 0">价格</td>
                       <td>过期时间</td>
-                      <td>创建时间</td>
                       <td>更新时间</td>
                     </tr>
                   </thead>
                   <tbody class="is-size-7">
-                    <tr v-for="(item, index) in data" :key="item.ID" class="hasimg">
+                    <tr v-for="(item, index) in data" :key="item.ID" class="hasimg" :class="checkTemp.indexOf(item.ID) !== -1  ? 'hasClick' : ''">
                       <td>
                         <label class="checkbox">
                           <input type="checkbox" v-model="item.check" @click="(e)=>checkBox(e,item.ID)">
@@ -243,7 +240,6 @@
                       <td>{{item.Precise}}</td>
                       <td v-if="item.Price.length > 0">{{item.Price}}</td>
                       <td><ExpTime :DateTime="item.Exptime" /></td>
-                      <td><FormaTime :DateTime="item.CreatedAt" /></td>
                       <td class="potd">
                         <FormaTime :DateTime="item.UpdatedAt" />
                         <div v-if="item.Cover.length > 0" class="poimg">
@@ -282,6 +278,7 @@ import FormaTime from '@/components/Other/FormaTime'
 import FormaNumber from '@/components/Other/FormaNumber'
 import ExpTime from '@/components/Other/ExpTime'
 import RenewalCard from '@/components/Other/Renewal'
+import PopoButton from '@/components/Other/PopoButton'
 
 
 import Fetch from '@/helper/fetch'
@@ -290,7 +287,7 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'AccountList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime, RenewalCard },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime, RenewalCard, PopoButton },
   setup() {
     let states = reactive({
       AccountKey: "",
@@ -602,16 +599,13 @@ export default defineComponent({
       if (d.status == 0) {
         states.loading = false
         states.buttonLoading = false
-        e.color = 'is-success'
-        e.message = d.message
-        ShowMessage(e)
-        const AccountType = router.currentRoute._value.params.type
-        if (AccountType == 'date') {
-          GetDateList()
-        }else {
-          GetGoldData()
-        }
+        const data = makeData(d.data)
+        states.openModal.active = true
+        states.openModal.title = "提取成功"
+        states.openModal.message = "成功提取帐号，点击复制到剪切板再关闭此弹窗。"
+        states.openModal.data = data
       }else{
+        e.message = d.message
         states.checkTemp = []
         states.loading = false
         states.buttonLoading = false
@@ -657,5 +651,8 @@ export default defineComponent({
 }
 .hasimg:hover .potd .poimg {
   display: block;
+}
+.hasClick {
+  background: #c5e0fd !important
 }
 </style>

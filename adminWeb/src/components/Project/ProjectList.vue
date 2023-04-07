@@ -36,16 +36,16 @@
                   <thead>
                     <tr>
                       <td width="8%">项目名称</td>
-                      <td>所属用户</td>
-                      <td>所属游戏</td>
-                      <td v-if="username === 'admin' && userid === '1'">所属管理员</td>
-                      <td>Key</td>
-                      <td>状态</td>
-                      <td>可乐API</td>
-                      <td>创建时间</td>
-                      <td v-if="showCola">用户名</td>
-                      <td v-if="showCola">密码</td>
-                      <td v-if="showCola">帐号数</td>
+                      <td width="5%">所属用户</td>
+                      <td width="8%">所属游戏</td>
+                      <td width="5%" v-if="username === 'admin' && userid === '1'">所属管理员</td>
+                      <td width="8%">Key</td>
+                      <td width="2%">状态</td>
+                      <td width="3%">可乐API</td>
+                      <td width="8%">创建时间</td>
+                      <td width="2%" v-if="showCola">用户名</td>
+                      <td width="8%" v-if="showCola">密码</td>
+                      <td width="3%" v-if="showCola">帐号数</td>
                       <td width="25%">操作</td>
                     </tr>
                   </thead>
@@ -55,7 +55,7 @@
                       <td>{{item.Users.UserName}}<br />{{item.Users.Remarks.length > 0 ? item.Users.Remarks : "" }}</td>
                       <td>{{item.Games.GameName}}</td>
                       <td v-if="username === 'admin' && userid === '1'">{{item.Users.Manager.UserName}}</td>
-                      <td>{{item.Key}}</td>
+                      <td v-tooltip="'单击此处复制KEY，双击复制API网址'" @dblclick="()=>{copyUri(item.Key)}"><span @click.stop="()=>{copyKey(item.Key)}">{{item.Key}}</span></td>
                       <td>
                         <span class="has-text-success" v-if="item.NewStatus === 0">正常</span>
                         <span class="has-text-danger" v-else>锁定</span>
@@ -123,6 +123,9 @@ import Fetch from '@/helper/fetch'
 import CheckLogin from '@/helper/checkLogin'
 import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
+
+import useClipboard from 'vue-clipboard3'
+const { toClipboard } = useClipboard()
 export default defineComponent({
   name: 'ProjectList',
   components: { ManageHeader, LoadIng, EmptyEd, NotIfication, AddProject, PopoButton, PaginAtion, FormaTime, ModifyProject },
@@ -342,6 +345,21 @@ export default defineComponent({
       states.showCola = !states.showCola
     }
 
+    let time = 200;
+    let timeOut = null;
+
+    const copyUri = async(key) => {
+      clearTimeout(timeOut);
+      const uri = `${window.location.origin}/api/v1/${key}`
+      await toClipboard(uri)
+    }
+    const copyKey = (key) => {
+      clearTimeout(timeOut); // 清除第一个单击事件
+        timeOut = setTimeout(async() => {
+          await toClipboard(key)
+        }, time)
+    }
+
     return {
       ...toRefs(states),
       ShowMessage,
@@ -354,7 +372,9 @@ export default defineComponent({
       showModifyModal,
       showAccountDraw,
       showAccountDrawed,
-      ShowCola
+      ShowCola,
+      copyUri,
+      copyKey
     }
   },
 })

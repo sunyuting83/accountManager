@@ -5,7 +5,7 @@
       <div class="card events-card">
         <header class="card-header">
           <p class="card-header-title">
-            项目名称：{{projects.ProjectsName}} --- 归档管理
+            项目名称：{{projects.ProjectsName}} --- 提取记录管理
           </p>
           <button class="card-header-icon">
             <button class="button is-link is-small" @click="backRouter">
@@ -51,6 +51,7 @@
                       <td>瞄准</td>
                       <td v-if="data[0].Price.length > 0">价格</td>
                       <td>过期时间</td>
+                      <td>创建时间</td>
                       <td>更新时间</td>
                     </tr>
                   </thead>
@@ -68,6 +69,7 @@
                       <td>{{item.Precise}}</td>
                       <td v-if="item.Price.length > 0">{{item.Price}}</td>
                       <td><ExpTime :DateTime="item.Exptime" /></td>
+                      <td><FormaTime :DateTime="item.CreatedAt" /></td>
                       <td class="potd">
                         <FormaTime :DateTime="item.UpdatedAt" />
                         <div v-if="item.Cover.length > 0" class="poimg">
@@ -107,7 +109,7 @@ import CheckLogin from '@/helper/checkLogin'
 import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
-  name: 'FiledList',
+  name: 'DrawedLog',
   components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime },
   setup() {
     let states = reactive({

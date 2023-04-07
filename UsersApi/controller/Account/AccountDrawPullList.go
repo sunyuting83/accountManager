@@ -38,7 +38,7 @@ func PullAccountDrawList(c *gin.Context) {
 		}
 		projectsID, ColaAPI := GetProjects(c)
 		ProjectsID, _ := strconv.ParseInt(projectsID, 10, 64)
-		upData, err := database.PullDataUseIn(form.List, projectsID)
+		upData, err := database.PullDataUseIn(form.List)
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  1,

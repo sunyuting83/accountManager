@@ -108,7 +108,7 @@ func main() {
 	CurrentPath, _ := GetCurrentPath()
 	confYaml, err := CheckConfig(OS, CurrentPath)
 	if err != nil {
-		fmt.Println(err)
+		// fmt.Println(err)
 		time.Sleep(time.Duration(10) * time.Second)
 		os.Exit(0)
 	}
@@ -117,20 +117,26 @@ func main() {
 	// fmt.Println(token)
 	if err != nil || len(token) == 0 {
 		// haven't token, so create Login for cola
-		DelColaToken(confYaml.APIServer)
 		var colaRequest ColaAccountRequest
 		LoginStatus := false
+		index := 10
+		DelColaToken(confYaml.APIServer)
 		for {
+			index = index - 1
 			// get cola username and password an token
 			// if has a active at server, wait it done.
-			colaRequest, _ = GetColaAccount(confYaml.APIServer)
-			fmt.Println(colaRequest)
-			if colaRequest.Status == 0 {
-				LoginStatus = true
-				token = colaRequest.Token
+			if index == 0 {
 				break
+			} else {
+				colaRequest, _ = GetColaAccount(confYaml.APIServer)
+				// fmt.Println(colaRequest)
+				if colaRequest.Status == 0 {
+					LoginStatus = true
+					token = colaRequest.Token
+					break
+				}
+				time.Sleep(time.Duration(15) * time.Second)
 			}
-			time.Sleep(time.Duration(10) * time.Second)
 		}
 		if LoginStatus && len(token) == 0 {
 			token, err = ColaLogin(colaRequest)
@@ -145,13 +151,14 @@ func main() {
 	}
 	// fmt.Println(token)
 	qrurl, err := GetPaymentStr(f)
-	fmt.Println(qrurl)
+	// fmt.Println(qrurl)
 	if err != nil {
 		fmt.Println("1,e")
 		return
 	}
 	if s == "1" {
 		// AddAccount(confYaml.APIServer, "38588302", t, r)
+		// fmt.Println(token)
 		status, orderID := CreateOrder(token, qrurl, p)
 		if !status {
 			SetColaToken(confYaml.APIServer, "")
@@ -173,7 +180,7 @@ func main() {
 	}
 	if a != "0" {
 		status := TowOrder(token, qrurl, a)
-		fmt.Println(status)
+		// fmt.Println(status)
 		if !status {
 			SetColaToken(confYaml.APIServer, "")
 			fmt.Println("1,e")
@@ -286,7 +293,7 @@ func DelColaToken(uri string) bool {
 
 func GetColaAccount(uri string) (request ColaAccountRequest, err error) {
 	URL := strings.Join([]string{uri, "ColaAccount"}, "/")
-	fmt.Println(URL)
+	// fmt.Println(URL)
 	req, _ := http.NewRequest("GET", URL, nil)
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -299,9 +306,9 @@ func GetColaAccount(uri string) (request ColaAccountRequest, err error) {
 	}
 	defer resp.Body.Close()
 	respByte, _ := io.ReadAll(resp.Body)
-	fmt.Println(string(respByte))
+	// fmt.Println(string(respByte))
 	json.Unmarshal(respByte, &request)
-	fmt.Println(request.Message, request.UserName, request.Password)
+	// fmt.Println(request.Message, request.UserName, request.Password)
 	if request.Status == 1 {
 		return request, errors.New(request.Message)
 	}
@@ -315,7 +322,13 @@ func SetColaToken(uri, token string) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("X-Requested-With", "XMLHttpRequest")
 	req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
-	_, _ = (&http.Client{Timeout: 35 * time.Second}).Do(req)
+	d, err := (&http.Client{Timeout: 35 * time.Second}).Do(req)
+	if err != nil {
+		fmt.Println("1," + err.Error())
+	}
+	defer d.Body.Close()
+	// respByte, _ := io.ReadAll(d.Body)
+	// fmt.Println(string(respByte))
 }
 
 func ColaLogin(colaRequest ColaAccountRequest) (token string, err error) {
@@ -338,7 +351,7 @@ func ColaLogin(colaRequest ColaAccountRequest) (token string, err error) {
 	respByte, _ := io.ReadAll(resp.Body)
 
 	json.Unmarshal(respByte, &request)
-	fmt.Println(request)
+	// fmt.Println(request)
 	if request.Status == "200" {
 		token = request.Token
 	}
@@ -406,13 +419,13 @@ func GetCurrentPath() (string, error) {
 func GetPaymentStr(fi string) (paymentCodeUrl string, err error) {
 	file, err := os.Open(fi)
 	if err != nil {
-		fmt.Println("a" + err.Error())
+		// fmt.Println("a" + err.Error())
 		return "", err
 	}
 	defer file.Close()
 	img, _, err := image.Decode(file)
 	if err != nil {
-		fmt.Println("b" + err.Error())
+		// fmt.Println("b" + err.Error())
 		return "", err
 	}
 	// prepare BinaryBitmap
@@ -421,7 +434,7 @@ func GetPaymentStr(fi string) (paymentCodeUrl string, err error) {
 	qrReader := qrcode.NewQRCodeReader()
 	result, err := qrReader.Decode(bmp, nil)
 	if err != nil {
-		fmt.Println("c" + err.Error())
+		// fmt.Println("c" + err.Error())
 		return "", err
 	}
 	// fmt.Println(result.String())

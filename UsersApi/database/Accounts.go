@@ -1,6 +1,8 @@
 package database
 
 import (
+	"colaAPI/UsersApi/utils"
+
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -171,18 +173,91 @@ func (account *Accounts) ExportAccount(projectsID, status string) (accounts []*A
 	// SELECT DISTINCT DATE(updated_at / 1000, 'unixepoch','localtime') FROM accounts WHERE new_status IN (2,3,4,5)
 }
 
-func PullDataUseIn(IDs []int, projectsID string) (accounts []*Accounts, err error) {
+func PullDataUseIn(IDs []int) (accounts []*Accounts, err error) {
 	sqlDB.
 		Model(&accounts).
 		Clauses(clause.Returning{}).
-		Where("projects_id = ? AND id IN ?", projectsID, IDs).
+		Where("id IN ?", IDs).
 		Update("new_status", "108")
 	return
 }
 
-func (account *Accounts) PullDataUseSQL(SQL string) (rows int64) {
-	db := sqlDB.Exec(SQL)
-	rows = db.RowsAffected
+func MinGold(MinGold int64) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if MinGold > 0 {
+			return db.Where("today_gold >= ?", MinGold)
+		}
+		return db.Where("")
+	}
+}
+func MaxGold(MaxGold int64) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if MaxGold > 0 {
+			return db.Where("today_gold <= ?", MaxGold)
+		}
+		return db.Where("")
+	}
+}
+func Multiple(Multiple int64) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if Multiple > 0 {
+			return db.Where("multiple >= ?", Multiple)
+		}
+		return db.Where("")
+	}
+}
+func Diamond(Diamond int64) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if Diamond > 0 {
+			return db.Where("diamond >= ?", Diamond)
+		}
+		return db.Where("")
+	}
+}
+func Crazy(Crazy int64) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if Crazy > 0 {
+			return db.Where("crazy >= ?", Crazy)
+		}
+		return db.Where("")
+	}
+}
+func Cold(Cold int64) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if Cold > 0 {
+			return db.Where("cold >= ?", Cold)
+		}
+		return db.Where("")
+	}
+}
+func Precise(Precise int64) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if Precise > 0 {
+			return db.Where("precise >= ?", Precise)
+		}
+		return db.Where("")
+	}
+}
+func HasStatus(hasStatus []string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("new_status IN (?)", hasStatus)
+	}
+}
+
+func GetDataUseScopes(filter utils.Filter, hasStatus []string, projectsID string) (accounts []*Accounts, err error) {
+	if err = sqlDB.
+		Where("projects_id = ?", projectsID).
+		Scopes(HasStatus(hasStatus)).
+		Scopes(MinGold(filter.MinGold)).
+		Scopes(MaxGold(filter.MaxGold)).
+		Scopes(Multiple(filter.Multiple)).
+		Scopes(Diamond(filter.Diamond)).
+		Scopes(Crazy(filter.Crazy)).
+		Scopes(Cold(filter.Cold)).
+		Scopes(Precise(filter.Precise)).
+		Find(&accounts).Error; err != nil {
+		return
+	}
 	return
 }
 
