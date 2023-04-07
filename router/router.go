@@ -4,6 +4,7 @@ import (
 	"colaAPI/controller"
 	Account "colaAPI/controller/Account"
 	Admin "colaAPI/controller/Admin"
+	DrawLog "colaAPI/controller/DrawLog"
 	Games "colaAPI/controller/Games"
 	Projects "colaAPI/controller/Projects"
 	User "colaAPI/controller/User"
@@ -75,6 +76,8 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64, Users_SECRET_K
 		adminapiv1.DELETE("/DelGame", utils.AdminVerifyMiddleware(), Games.DeleteGame)
 		adminapiv1.GET("/GamesList", utils.AdminVerifyMiddleware(), Games.GamesList)
 		adminapiv1.GET("/GamesAllList", utils.AdminVerifyMiddleware(), Games.GamesAllList)
+		adminApiV1HasKey.GET("/DrawList", utils.AdminVerifyMiddleware(), DrawLog.DrawList)
+		adminapiv1.GET("/DrawData", utils.AdminVerifyMiddleware(), DrawLog.DrawData)
 	}
 
 	return router

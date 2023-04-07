@@ -39,6 +39,8 @@ const Api = {
   'GamesList': `${RootUrl}GamesList`,
   'GamesAllList':`${RootUrl}GamesAllList`,
   'setRemarks' : `${RootUrl}SetUserRemarks`,
+  'DrawList' : `${RootUrl}DrawList`,
+  'DrawData' : `${RootUrl}DrawData`,
 }
 
 const makePopeData = (e, message, active = true)=> {

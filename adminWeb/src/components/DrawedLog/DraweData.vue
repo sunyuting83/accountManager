@@ -40,21 +40,40 @@
                   <thead class="is-size-7">
                     <tr>
                       <td>序号</td>
-                      <td>日志时间</td>
-                      <td>题号人</td>
-                      <td>题号时间</td>
-                      <td>查看详细</td>
+                      <td>帐号</td>
+                      <td v-if="data[0].PhoneNumber.length > 0">手机号</td>
+                      <td>今日金币</td>
+                      <td>昨日金币</td>
+                      <td>炮台</td>
+                      <td>钻石</td>
+                      <td>狂暴</td>
+                      <td>冰冻</td>
+                      <td>瞄准</td>
+                      <td v-if="data[0].Price.length > 0">价格</td>
+                      <td>过期时间</td>
+                      <td>更新时间</td>
                     </tr>
                   </thead>
                   <tbody class="is-size-7">
                     <tr v-for="(item, index) in data" :key="item.ID" class="hasimg">
                       <td>{{index + 1}}</td>
-                      <td>{{item.LogName}}</td>
-                      <td>{{item.DrawUser}}</td>
-                      <td>
+                      <td>{{item.UserName}}</td>
+                      <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
+                      <td><FormaNumber :Numbers="item.TodayGold" /></td>
+                      <td><FormaNumber :Numbers="item.YesterdayGold" /></td>
+                      <td><FormaNumber :Numbers="item.Multiple" /></td>
+                      <td>{{item.Diamond}}</td>
+                      <td>{{item.Crazy}}</td>
+                      <td>{{item.Cold}}</td>
+                      <td>{{item.Precise}}</td>
+                      <td v-if="item.Price.length > 0">{{item.Price}}</td>
+                      <td><ExpTime :DateTime="item.Exptime" /></td>
+                      <td class="potd">
                         <FormaTime :DateTime="item.UpdatedAt" />
+                        <div v-if="item.Cover.length > 0" class="poimg">
+                          <img :src="IMGUri+item.Cover" />
+                        </div>
                       </td>
-                      <td><router-link :to="`/drawData/${item.ID}`" class="button is-success is-small">查看详细</router-link></td>
                     </tr>
                   </tbody>
                 </table>
@@ -96,7 +115,6 @@ export default defineComponent({
       total: 0,
       username: '',
       pageLoading: false,
-      limit: Config.Limit,
       IMGUri: Config.IMGUri,
     })
     const router = useRouter()
@@ -104,7 +122,7 @@ export default defineComponent({
       document.title = `${Config.GlobalTitle}-游戏管理`
       const data = await CheckLogin()
       if (data == 0) {
-        states.AccountKey = router.currentRoute._value.params.key
+        states.AccountKey = router.currentRoute._value.params.id
         const username = localStorage.getItem('user')
         states.username = username
         GetData()
@@ -115,18 +133,18 @@ export default defineComponent({
     })
 
     const backRouter = () => {
-      router.push("/project")
+      router.back()
     }
-    const GetData = async(page = 1) => {
+    const GetData = async() => {
       const token = localStorage.getItem("token")
-      const url = `${Config.RootUrl}${states.AccountKey}/DrawList`
-      const d = await Fetch(url, {page:page, limit: states.limit}, 'GET', token)
+      const url = `${Config.RootUrl}DrawData`
+      const d = await Fetch(url, {id: states.AccountKey}, 'GET', token)
       states.loading = true
       states.pageLoading = false
       if (d.status == 0) {
-        if (d.data.length != 0) states.projects = d.data[0].Projects
+        states.projects = d.projects
         states.data = d.data
-        states.total = d.total
+        states.total = d.data.length
       states.pageLoading = true
         states.loading = false
       }else{
@@ -144,3 +162,25 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+.f-1 {
+  margin-left: -1px;
+}
+.w165 {
+  min-width: 100px;
+  max-width: 140px;
+}
+
+.hasimg .potd .poimg {
+  position: absolute;
+  right: 0;
+  min-width: 570px;
+  min-height: 76px;
+  display: none;
+  z-index: 10000;
+}
+.hasimg:hover .potd .poimg {
+  display: block;
+}
+</style>

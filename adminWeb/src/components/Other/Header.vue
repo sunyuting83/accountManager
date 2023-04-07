@@ -22,6 +22,15 @@
           <router-link class="navbar-item" v-if="userid === '1'" :class="path === 'gameslist'?'is-active':''" to="/gameslist">
             游戏管理
           </router-link>
+          <a class="navbar-item" v-if="path === 'accountDraw'" :class="path === 'accountDraw'?'is-active':''">
+            未提取帐号管理
+          </a>
+          <a class="navbar-item" v-if="path === 'accountDrawed'" :class="path === 'accountDrawed'?'is-active':''">
+            已提取帐号管理
+          </a>
+          <a class="navbar-item" v-if="path === 'drawLog'" :class="path === 'drawLog'?'is-active':''">
+            提取记录
+          </a>
         </div>
         <div class="navbar-end">
           <div class="navbar-item">

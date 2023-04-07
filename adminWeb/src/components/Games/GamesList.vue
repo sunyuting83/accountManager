@@ -180,25 +180,6 @@ export default defineComponent({
     const showAddModel = () => {
       states.openAddModal.active = true
     }
-    const lockIt = async(id) => {
-      const token = localStorage.getItem("token")
-      const d = await Fetch(Config.Api.upstatus, {id: id}, 'PUT', token)
-      if (d.status == 0) {
-        const data = {
-          active: true,
-          message: d.message,
-          color: 'is-success'
-        }
-        ShowMessage(data, 2, id)
-      }else{
-        const data = {
-          active: true,
-          message: d.message,
-          color: 'is-danger'
-        }
-        ShowMessage(data, 0)
-      }
-    }
     const deleteIt = async(id) => {
       const token = localStorage.getItem("token")
       const d = await Fetch(Config.Api.deladmin, {id: id}, 'DELETE', token)
@@ -224,7 +205,6 @@ export default defineComponent({
       ShowMessage,
       showModel,
       showAddModel,
-      lockIt,
       deleteIt,
       GetData
     }

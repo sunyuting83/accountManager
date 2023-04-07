@@ -73,6 +73,7 @@
                           <button class="button is-success is-small" @click="()=>{showAccount(item.Key)}">帐号管理</button>
                           <button class="button is-info is-small" @click="()=>{showAccountDraw(item.Key)}">提号管理</button>
                           <button class="button is-primary is-small" @click="()=>{showAccountDrawed(item.Key)}">已提取帐号</button>
+                          <button class="button is-info is-light is-small" @click="()=>{showDrawedLog(item.Key)}">提取记录</button>
                           <button class="button is-warning is-small" @click="()=>{showModifyModal(item.ID)}">修改项目</button>
                           <PopoButton
                             :message="item.NewStatus === 0?'锁定':'解锁'" color="is-dark" :callBack="()=>{lockIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
@@ -359,6 +360,9 @@ export default defineComponent({
           await toClipboard(key)
         }, time)
     }
+    const showDrawedLog = (key) => {
+      router.push(`/drawLog/${key}`)
+    }
 
     return {
       ...toRefs(states),
@@ -374,7 +378,8 @@ export default defineComponent({
       showAccountDrawed,
       ShowCola,
       copyUri,
-      copyKey
+      copyKey,
+      showDrawedLog
     }
   },
 })
