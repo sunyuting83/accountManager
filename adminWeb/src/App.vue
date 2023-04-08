@@ -7,6 +7,9 @@
 <script>
 export default {
   name: 'App',
+  mounted(){
+    localStorage.setItem('header_style','link')
+  },
   provide() {
     return{
       reload: this.reload	

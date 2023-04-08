@@ -1,7 +1,7 @@
 <template>
   <div>
     <ManageHeader></ManageHeader>
-    <div class="container">
+    <div class="container.is-fullhd">
       <div class="card events-card">
         <header class="card-header">
           <p class="card-header-title">
@@ -54,11 +54,6 @@
 
       <PaginAtion v-if="data.length >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
     </div>
-    <ChangePassword
-      :showData="openModal"
-      :ShowMessage="ShowMessage"
-      :Admin="true">
-    </ChangePassword>
     <AddGame
       :showData="openAddModal"
       :ShowMessage="ShowMessage">
