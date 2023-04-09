@@ -4,12 +4,14 @@ import AdminList from '@/components/Admin/AdminList'
 import GamesList from '@/components/Games/GamesList'
 import UserList from '@/components/User/UserList'
 import ProjectList from '@/components/Project/ProjectList'
+import UserProjectList from '@/components/Project/UserProjectList'
 import AccountList from '@/components/Account/AccountList'
 import AccountDraw from '@/components/AccountDraw/AccountList'
 import AccountDrawed from '@/components/AccountDrawed/AccountList'
 import AccountFiled from '@/components/AccountFiled/FiledList'
 import DrawLogs from '@/components/DrawedLog/DrawedLog'
 import DraweData from '@/components/DrawedLog/DraweData'
+import AllDraw from '@/components/AllDraw/AllDraw'
 
 const routerHistory = createWebHistory()
 
@@ -40,6 +42,11 @@ const constantRoutes = [
     component: ProjectList
   },
   {
+    path: '/userProject/:userid',
+    name: 'userProject',
+    component: UserProjectList
+  },
+  {
     path: '/account/:key',
     name: 'account',
     component: AccountList
@@ -68,6 +75,11 @@ const constantRoutes = [
     path: '/drawData/:id',
     name: 'drawData',
     component: DraweData
+  },
+  {
+    path: '/AllDraw',
+    name: 'AllDraw',
+    component: AllDraw
   }
 ]
 

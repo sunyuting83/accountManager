@@ -41,7 +41,7 @@
                     <tr v-for="(item) in data" :key="item.ID">
                       <td>{{item.UserName}}</td>
                       <td>
-                        <input class="input is-link is-small" type="Remarks" :placeholder=item.Remarks @blur="(e)=>{setRemarks(item.ID,e)}" />
+                        <input class="input is-link is-small" size="10" type="Remarks" :placeholder=item.Remarks @blur="(e)=>{setRemarks(item.ID,e)}" />
                       </td>
                       <td>
                         <span class="has-text-success" v-if="item.NewStatus === 0">正常</span>
@@ -53,8 +53,9 @@
                         <div class="buttons">
                           <button class="button is-success is-small" @click="()=>{showModel(item.UserName)}">修改密码</button>
                           <PopoButton
-                            :message="item.NewStatus === 0?'锁定':'解锁'" color="is-info" :callBack="()=>{lockIt(item.ID)}"></PopoButton>
+                            :message="item.NewStatus === 0 ? '锁定' :'解锁'" color="is-info" :callBack="()=>{lockIt(item.ID)}"></PopoButton>
                           <PopoButton message="删除" color="is-danger" :callBack="()=>{deleteIt(item.ID)}"></PopoButton>
+                          <router-link :to="'/userProject/'+item.ID" class="button is-link is-small">查看所有项目</router-link>
                         </div>
                       </td>
                     </tr>

@@ -29,6 +29,7 @@ const Api = {
   'deluser': `${RootUrl}DelUser`,
   'reUserPassword': `${RootUrl}RePasswordUser`,
   'projectList': `${RootUrl}ProjectsList`,
+  'userProjectList': `${RootUrl}UserProjectsList`,
   'addproject': `${RootUrl}AddProjects`,
   'delproject': `${RootUrl}DelProjects`,
   'upprojectstatus': `${RootUrl}UpStatusProjects`,
@@ -41,6 +42,7 @@ const Api = {
   'setRemarks' : `${RootUrl}SetUserRemarks`,
   'DrawList' : `${RootUrl}DrawList`,
   'DrawData' : `${RootUrl}DrawData`,
+  'AllCount' : `${RootUrl}AllCount`,
 }
 
 const makePopeData = (e, message, active = true)=> {

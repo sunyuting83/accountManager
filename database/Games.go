@@ -1,9 +1,12 @@
 package database
 
+import "gorm.io/gorm"
+
 type Games struct {
 	ID        uint `gorm:"primaryKey"`
 	GameName  string
 	Projects  []Projects
+	Count     int64
 	CreatedAt int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt int64 `gorm:"autoUpdateTime:milli"`
 }
@@ -56,6 +59,19 @@ func GetGamesList(page, Limit int) (game []*Games, err error) {
 
 func GetAllGamesList() (game []*Games, err error) {
 	if err = sqlDB.
+		Order("id desc").
+		Find(&game).Error; err != nil {
+		return
+	}
+	return
+}
+
+func GetAllGames() (game []*Games, err error) {
+	if err = sqlDB.
+		Preload("Projects", func(db *gorm.DB) *gorm.DB {
+			return sqlDB.Select("ID", "GamesID", "StatusJSON")
+		}).
+		Select("ID", "GameName").
 		Order("id desc").
 		Find(&game).Error; err != nil {
 		return

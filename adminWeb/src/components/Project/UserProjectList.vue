@@ -1,0 +1,363 @@
+<template>
+  <div>
+    <ManageHeader></ManageHeader>
+    <div class="container.is-fullhd">
+      <div class="card events-card">
+        <header class="card-header">
+          <p class="card-header-title">
+            {{data.length !== 0 ? data[0].Users.UserName : ''}}所有项目列表
+          </p>
+          <button class="buttons card-header-icon">
+            <button class="button is-info is-small" @click="ShowCola">
+              <span class="icon is-small">
+                <i class="fa" :class="showCola?'fa-eye-slash':'fa-eye'"></i>
+              </span>
+              <span>{{showCola?"隐藏":"显示"}}可乐</span>
+            </button>
+            <button class="button is-link is-small" @click="backRouter">
+              <span class="icon is-small">
+                <i class="fa fa-arrow-circle-left"></i>
+              </span>
+              <span>返回</span>
+            </button>
+          </button>
+        </header>
+        <div class="card-content">
+          <div class="content has-text-centered	min-heights" style="min-height: 11.3rem">
+            <div class="com__box" v-if="loading" :style="loading? 'margin-top:5rem':''">
+              <LoadIng></LoadIng>
+            </div>
+            <div v-else>
+              <div v-if="data.length <= 0">
+                <EmptyEd></EmptyEd>
+              </div>
+              <div class="table-container" v-else>
+                <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left">
+                  <thead>
+                    <tr>
+                      <td width="8%">项目名称</td>
+                      <td width="5%">所属用户</td>
+                      <td width="8%">所属游戏</td>
+                      <td width="5%" v-if="username === 'admin' && userid === '1'">所属管理员</td>
+                      <td width="8%">Key</td>
+                      <td width="2%">状态</td>
+                      <td width="3%">可乐API</td>
+                      <td width="8%">创建时间</td>
+                      <td width="2%" v-if="showCola">用户名</td>
+                      <td width="8%" v-if="showCola">密码</td>
+                      <td width="3%" v-if="showCola">帐号数</td>
+                      <td width="25%">操作</td>
+                    </tr>
+                  </thead>
+                  <tbody class=" is-size-7">
+                    <tr v-for="(item) in data" :key="item.ID">
+                      <td>{{item.ProjectsName}}</td>
+                      <td>{{item.Users.UserName}}<br />{{item.Users.Remarks.length > 0 ? item.Users.Remarks : "" }}</td>
+                      <td>{{item.Games.GameName}}</td>
+                      <td v-if="username === 'admin' && userid === '1'">{{item.Users.Manager.UserName}}</td>
+                      <td v-tooltip="'单击此处复制KEY，双击复制API网址'" @dblclick="()=>{copyUri(item.Key)}"><span @click.stop="()=>{copyKey(item.Key)}">{{item.Key}}</span></td>
+                      <td>
+                        <span class="has-text-success" v-if="item.NewStatus === 0">正常</span>
+                        <span class="has-text-danger" v-else>锁定</span>
+                      </td>
+                      <td>
+                        <span class="has-text-success" v-if="item.ColaAPI">是</span>
+                        <span class="has-text-danger" v-else>否</span>
+                      </td>
+                      <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
+                      <td v-if="showCola">{{item.UserName}}</td>
+                      <td v-if="showCola">{{item.Password}}</td>
+                      <td v-if="showCola">{{item.AccNumber}}</td>
+                      <td>
+                        <div class="buttons">
+                          <button class="button is-success is-small" @click="()=>{showAccount(item.Key)}">帐号管理</button>
+                          <button class="button is-info is-small" @click="()=>{showAccountDraw(item.Key)}">提号管理</button>
+                          <button class="button is-primary is-small" @click="()=>{showAccountDrawed(item.Key)}">已提取帐号</button>
+                          <button class="button is-info is-light is-small" @click="()=>{showDrawedLog(item.Key)}">提取记录</button>
+                          <button class="button is-warning is-small" @click="()=>{showModifyModal(item.ID)}">修改项目</button>
+                          <PopoButton
+                            :message="item.NewStatus === 0?'锁定':'解锁'" color="is-dark" :callBack="()=>{lockIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
+                          <PopoButton message="删除" color="is-danger" :callBack="()=>{deleteIt(item.ID)}" v-if="item.UserName !== username"></PopoButton>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <PaginAtion v-if="data.length >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
+    </div>
+    <AddProject
+      v-if="userLoading && GamesLoading"
+      :showData="openAddModal"
+      :ShowMessage="ShowMessage"
+      :AddData="AddData">
+    </AddProject>
+    <ModifyProject
+      v-if="modifyStatus"
+      :showData="openModifyModal"
+      :ShowMessage="ShowMessage">
+    </ModifyProject>
+    <NotIfication
+      :showData="openerr">
+    </NotIfication>
+  </div>
+</template>
+<script>
+import { reactive, toRefs, onMounted, defineComponent } from 'vue'
+import { useRouter } from 'vue-router'
+import ManageHeader from '@/components/Other/Header'
+import LoadIng from '@/components/Other/Loading'
+import EmptyEd from '@/components/Other/Empty'
+import NotIfication from "@/components/Other/Notification"
+import ModifyProject from "@/components/Project/ModifyProject"
+import PopoButton from '@/components/Other/PopoButton'
+import PaginAtion from '@/components/Other/PaginAtion'
+import FormaTime from '@/components/Other/FormaTime'
+
+
+import Fetch from '@/helper/fetch'
+import CheckLogin from '@/helper/checkLogin'
+import Config from '@/helper/config'
+import setStorage from '@/helper/setStorage'
+
+import useClipboard from 'vue-clipboard3'
+const { toClipboard } = useClipboard()
+export default defineComponent({
+  name: 'UserProjectList',
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PopoButton, PaginAtion, FormaTime, ModifyProject },
+  setup() {
+    let states = reactive({
+      loading: false,
+      data: [],
+      AddData: {
+        UserData: [],
+        GamesData: [],
+      },
+      showCola: false,
+      total: 0,
+      username: "",
+      userid: "",
+      userLoading: false,
+      GamesLoading: false,
+      modifyStatus: false,
+      openModal:{
+        active: false,
+        username: ""
+      },
+      openModifyModal:{
+        active: false,
+        Project: {}
+      },
+      openerr: {
+        active: false,
+        message: "",
+        color: ""
+      },
+      pageLoading: false,
+      limit: Config.Limit,
+      UserID: 0,
+    })
+    const router = useRouter()
+    onMounted(async() => {
+      document.title = `${Config.GlobalTitle}-项目管理`
+      states.UserID = router.currentRoute._value.params.userid
+      const data = await CheckLogin()
+      if (data == 0) {
+        const username = localStorage.getItem('user')
+        states.username = username
+        states.userid = localStorage.getItem('userid')
+        GetData()
+      }else{
+        setStorage(false)
+        router.push("/")
+      }
+    })
+    const GetData = async(page = 1) => {
+      const token = localStorage.getItem("token")
+      const data = {
+        page:page,
+        limit: states.limit,
+        userid: states.UserID
+      }
+      const d = await Fetch(Config.Api.userProjectList, data, 'GET', token)
+      states.loading = true
+      states.pageLoading = false
+      if (d.status == 0) {
+        states.data = d.data
+        states.total = d.total
+        states.pageLoading = true
+        states.loading = false
+      }else{
+        states.data = []
+        states.total = 0
+        states.page = []
+        states.loading = false
+      }
+    }
+    /**
+     * 
+     * @param {*} e message用到的值
+     * @param {*} status 0默认不传参 1添加-加入列表 2锁定-替换列表值 3删除-filter值
+     */
+    const ShowMessage = (e, status = 0, id=0) => {
+      states.openerr.active = e.active
+      states.openerr.message = e.message
+      states.openerr.color = e.color
+      switch (status) {
+        case 1:
+          states.data = [...states.data, e.data]
+          states.userLoading = false
+          states.GamesLoading = false
+          break;
+        case 2:
+          states.data = states.data.map((e)=>{
+            if(e.ID == id) {
+              if(e.NewStatus === 0) {
+                e.NewStatus = 1
+              }else {
+                e.NewStatus = 0
+              }
+            }
+            return e
+          })
+          break;
+        case 3:
+          states.data = states.data.filter((e)=>{
+            return e.ID !== id
+          })
+          break;
+        case 4:
+          states.userLoading = false
+          states.GamesLoading = false
+          states.AddData.UserData = []
+          states.AddData.GamesData = []
+          break;
+        case 5:
+          states.modifyStatus = false
+          states.openModifyModal.Project = {}
+          break;
+        case 6:
+          states.modifyStatus = false
+          states.data = states.data.map((el)=>{
+            console.log(el.ID, e.data.ID)
+            if (el.ID == e.data.ID) {
+              return el = e.data
+            }
+            return el
+          })
+          break;
+        default:
+          break;
+      }
+    }
+    const showModel = (username) => {
+      states.openModal.active = true
+      states.openModal.username = username
+    }
+    const showModifyModal = async(id) => {
+      states.openModifyModal.Project = states.data.filter((e) => {
+        return e.ID == id
+      })[0]
+      states.openModifyModal.active = true
+      states.modifyStatus = true
+      // console.log(states.openModifyModal.Project)
+    }
+    const lockIt = async(id) => {
+      const token = localStorage.getItem("token")
+      const d = await Fetch(Config.Api.upprojectstatus, {id: id}, 'PUT', token)
+      if (d.status == 0) {
+        const data = {
+          active: true,
+          message: d.message,
+          color: 'is-success'
+        }
+        ShowMessage(data, 2, id)
+      }else{
+        const data = {
+          active: true,
+          message: d.message,
+          color: 'is-danger'
+        }
+        ShowMessage(data, 0)
+      }
+    }
+    const deleteIt = async(id) => {
+      const token = localStorage.getItem("token")
+      const d = await Fetch(Config.Api.delproject, {id: id}, 'DELETE', token)
+      if (d.status == 0) {
+        const data = {
+          active: true,
+          message: d.message,
+          color: 'is-success'
+        }
+        ShowMessage(data, 3, d.id)
+      }else{
+        const data = {
+          active: true,
+          message: d.message,
+          color: 'is-danger'
+        }
+        ShowMessage(data, 0)
+      }
+    }
+
+    const showAccount = (key) => {
+      router.push(`/account/${key}`)
+    }
+
+    const showAccountDraw = (id) => {
+      router.push(`/accountDraw/${id}/gold`)
+    }
+    const showAccountDrawed = (id) => {
+      router.push(`/accountDrawed/${id}`)
+    }
+
+    const ShowCola = () => {
+      states.showCola = !states.showCola
+    }
+
+    let time = 200;
+    let timeOut = null;
+
+    const copyUri = async(key) => {
+      clearTimeout(timeOut);
+      const uri = `${window.location.origin}/api/v1/${key}`
+      await toClipboard(uri)
+    }
+    const copyKey = (key) => {
+      clearTimeout(timeOut); // 清除第一个单击事件
+        timeOut = setTimeout(async() => {
+          await toClipboard(key)
+        }, time)
+    }
+    const showDrawedLog = (key) => {
+      router.push(`/drawLog/${key}`)
+    }
+    const backRouter = () => {
+      router.back()
+    }
+
+    return {
+      ...toRefs(states),
+      ShowMessage,
+      showModel,
+      lockIt,
+      deleteIt,
+      GetData,
+      showAccount,
+      showModifyModal,
+      showAccountDraw,
+      showAccountDrawed,
+      ShowCola,
+      copyUri,
+      copyKey,
+      showDrawedLog,
+      backRouter
+    }
+  },
+})
+</script>

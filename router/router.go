@@ -4,6 +4,7 @@ import (
 	"colaAPI/controller"
 	Account "colaAPI/controller/Account"
 	Admin "colaAPI/controller/Admin"
+	Draw "colaAPI/controller/Draw"
 	DrawLog "colaAPI/controller/DrawLog"
 	Games "colaAPI/controller/Games"
 	Projects "colaAPI/controller/Projects"
@@ -39,6 +40,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64, Users_SECRET_K
 		router.GET("/accountFiled/:key", controller.Index)
 		router.GET("/drawLog/:key", controller.Index)
 		router.GET("/drawData/:id", controller.Index)
+		router.GET("/AllDraw", controller.Index)
 		adminapiv1.POST("/AddAdmin", utils.AdminVerifyMiddleware(), Admin.AddAdmin)
 		adminapiv1.PUT("/RePassword", utils.AdminVerifyMiddleware(), Admin.ResetPassword)
 		adminapiv1.DELETE("/DelAdmin", utils.AdminVerifyMiddleware(), Admin.DeleteAdmin)
@@ -53,12 +55,19 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64, Users_SECRET_K
 		adminapiv1.GET("/UsersAllList", utils.AdminVerifyMiddleware(), User.UsersAllList)
 		adminapiv1.PUT("/UpStatusUser", utils.AdminVerifyMiddleware(), User.UpStatusUser)
 		adminapiv1.PUT("/SetUserRemarks", utils.AdminVerifyMiddleware(), User.SetUserRemarks)
-		adminapiv1.GET("/aaa", utils.AdminVerifyMiddleware(), controller.Index)
 		adminapiv1.POST("/AddProjects", utils.AdminVerifyMiddleware(), Projects.AddProjects)
 		adminapiv1.DELETE("/DelProjects", utils.AdminVerifyMiddleware(), Projects.DeleteProjects)
 		adminapiv1.GET("/ProjectsList", utils.AdminVerifyMiddleware(), Projects.ProjectsList)
+		adminapiv1.GET("/UserProjectsList", utils.AdminVerifyMiddleware(), Projects.UserProjectsList)
 		adminapiv1.PUT("/UpStatusProjects", utils.AdminVerifyMiddleware(), Projects.UpStatusProjects)
 		adminapiv1.PUT("/UpdateProjects", utils.AdminVerifyMiddleware(), Projects.ModifyProjects)
+		adminapiv1.POST("/AddGame", utils.AdminVerifyMiddleware(), Games.AddGame)
+		adminapiv1.DELETE("/DelGame", utils.AdminVerifyMiddleware(), Games.DeleteGame)
+		adminapiv1.GET("/GamesList", utils.AdminVerifyMiddleware(), Games.GamesList)
+		adminapiv1.GET("/GamesAllList", utils.AdminVerifyMiddleware(), Games.GamesAllList)
+		adminApiV1HasKey.GET("/DrawList", utils.AdminVerifyMiddleware(), DrawLog.DrawList)
+		adminapiv1.GET("/DrawData", utils.AdminVerifyMiddleware(), DrawLog.DrawData)
+		adminapiv1.GET("/AllCount", utils.AdminVerifyMiddleware(), Draw.DrawIndex)
 		adminApiV1HasKey.GET("/AccountList", utils.AdminVerifyMiddleware(), Account.AccountList)
 		adminApiV1HasKey.POST("/PostAccount", utils.AdminVerifyMiddleware(), Account.PostAccount)
 		adminApiV1HasKey.DELETE("/DeleteAccount", utils.AdminVerifyMiddleware(), Account.DeleteAccount)
@@ -74,12 +83,6 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64, Users_SECRET_K
 		adminApiV1HasKey.GET("/ExportDrawed", utils.AdminVerifyMiddleware(), Account.ExportAccountDrawed)
 		adminApiV1HasKey.GET("/GetFiledList", utils.AdminVerifyMiddleware(), Account.GetFiledList)
 		adminApiV1HasKey.GET("/GetOneFiled", utils.AdminVerifyMiddleware(), Account.GetOneFiled)
-		adminapiv1.POST("/AddGame", utils.AdminVerifyMiddleware(), Games.AddGame)
-		adminapiv1.DELETE("/DelGame", utils.AdminVerifyMiddleware(), Games.DeleteGame)
-		adminapiv1.GET("/GamesList", utils.AdminVerifyMiddleware(), Games.GamesList)
-		adminapiv1.GET("/GamesAllList", utils.AdminVerifyMiddleware(), Games.GamesAllList)
-		adminApiV1HasKey.GET("/DrawList", utils.AdminVerifyMiddleware(), DrawLog.DrawList)
-		adminapiv1.GET("/DrawData", utils.AdminVerifyMiddleware(), DrawLog.DrawData)
 	}
 
 	return router

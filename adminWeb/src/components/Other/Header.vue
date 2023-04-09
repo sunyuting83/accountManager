@@ -20,11 +20,14 @@
         <router-link class="navbar-item" :class="path === 'userlist'?'is-active':''" to="/userlist">
           用户管理
         </router-link>
-        <router-link class="navbar-item" :class="path === 'project'?'is-active':''" to="/project">
+        <router-link class="navbar-item" :class="path === 'project' || path === 'userProject' ? 'is-active' : ''" to="/project">
           项目管理
         </router-link>
         <router-link class="navbar-item" v-if="userid === '1'" :class="path === 'gameslist'?'is-active':''" to="/gameslist">
           游戏管理
+        </router-link>
+        <router-link class="navbar-item" v-if="userid === '1'" :class="path === 'AllDraw'?'is-active':''" to="/AllDraw">
+          题号管理
         </router-link>
         <a class="navbar-item" v-if="path === 'account'" :class="path === 'account' ? 'is-active' : ''">
         帐号管理
@@ -188,9 +191,5 @@ export default defineComponent({
 }
 .navbar-menu .item.light {
   background: #f5f5f5;
-}
-
-.navbar-menu.is-active .item {
-  display: none
 }
 </style>

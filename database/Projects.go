@@ -36,11 +36,36 @@ func (projects *Projects) GetCount() (count int64, err error) {
 	}
 	return
 }
+
+// Get User Count
+func (projects *Projects) GetCountAtUser(UserID string) (count int64, err error) {
+	if err = sqlDB.Model(&projects).Where("users_id = ?", UserID).Count(&count).Error; err != nil {
+		return
+	}
+	return
+}
 func (projects *Projects) GetCountWithIn(UsersIDs []int) (count int64, err error) {
 	if err = sqlDB.
 		Model(&projects).
 		Where("users_id IN ?", UsersIDs).
 		Count(&count).Error; err != nil {
+		return
+	}
+	return
+}
+
+// GetUserProjectsList
+func GetUserProjectsList(page, Limit int, UserID string) (projects *[]Projects, err error) {
+	p := makePage(page, Limit)
+	if err = sqlDB.
+		Model(&Projects{}).
+		Preload("Users").
+		Preload("Users.Manager").
+		Preload("Games").
+		Where("users_id = ?", UserID).
+		Order("projects.id desc").
+		Limit(Limit).Offset(p).
+		Find(&projects).Error; err != nil {
 		return
 	}
 	return
