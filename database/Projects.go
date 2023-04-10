@@ -59,9 +59,8 @@ func GetUserProjectsList(page, Limit int, UserID string) (projects *[]Projects, 
 	p := makePage(page, Limit)
 	if err = sqlDB.
 		Model(&Projects{}).
-		Preload("Users").
-		Preload("Users.Manager").
-		Preload("Games").
+		Joins("Users").
+		Joins("Games").
 		Where("users_id = ?", UserID).
 		Order("projects.id desc").
 		Limit(Limit).Offset(p).
@@ -76,9 +75,9 @@ func GetProjectsList(page, Limit int) (projects *[]Projects, err error) {
 	p := makePage(page, Limit)
 	if err = sqlDB.
 		Model(&Projects{}).
-		Preload("Users").
+		Joins("Users").
 		Preload("Users.Manager").
-		Preload("Games").
+		Joins("Games").
 		Order("projects.id desc").
 		Limit(Limit).Offset(p).
 		Find(&projects).Error; err != nil {
@@ -105,6 +104,14 @@ func GetProjectsListWithIn(page, Limit int, UsersIDs []int) (projects *[]Project
 // Check ID
 func ProjectsCheckID(id int64) (projects *Projects, err error) {
 	if err = sqlDB.First(&projects, "id = ?", id).Error; err != nil {
+		return
+	}
+	return
+}
+
+// Check ID
+func ProjectsCheckIDWithJoin(id int64) (projects *Projects, err error) {
+	if err = sqlDB.Joins("Users").First(&projects, id).Error; err != nil {
 		return
 	}
 	return

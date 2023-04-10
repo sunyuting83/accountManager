@@ -94,6 +94,9 @@ import LoadIng from '@/components/Other/Loading'
 import EmptyEd from '@/components/Other/Empty'
 import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
+import FormaNumber from '@/components/Other/FormaNumber'
+import ExpTime from '@/components/Other/ExpTime'
+
 
 
 import Fetch from '@/helper/fetch'
@@ -102,7 +105,7 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'DrawedLog',
-  components: { ManageHeader, LoadIng, EmptyEd, PaginAtion, FormaTime },
+  components: { ManageHeader, LoadIng, EmptyEd, PaginAtion, FormaNumber, ExpTime, FormaTime },
   setup() {
     let states = reactive({
       RootUrl: Config.RootUrl,
@@ -112,7 +115,9 @@ export default defineComponent({
       dateList: [],
       loading: false,
       data: [],
+      temp: [],
       total: 0,
+      limit: Config.Limit,
       username: '',
       pageLoading: false,
       IMGUri: Config.IMGUri,
@@ -135,6 +140,17 @@ export default defineComponent({
     const backRouter = () => {
       router.back()
     }
+    const makeData = (fromArr, mountOfEachLine) => {
+      let newArr = [];
+      let len = fromArr.length;
+      let lineNum =  len % mountOfEachLine == 0 ? len / mountOfEachLine : Math.ceil(len / mountOfEachLine);
+      //将源数组的元素拿出来，放到新数组 newArr 容器内
+      for (let i = 0; i < lineNum; i++) {
+          let tempElement = fromArr.slice(i*mountOfEachLine,(i+1)*mountOfEachLine);
+          newArr.push(tempElement);
+      }
+      return newArr;
+    }
     const GetData = async() => {
       const token = localStorage.getItem("token")
       const url = `${Config.RootUrl}DrawData`
@@ -143,21 +159,27 @@ export default defineComponent({
       states.pageLoading = false
       if (d.status == 0) {
         states.projects = d.projects
-        states.data = d.data
         states.total = d.data.length
+        states.temp = makeData(d.data, states.limit)
+        states.data = states.temp[0]
       states.pageLoading = true
         states.loading = false
       }else{
         states.data = []
+        states.temp = []
         states.total = 0
         states.page = []
         states.loading = false
       }
     }
+    const GetDateList = (p) => {
+      states.data = states.temp[p]
+    }
     return {
       ...toRefs(states),
       GetData,
-      backRouter
+      backRouter,
+      GetDateList
     }
   },
 })

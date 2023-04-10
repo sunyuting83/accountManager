@@ -69,7 +69,7 @@ func GetAllGamesList() (game []*Games, err error) {
 func GetAllGames() (game []*Games, err error) {
 	if err = sqlDB.
 		Preload("Projects", func(db *gorm.DB) *gorm.DB {
-			return sqlDB.Select("ID", "GamesID", "StatusJSON")
+			return sqlDB.Select("ID", "GamesID", "StatusJSON", "UsersID")
 		}).
 		Select("ID", "GameName").
 		Order("id desc").
@@ -78,3 +78,22 @@ func GetAllGames() (game []*Games, err error) {
 	}
 	return
 }
+
+func GetGame(id int64) (game *Games, err error) {
+	if err = sqlDB.
+		Preload("Projects").
+		Preload("Projects.Users").
+		Select("ID", "GameName").
+		Where("id", id).
+		Order("id desc").
+		Find(&game).Error; err != nil {
+		return
+	}
+	return
+}
+
+/*
+, func(db *gorm.DB) *gorm.DB {
+	return sqlDB.Select("ID", "GamesID", "StatusJSON", "UsersID")
+}
+*/

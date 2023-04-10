@@ -55,6 +55,7 @@ type Filter struct {
 	Crazy    int64 `form:"crazy" json:"crazy" xml:"crazy"`
 	Cold     int64 `form:"cold" json:"cold" xml:"cold"`
 	Precise  int64 `form:"precise" json:"precise" xml:"precise"`
+	GameID   int64 `form:"gameid" json:"gameid" xml:"gameid"`
 }
 
 // GetCurrentPath Get Current Path

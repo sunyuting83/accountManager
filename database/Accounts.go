@@ -241,6 +241,23 @@ func GetDataUseScopes(filter utils.Filter, hasStatus []string, projectsID string
 	return
 }
 
+func GetDataUseScopes1(filter utils.Filter, hasStatus []string, projectsID string) (accounts []Accounts, err error) {
+	if err = sqlDB.
+		Where("projects_id = ?", projectsID).
+		Scopes(HasStatus(hasStatus)).
+		Scopes(MinGold(filter.MinGold)).
+		Scopes(MaxGold(filter.MaxGold)).
+		Scopes(Multiple(filter.Multiple)).
+		Scopes(Diamond(filter.Diamond)).
+		Scopes(Crazy(filter.Crazy)).
+		Scopes(Cold(filter.Cold)).
+		Scopes(Precise(filter.Precise)).
+		Find(&accounts).Error; err != nil {
+		return
+	}
+	return
+}
+
 // func (account *Accounts) PullDataUseSQL(SQL string) (accounts []interface{}, err error) {
 // 	// db := sqlDB.Exec(SQL)
 // 	rows, err := sqlDB.Raw(SQL).Rows()

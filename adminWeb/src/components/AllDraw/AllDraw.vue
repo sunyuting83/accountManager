@@ -165,80 +165,94 @@
                       <PopoButton
                         message="按条件搜索" 
                         color="is-link" 
-                        :callBack="pullSelectData" 
+                        :callBack="GetDrawData" 
                         v-if="Filter.GameID !== 0"
                         ></PopoButton>
                       <PopoButton
                         message="按条件提取" 
                         color="is-primary" 
-                        :callBack="pullSelectData"
-                        v-if="Filter.GameID !== 0"
+                        :callBack="pullData"
+                        v-if="checkTemp.length !== 0"
                         ></PopoButton>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div v-if="data.length <= 0">
+              <div v-if="data.length === 0">
                 <EmptyEd></EmptyEd>
               </div>
-              <div class="table-container" v-else>
-                <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left">
-                  <thead class="is-size-7">
-                    <tr>
-                      <td>
-                        <label class="checkbox"><input type="checkbox" @click="checkall" />全选</label>
-                      </td>
-                      <td>序号</td>
-                      <td>帐号</td>
-                      <td v-if="data[0].PhoneNumber.length > 0">手机号</td>
-                      <td>今日金币</td>
-                      <td>昨日金币</td>
-                      <td>炮台</td>
-                      <td>钻石</td>
-                      <td>狂暴</td>
-                      <td>冰冻</td>
-                      <td>瞄准</td>
-                      <td v-if="data[0].Price.length > 0">价格</td>
-                      <td>过期时间</td>
-                      <td>更新时间</td>
-                    </tr>
-                  </thead>
-                  <tbody class="is-size-7">
-                    <tr v-for="(item, index) in data" :key="item.ID" class="hasimg" :class="checkTemp.indexOf(item.ID) !== -1  ? 'hasClick' : ''">
-                      <td>
-                        <label class="checkbox">
-                          <input type="checkbox" v-model="item.check" @click="(e)=>checkBox(e,item.ID)">
-                        </label>
-                      </td>
-                      <td>{{index + 1}}</td>
-                      <td>{{item.UserName}}</td>
-                      <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
-                      <td><FormaNumber :Numbers="item.TodayGold" /></td>
-                      <td><FormaNumber :Numbers="item.YesterdayGold" /></td>
-                      <td><FormaNumber :Numbers="item.Multiple" /></td>
-                      <td>{{item.Diamond}}</td>
-                      <td>{{item.Crazy}}</td>
-                      <td>{{item.Cold}}</td>
-                      <td>{{item.Precise}}</td>
-                      <td v-if="item.Price.length > 0">{{item.Price}}</td>
-                      <td><ExpTime :DateTime="item.Exptime" /></td>
-                      <td class="potd">
-                        <FormaTime :DateTime="item.UpdatedAt" />
-                        <div v-if="item.Cover.length > 0" class="poimg">
-                          <img :src="IMGUri+item.Cover" />
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div v-else>
+                <div class="container.is-fullhd mb-3" v-for="project in data" :key="project.ID">
+                  <div class="card events-card">
+                    <header class="card-header">
+                      <p class="card-header-title">
+                        用户：{{project.Remarks}}--{{project.UserName}} 项目名称：{{project.ProjectsName}}
+                      </p>
+                      <button class="card-header-icon">
+                        帐号总数: {{project.Count}}
+                      </button>
+                    </header>
+                    <div class="card-content">
+                      <div class="table-container">
+                        <table class="table is-striped is-hoverable is-fullwidth is-narrow has-text-left">
+                          <thead class="is-size-7">
+                            <tr>
+                              <td>
+                                <label class="checkbox"><input type="checkbox" @click="(e)=>{checkall(e, project.ID)}" />全选</label>
+                              </td>
+                              <td>序号</td>
+                              <td>帐号</td>
+                              <td v-if="project.Accounts[0].PhoneNumber.length > 0">手机号</td>
+                              <td>今日金币</td>
+                              <td>昨日金币</td>
+                              <td>炮台</td>
+                              <td>钻石</td>
+                              <td>狂暴</td>
+                              <td>冰冻</td>
+                              <td>瞄准</td>
+                              <td v-if="project.Accounts[0].Price.length > 0">价格</td>
+                              <td>过期时间</td>
+                              <td>更新时间</td>
+                            </tr>
+                          </thead>
+                          <tbody class="is-size-7">
+                            <tr v-for="(item, index) in project.Accounts" :key="item.ID" class="hasimg" :class="checkTemp.indexOf(item.ID) !== -1  ? 'hasClick' : ''">
+                              <td>
+                                <label class="checkbox">
+                                  <input type="checkbox" v-model="item.check" @click="(e)=>checkBox(e, item.ID, project.ID)">
+                                </label>
+                              </td>
+                              <td>{{index + 1}}</td>
+                              <td>{{item.UserName}}</td>
+                              <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
+                              <td><FormaNumber :Numbers="item.TodayGold" /></td>
+                              <td><FormaNumber :Numbers="item.YesterdayGold" /></td>
+                              <td><FormaNumber :Numbers="item.Multiple" /></td>
+                              <td>{{item.Diamond}}</td>
+                              <td>{{item.Crazy}}</td>
+                              <td>{{item.Cold}}</td>
+                              <td>{{item.Precise}}</td>
+                              <td v-if="item.Price.length > 0">{{item.Price}}</td>
+                              <td><ExpTime :DateTime="item.Exptime" /></td>
+                              <td class="potd">
+                                <FormaTime :DateTime="item.UpdatedAt" />
+                                <div v-if="item.Cover.length > 0" class="poimg">
+                                  <img :src="IMGUri+item.Cover" />
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <PaginAtion v-if="AccountType == 'gold' && total >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetGoldData"></PaginAtion>
-      <PaginAtion v-if="AccountType == 'date' && total >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetDateList"></PaginAtion>
     </div>
     <NotIfication
       :showData="openerr">
@@ -250,13 +264,12 @@
   </div>
 </template>
 <script>
-import { reactive, toRefs, onMounted, defineComponent, inject } from 'vue'
+import { reactive, toRefs, onMounted, defineComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import ManageHeader from '@/components/Other/Header'
 import LoadIng from '@/components/Other/Loading'
 import EmptyEd from '@/components/Other/Empty'
 import NotIfication from "@/components/Other/Notification"
-import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
 import FormaNumber from '@/components/Other/FormaNumber'
 import ExpTime from '@/components/Other/ExpTime'
@@ -270,7 +283,7 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'AllDraw',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime, RenewalCard, PopoButton },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, FormaTime, FormaNumber, ExpTime, RenewalCard, PopoButton },
   setup() {
     let states = reactive({
       AccountKey: "",
@@ -311,7 +324,6 @@ export default defineComponent({
       },
       IMGUri: Config.IMGUri
     })
-    const Reload = inject('reload')
     const router = useRouter()
     onMounted(async() => {
       document.title = `${Config.GlobalTitle}-帐号管理`
@@ -323,6 +335,7 @@ export default defineComponent({
         GetDateList()
       }else{
         setStorage(false)
+        CleanData()
         router.push("/")
       }
     })
@@ -339,6 +352,12 @@ export default defineComponent({
       states.pageLoading = true
       states.loading = false
       states.buttonLoading = false
+    }
+
+
+    const getDateData = (date) => {
+      states.CurrentDate = date
+      GetDateList()
     }
 
     const GetDateList = async() => {
@@ -360,20 +379,21 @@ export default defineComponent({
       }
     }
 
-    const getDateData = (date) => {
-      states.CurrentDate = date
-      GetDateList()
-    }
-
-    const GetGoldData = async(page = 1) => {
+    const GetDrawData = async() => {
       const token = localStorage.getItem("token")
+      const Filter = states.Filter
       const data = {
-        page:page, 
-        limit: states.limit,
+        mingold: Filter.mingold * 100000000,
+        maxgold: Filter.maxgold * 100000000,
+        multiple: Filter.multiple * 10000,
+        diamond: Filter.diamond,
+        crazy: Filter.crazy,
+        cold: Filter.cold,
+        precise: Filter.precise,
+        gameid: Filter.GameID
       }
-      const url = `${Config.RootUrl}${states.AccountKey}/AccountDrawList`
       states.loading = true
-      const d = await Fetch(url, data, 'GET', token)
+      const d = await Fetch(Config.Api.drawSelect, data, 'PUT', token)
       if (d.status == 0) {
         states.data = d.data
         states.temp = d.data
@@ -388,6 +408,12 @@ export default defineComponent({
         states.page = []
         states.projects = {}
         states.loading = false
+        const e = {
+          active: true,
+          message: d.message,
+          color: "is-danger",
+        }
+        ShowMessage(e)
       }
     }
     /**
@@ -406,45 +432,45 @@ export default defineComponent({
       router.push("/project")
     }
 
-    const pushRouter = () => {
-      const accounType = states.AccountType
-      const AccountKey = states.AccountKey
-      if (accounType === 'gold') {
-        states.AccountType = 'date'
-      }else {
-        states.AccountType = 'gold'
-      }
-      CleanData()
-      router.push(`/accountDraw/${AccountKey}/${states.AccountType}`)
-      Reload()
-    }
-
-    const checkBox = (e, account) => {
+    const checkBox = (e, account, id) => {
       if (e.target.checked) {
-        states.checkTemp = [...states.checkTemp, account]
+        states.checkTemp = [...states.checkTemp, {'pid':id, 'aid':account}]
       }else{
         states.checkTemp = states.checkTemp.filter((el) => {
-          if (el !== account) return el
+          if (el.aid !== account) return el
         })
       }
+      // console.log(states.checkTemp)
     }
-    const checkall = (e) => {
+    const checkall = (e,id) => {
       if (e.target.checked) {
-        states.checkTemp = []
-        states.data.forEach((el) => {
-          states.checkTemp =  [...states.checkTemp,el.ID]
+        states.data.map((el) => {
+          if (el.ID == id) {
+            el.Accounts.map((es) => {
+              states.checkTemp =  [...states.checkTemp, {'pid': id, 'aid': es.ID}]
+              es.check = true
+              return es
+            })
+          }
         })
-        states.data = states.data.map((el) => {
-          el.check =  true
-          return el
-        })
+        states.checkTemp = [...new Set(states.checkTemp.map(item => 
+            JSON.stringify(item)
+        ))].map(val => JSON.parse(val))
       }else{
-        states.checkTemp = []
         states.data = states.data.map((el) => {
-          el.check =  false
+          if (el.ID == id) {
+            el.Accounts.map((es) => {
+              es.check =  false
+              states.checkTemp = states.checkTemp.filter((ct)=> {
+                return ct.aid != es.ID
+              })
+              return es
+            })
+          }
           return el
         })
       }
+      // console.log(states.checkTemp)
     }
     const makeNumberINT = (n) =>{
       let x = "0"
@@ -465,7 +491,7 @@ export default defineComponent({
     const makeData = (data) => {
       let d = []
       data.forEach((el) => {
-        d = [...d, `${el.UserName}\t${el.Password}\t${makeNumberINT(el.TodayGold)}\t${el.Multiple}`]
+        el.Accounts.forEach((a) => d = [...d, `${a.UserName}\t${a.Password}\t${makeNumberINT(a.TodayGold)}\t${a.Multiple}\t${el.Projects.ProjectsName}\t${el.Projects.Users.Remarks}\t${el.Projects.Users.UserName}`])
       })
       const x = d.join("\r\n")
       return x
@@ -473,12 +499,7 @@ export default defineComponent({
 
     const closeModal = () => {
       states.checkTemp = []
-      const AccountType = router.currentRoute._value.params.type
-      if (AccountType == 'date') {
-        GetDateList()
-      }else {
-        GetGoldData()
-      }
+      GetDrawData()
     }
 
     const pullData = async() => {
@@ -492,13 +513,12 @@ export default defineComponent({
       if (list.length > 0 ) {
         const token = localStorage.getItem("token")
         const data = {
-          list: states.checkTemp
+          list: JSON.stringify(states.checkTemp)
         }
-        const url = `${Config.RootUrl}${states.AccountKey}/PullDrawList`
         states.buttonLoading = true
         states.pageLoading = false
         states.loading = true
-        const d = await Fetch(url, data, 'PUT', token)
+        const d = await Fetch(Config.Api.drawSelectPull, data, 'PUT', token)
         if (d.status == 0) {
           states.loading = false
           states.buttonLoading = false
@@ -520,46 +540,6 @@ export default defineComponent({
       }
     }
 
-    const pullSelectData = async() => {
-      const Filter = states.Filter
-      const e = {
-        active: true,
-        message: "获取失败",
-        color: "is-danger",
-        newtime: 0,
-      }
-      const token = localStorage.getItem("token")
-      const data = {
-        mingold: Filter.mingold * 100000000,
-        maxgold: Filter.maxgold * 100000000,
-        multiple: Filter.multiple * 10000,
-        diamond: Filter.diamond,
-        crazy: Filter.crazy,
-        cold: Filter.cold,
-        precise: Filter.precise,
-      }
-      const url = `${Config.RootUrl}${states.AccountKey}/PullDrawSelect`
-      states.buttonLoading = true
-      states.pageLoading = false
-      states.loading = true
-      const d = await Fetch(url, data, 'PUT', token)
-      if (d.status == 0) {
-        states.loading = false
-        states.buttonLoading = false
-        const data = makeData(d.data)
-        states.openModal.active = true
-        states.openModal.title = "提取成功"
-        states.openModal.message = "成功提取帐号，点击复制到剪切板再关闭此弹窗。"
-        states.openModal.data = data
-      }else{
-        e.message = d.message
-        states.checkTemp = []
-        states.loading = false
-        states.buttonLoading = false
-        ShowMessage(e)
-      }
-    }
-
     const pushRouterToDrawed = () => {
       const AccountKey = router.currentRoute._value.params.key
       router.push(`/accountDrawed/${AccountKey}`)
@@ -567,15 +547,13 @@ export default defineComponent({
 
     return {
       ...toRefs(states),
-      GetGoldData,
       backRouter,
-      pushRouter,
+      GetDrawData,
       getDateData,
       GetDateList,
       checkBox,
       checkall,
       pullData,
-      pullSelectData,
       pushRouterToDrawed,
       closeModal,
       ShowMessage
