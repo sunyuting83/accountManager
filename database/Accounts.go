@@ -158,6 +158,7 @@ func PullDataUseIn(IDs []int) (accounts []*Accounts, err error) {
 		Model(&accounts).
 		Clauses(clause.Returning{}).
 		Where("id IN ?", IDs).
+		Order("today_gold DESC").
 		Update("new_status", "108")
 	return
 }
@@ -252,6 +253,7 @@ func GetDataUseScopes1(filter utils.Filter, hasStatus []string, projectsID strin
 		Scopes(Crazy(filter.Crazy)).
 		Scopes(Cold(filter.Cold)).
 		Scopes(Precise(filter.Precise)).
+		Order("today_gold DESC").
 		Find(&accounts).Error; err != nil {
 		return
 	}
