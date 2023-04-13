@@ -121,10 +121,11 @@ func PostSetAccount(c *gin.Context) {
 		Exptime:   ExpTimeInt,
 	}
 
-	timeobj := time.Unix(int64(account.UpdatedAt), 0)
+	timeobj := time.Unix(account.UpdatedAt/1000, 0)
 	olDate := timeobj.Format("20060102")
 	nowTime := time.Now()
 	timeStr := nowTime.Format("20060102")
+	// fmt.Println(olDate, timeStr)
 	if timeStr > olDate {
 		updata.YesterdayGold = account.TodayGold
 	}
