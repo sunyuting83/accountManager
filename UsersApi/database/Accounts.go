@@ -144,7 +144,6 @@ func (account *Accounts) BackTo(projectsID, status string, backToStatus int) {
 func (account *Accounts) UpdataOneAccount(projectsID, username string, accounts map[string]interface{}) {
 	sqlDB.Model(&account).
 		Omit("created_at").
-		Select("cover", "today_gold", "multiple", "diamond", "crazy", "cold", "precise", "exptime", "updated_at", "yesterday_gold").
 		Where("projects_id = ? and user_name = ?", projectsID, username).
 		Updates(accounts)
 }
@@ -255,6 +254,7 @@ func GetDataUseScopes(filter utils.Filter, hasStatus []string, projectsID string
 		Scopes(Crazy(filter.Crazy)).
 		Scopes(Cold(filter.Cold)).
 		Scopes(Precise(filter.Precise)).
+		Order("today_gold DESC").
 		Find(&accounts).Error; err != nil {
 		return
 	}
