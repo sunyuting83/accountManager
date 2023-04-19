@@ -493,8 +493,18 @@ export default defineComponent({
       data.forEach((el) => {
         el.Accounts.forEach((a) => d = [...d, `${a.UserName}\t${a.Password}\t${makeNumberINT(a.TodayGold)}\t${a.Multiple}\t${el.Projects.ProjectsName}\t${el.Projects.Users.Remarks}\t${el.Projects.Users.UserName}`])
       })
+      d = sortTable(d)
       const x = d.join("\r\n")
       return x
+    }
+
+    const sortTable = (d) => {
+      d.sort((a, b)=>{
+        const aGold = Number(a.split("\t")[2])
+        const bGold = Number(b.split("\t")[2])
+        return bGold - aGold
+      })
+      return d
     }
 
     const closeModal = () => {
