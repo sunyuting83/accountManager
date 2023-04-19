@@ -520,8 +520,18 @@ export default defineComponent({
       data.forEach((el) => {
         d = [...d, `${el.UserName}\t${el.Password}\t${makeNumberINT(el.TodayGold)}\t${el.Multiple}`]
       })
+      d = sortTable(d)
       const x = d.join("\r\n")
       return x
+    }
+
+    const sortTable = (d) => {
+      d.sort((a, b)=>{
+        const aGold = Number(a.split("\t")[2])
+        const bGold = Number(b.split("\t")[2])
+        return bGold - aGold
+      })
+      return d
     }
 
     const closeModal = () => {
