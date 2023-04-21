@@ -57,7 +57,7 @@ func SetAccount(c *gin.Context) {
 		json.Unmarshal([]byte(has), &result)
 		projectsID = result.ProjectsID
 	}
-	account, err := database.CheckAccount(projectsID, Account)
+	account, err := database.CheckOneAccount(projectsID, Account)
 	if err != nil {
 		if IsJson == "1" {
 			c.JSON(http.StatusOK, gin.H{

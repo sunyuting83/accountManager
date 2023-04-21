@@ -101,7 +101,7 @@ func PostSetAccount(c *gin.Context) {
 	ExpTimeInt := strToDate(form.ExpTime)
 	projectsID, _ := GetProjectsID(c)
 
-	account, err := database.CheckAccount(projectsID, form.Account)
+	account, err := database.CheckOneAccount(projectsID, form.Account)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
