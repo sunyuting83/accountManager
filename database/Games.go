@@ -3,12 +3,13 @@ package database
 import "gorm.io/gorm"
 
 type Games struct {
-	ID        uint `gorm:"primaryKey"`
-	GameName  string
-	Projects  []Projects
-	Count     int64
-	CreatedAt int64 `gorm:"autoUpdateTime:milli"`
-	UpdatedAt int64 `gorm:"autoUpdateTime:milli"`
+	ID         uint `gorm:"primaryKey"`
+	GameName   string
+	Projects   []Projects
+	Count      int64
+	AliveCount int64
+	CreatedAt  int64 `gorm:"autoUpdateTime:milli"`
+	UpdatedAt  int64 `gorm:"autoUpdateTime:milli"`
 }
 
 func (game *Games) Insert() (err error) {

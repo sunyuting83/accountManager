@@ -51,6 +51,15 @@ func (account *Accounts) GetInCount(ProjectsID string, statusList []string) (cou
 	}
 	return
 }
+func (account *Accounts) GetInCountWithDate(ProjectsID string, statusList []string, starTime, endTime int64) (count int64, err error) {
+	if err = sqlDB.
+		Model(&account).
+		Where("projects_id = ? and new_status IN ? AND updated_at >= ? AND updated_at <= ?", ProjectsID, statusList, starTime, endTime).
+		Count(&count).Error; err != nil {
+		return
+	}
+	return
+}
 
 // Account List
 func (account *Accounts) GetInList(ProjectsID string, statusList []string, page, Limit int) (accounts []*Accounts, err error) {

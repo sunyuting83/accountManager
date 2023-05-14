@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +15,9 @@ import (
 func DrawIndex(c *gin.Context) {
 	userData := utils.GetTokenUserData(c)
 	if userData.UserID == 1 {
+		d := time.Now()
+		date := d.Format("2006-01-02")
+		startTime, endTime := utils.GetSqlDateTime(date)
 		gamesList, err := database.GetAllGames()
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -30,7 +34,9 @@ func DrawIndex(c *gin.Context) {
 						var account *database.Accounts
 						IDStr := strconv.Itoa(int(value.ID))
 						Count, _ := account.GetInCount(IDStr, hasStatus)
+						AliveCount, _ := account.GetInCountWithDate(IDStr, hasStatus, startTime, endTime)
 						item.Count = item.Count + Count
+						item.AliveCount = item.AliveCount + AliveCount
 					}
 				}
 			}

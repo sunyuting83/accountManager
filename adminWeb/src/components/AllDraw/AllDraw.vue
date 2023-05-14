@@ -9,6 +9,14 @@
         </div>
       </div>
     </nav>
+    <nav class="level is-mobile pt-3" v-if="GamesList.length !== 0">
+      <div class="level-item has-text-centered" v-for="item in GamesList" :key="item.ID" >
+        <div>
+          <p class="heading">{{item.GameName}}日活号</p>
+          <p class="title">{{item.AliveCount}}</p>
+        </div>
+      </div>
+    </nav>
     <div class="container.is-fullhd">
       <div class="card events-card">
         <div class="card-content">
