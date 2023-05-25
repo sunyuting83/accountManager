@@ -1,10 +1,8 @@
 package utils
 
 import (
-	BadgerDB "colaAPI/badger"
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"math/rand"
 	"net/http"
@@ -32,7 +30,6 @@ type UsersApi struct {
 	Port       string `yaml:"port"`
 	SECRET_KEY string `yaml:"SECRET_KEY"`
 }
-
 type ManagerApi struct {
 	Port       string `yaml:"port"`
 	SECRET_KEY string `yaml:"SECRET_KEY"`
@@ -61,7 +58,6 @@ type Filter struct {
 	Crazy    int64 `form:"crazy" json:"crazy" xml:"crazy"`
 	Cold     int64 `form:"cold" json:"cold" xml:"cold"`
 	Precise  int64 `form:"precise" json:"precise" xml:"precise"`
-	GameID   int64 `form:"gameid" json:"gameid" xml:"gameid"`
 }
 
 // GetCurrentPath Get Current Path
@@ -171,34 +167,6 @@ func SetConfigMiddleWare(SECRET_KEY, CurrentPath, Users_SECRET_KEY string) gin.H
 		c.Set("current_path", CurrentPath)
 		c.Writer.Status()
 	}
-}
-
-func GetTokenUserData(c *gin.Context) (result *CacheToken) {
-
-	token := c.GetHeader("Authorization")
-
-	secret_key, _ := c.Get("secret_key")
-	SECRET_KEY := secret_key.(string)
-	token = token[7:]
-	AEStoken, err := DecryptByAes(token, []byte(SECRET_KEY))
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  1,
-			"message": "haven't token",
-		})
-		return
-	}
-	Token, err := BadgerDB.GetToken(AEStoken)
-
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  1,
-			"message": err.Error(),
-		})
-		return
-	}
-	json.Unmarshal(Token, &result)
-	return
 }
 
 func randSeq(n int) string {

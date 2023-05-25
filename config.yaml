@@ -2,7 +2,6 @@ port: "13002"
 SECRET_KEY: Zq9efv8Ebs3DjKMriJeVfkShA7jHY4rm
 AdminPWD: 9r3rfQtagJAG
 FormMemory: 256
-FiledSize: 20
 Database:
   Username: acc_manage
   Password: aaa123123
@@ -13,9 +12,10 @@ Database:
 UsersApi:
   port: "13003"
   SECRET_KEY: NAsUng5HdjVwMuppRSofRppf7xnPm62y
+ManagerApi:
+  port: "13005"
+  SECRET_KEY: ADij1fXkrupev1HrVfSvIFDdyOmgTg1v
 Redis:
   Host: 192.168.1.90:6379
   Password: zH05aXvMzFpy8vDY
   DB: 1
-ImageServer:
-  Host: localhost:13005
