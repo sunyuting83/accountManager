@@ -1,6 +1,6 @@
 const CROSUrl = 'https://crossorigin.me/'
-const RootU = 'http://114.115.183.208:18562'
-const IMGUri = 'http://114.115.183.208:18080/image/'
+const RootU = 'http://localhost:13002'
+const IMGUri = 'http://localhost:18080/image/'
 const RootUrl = `${RootU}/admin/api/v1/`
 const IndexUrl = `${CROSUrl}${RootUrl}`
 const Name = '管理员帐号'
@@ -37,6 +37,7 @@ const Api = {
   'UpdateProjects': `${RootUrl}UpdateProjects`,
   'AddGame': `${RootUrl}AddGame`,
   'DelGame': `${RootUrl}DelGame`,
+  'ModifyCalc': `${RootUrl}ModifyCalc`,
   'GamesList': `${RootUrl}GamesList`,
   'GamesAllList':`${RootUrl}GamesAllList`,
   'setRemarks': `${RootUrl}SetUserRemarks`,

@@ -17,6 +17,7 @@ type Accounts struct {
 	Password      string
 	Cover         string
 	NewStatus     int `gorm:"index"`
+	SellStatus    int `gorm:"index;default:0"`
 	TodayGold     int64
 	YesterdayGold int64
 	Multiple      int64

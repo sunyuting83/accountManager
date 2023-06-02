@@ -40,6 +40,7 @@
                       <td><FormaTime :DateTime="item.CreatedAt"></FormaTime></td>
                       <td>
                         <div class="buttons">
+                          <button class="button is-success is-small" @click="()=>{showCaleModel(item.ID)}">价格公式</button>
                           <PopoButton message="删除" color="is-danger" :callBack="()=>{deleteIt(item.ID)}"></PopoButton>
                         </div>
                       </td>
@@ -58,6 +59,11 @@
       :showData="openAddModal"
       :ShowMessage="ShowMessage">
     </AddGame>
+    <ModifyCale
+      v-if="modifyStatus"
+      :showData="openCaleModal"
+      :ShowMessage="ShowMessage">
+    </ModifyCale>
     <NotIfication
       :showData="openerr">
     </NotIfication>
@@ -71,6 +77,7 @@ import LoadIng from '@/components/Other/Loading'
 import EmptyEd from '@/components/Other/Empty'
 import NotIfication from "@/components/Other/Notification"
 import AddGame from "@/components/Games/AddGame"
+import ModifyCale from "@/components/Games/ModifyCale"
 import PopoButton from '@/components/Other/PopoButton'
 import PaginAtion from '@/components/Other/PaginAtion'
 import FormaTime from '@/components/Other/FormaTime'
@@ -82,7 +89,7 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'GamesList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, AddGame, PopoButton, PaginAtion, FormaTime },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, AddGame, PopoButton, PaginAtion, FormaTime, ModifyCale },
   setup() {
     let states = reactive({
       loading: false,
@@ -93,8 +100,18 @@ export default defineComponent({
         active: false,
         username: ""
       },
+      modifyStatus: false,
       openAddModal:{
         active: false
+      },
+      openCaleModal:{
+        active: false,
+        data: {
+          GameID: 0,
+          BasePrice:0,
+          UnitPrice:0,
+          SingleNumber: 0
+        }
       },
       openerr: {
         active: false,
@@ -146,6 +163,7 @@ export default defineComponent({
       switch (status) {
         case 1:
           states.data = [...states.data, e.data]
+          states.modifyStatus = false
           break;
         case 2:
           states.data = states.data.map((e)=>{
@@ -158,13 +176,16 @@ export default defineComponent({
             }
             return e
           })
+          states.modifyStatus = false
           break;
         case 3:
           states.data = states.data.filter((e)=>{
             return e.ID !== id
           })
+          states.modifyStatus = false
           break;
         default:
+          states.modifyStatus = false
           break;
       }
     }
@@ -174,6 +195,18 @@ export default defineComponent({
     }
     const showAddModel = () => {
       states.openAddModal.active = true
+    }
+    const showCaleModel = (id) => {
+      states.data.forEach((e)=>{
+        if(e.ID == id) {
+          states.openCaleModal.data.BasePrice = e.BasePrice
+          states.openCaleModal.data.UnitPrice = e.UnitPrice
+          states.openCaleModal.data.SingleNumber = e.SingleNumber
+        }
+      })
+      states.openCaleModal.data.GameID = id
+      states.openCaleModal.active = true
+      states.modifyStatus = true
     }
     const deleteIt = async(id) => {
       const token = localStorage.getItem("token")
@@ -200,6 +233,7 @@ export default defineComponent({
       ShowMessage,
       showModel,
       showAddModel,
+      showCaleModel,
       deleteIt,
       GetData
     }

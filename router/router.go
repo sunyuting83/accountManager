@@ -66,6 +66,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64, Users_SECRET_K
 		adminapiv1.DELETE("/DelGame", utils.AdminVerifyMiddleware(), Games.DeleteGame)
 		adminapiv1.GET("/GamesList", utils.AdminVerifyMiddleware(), Games.GamesList)
 		adminapiv1.GET("/GamesAllList", utils.AdminVerifyMiddleware(), Games.GamesAllList)
+		adminapiv1.POST("/ModifyCalc", utils.AdminVerifyMiddleware(), Games.ModifyCalc)
 		adminapiv1.GET("/DrawData", utils.AdminVerifyMiddleware(), DrawLog.DrawData)
 		adminapiv1.GET("/AllCount", utils.AdminVerifyMiddleware(), Draw.DrawIndex)
 		adminapiv1.PUT("/DrawSelect", utils.AdminVerifyMiddleware(), Draw.DrawSelect)
