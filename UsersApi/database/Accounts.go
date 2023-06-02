@@ -17,6 +17,7 @@ type Accounts struct {
 	Password      string
 	Cover         string
 	NewStatus     int `gorm:"index"`
+	SellStatus    int `gorm:"index;default:0"`
 	TodayGold     int64
 	YesterdayGold int64
 	Multiple      int64
@@ -178,6 +179,14 @@ func PullDataUseIn(IDs []int) (accounts []*Accounts, err error) {
 		Clauses(clause.Returning{}).
 		Where("id IN ?", IDs).
 		Update("new_status", "108")
+	return
+}
+func SetSellUseIn(IDs []int) (accounts []*Accounts, err error) {
+	sqlDB.
+		Model(&accounts).
+		Clauses(clause.Returning{}).
+		Where("id IN ?", IDs).
+		Update("sell_status", "1")
 	return
 }
 

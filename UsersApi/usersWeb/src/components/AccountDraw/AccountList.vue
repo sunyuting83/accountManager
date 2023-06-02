@@ -1,7 +1,7 @@
 <template>
   <div>
     <ManageHeader></ManageHeader>
-    <div class="container">
+    <div class="container.is-fullhd">
       <div class="card events-card">
         <header class="card-header">
           <p class="card-header-title">
@@ -25,17 +25,26 @@
               <div class="columns flex-wrap is-justify-content-space-between mt-1">
                 <div class="field ml-3">
                   <div class="buttons is-horizontal are-small has-addons">
-                    <button class="button is-warning" :class="buttonLoading ? 'is-loading' : '' " :disabled="AccountType == 'gold'?true:false" @click="pushRouter">
+                    <button class="button is-warning" :class="buttonLoading ? 'is-loading' : '' " :disabled="AccountType == 'gold'?true:false" @click="()=>{pushRouter('gold')}">
                       按金币排列
                     </button>
-                    <button class="button is-info" :class="buttonLoading ? 'is-loading' : '' " :disabled="AccountType == 'date'?true:false" @click="pushRouter">
+                    <button class="button is-info" :class="buttonLoading ? 'is-loading' : '' " :disabled="AccountType == 'date'?true:false" @click="()=>{pushRouter('date')}">
                       按日期排列
+                    </button>
+                    <button class="button is-success" :class="buttonLoading ? 'is-loading' : '' " :disabled="AccountType == 'search'?true:false" @click="()=>{pushRouter('search')}">
+                      按条件搜索
                     </button>
                   </div>
                 </div>
                 <div class="field mr-3">
                   <div class="buttons is-horizontal are-small has-addons">
                     <span v-if="total !== 0" class="is-size-7 mr-3">帐号总数 <span class="has-text-danger ml-1">{{total}}</span></span>
+                    <button 
+                      class="button is-warning"
+                      :class="buttonLoading ? 'is-loading' : '' "
+                      @click="sellData" :disabled="checkTemp.length <= 0">
+                      出售选中
+                    </button>
                     <button 
                       class="button is-success"
                       :class="buttonLoading ? 'is-loading' : '' "
@@ -178,11 +187,17 @@
                     </div>
                   </div>
                   <div class="field ml-3">
+                    <div class="buttons">
+                    <PopoButton
+                      message="按条件搜索" 
+                      color="is-info" 
+                      :callBack="SearchSelectData" v-if="AccountType == 'search'"></PopoButton>
                     <PopoButton
                       message="按条件提取" 
                       color="is-primary" 
                       :callBack="pullSelectData" 
-                      v-if="data.length > 0 && Filter.mingold > 0" ></PopoButton>
+                      v-if="data.length > 0 && Filter.mingold > 0 && AccountType !== 'search'" ></PopoButton>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -217,6 +232,7 @@
                       <td>冰冻</td>
                       <td>瞄准</td>
                       <td v-if="data[0].Price.length > 0">价格</td>
+                      <td>出售中</td>
                       <td>过期时间</td>
                       <td>更新时间</td>
                     </tr>
@@ -239,6 +255,7 @@
                       <td>{{item.Cold}}</td>
                       <td>{{item.Precise}}</td>
                       <td v-if="item.Price.length > 0">{{item.Price}}</td>
+                      <td>{{item.SellStatus === 0 ? "待出售" : "出售中"}}</td>
                       <td><ExpTime :DateTime="item.Exptime" /></td>
                       <td class="potd">
                         <FormaTime :DateTime="item.UpdatedAt" />
@@ -346,7 +363,7 @@ export default defineComponent({
           }else {
             states.loading = false
           }
-        }else {
+        }else if  (states.AccountType == 'gold') {
           GetGoldData()
         }
       }else{
@@ -459,16 +476,11 @@ export default defineComponent({
       router.push("/project")
     }
 
-    const pushRouter = () => {
-      const accounType = states.AccountType
+    const pushRouter = (AccountType) => {
       const AccountKey = states.AccountKey
-      if (accounType === 'gold') {
-        states.AccountType = 'date'
-      }else {
-        states.AccountType = 'gold'
-      }
+      states.AccountType = AccountType
       CleanData()
-      router.push(`/accountDraw/${AccountKey}/${states.AccountType}`)
+      router.push(`/accountDraw/${AccountKey}/${AccountType}`)
       Reload()
     }
 
@@ -573,6 +585,39 @@ export default defineComponent({
       }
     }
 
+    const sellData = async() => {
+      const list = states.checkTemp
+      const AccountType = states.AccountType
+      const e = {
+        active: true,
+        message: "设置失败",
+        color: "is-danger",
+        newtime: 0,
+      }
+      if (list.length > 0 ) {
+        const token = localStorage.getItem("token")
+        const data = {
+          list: states.checkTemp
+        }
+        const url = `${Config.RootUrl}${states.AccountKey}/SetSellList`
+        states.buttonLoading = true
+        states.pageLoading = false
+        states.loading = true
+        const d = await Fetch(url, data, 'PUT', token)
+        if (d.status == 0) {
+          pushRouter(AccountType)
+        }else{
+          states.checkTemp = []
+          states.loading = false
+          states.buttonLoading = false
+          ShowMessage(e)
+        }
+      }else{
+        states.loading = false
+        ShowMessage(e)
+      }
+    }
+
     const pullSelectData = async() => {
       const Filter = states.Filter
       const e = {
@@ -613,6 +658,45 @@ export default defineComponent({
       }
     }
 
+    const SearchSelectData = async() => {
+      const Filter = states.Filter
+      const e = {
+        active: true,
+        message: "检索失败",
+        color: "is-danger",
+        newtime: 0,
+      }
+      const token = localStorage.getItem("token")
+      const data = {
+        mingold: Filter.mingold * 100000000,
+        maxgold: Filter.maxgold * 100000000,
+        multiple: Filter.multiple * 10000,
+        diamond: Filter.diamond,
+        crazy: Filter.crazy,
+        cold: Filter.cold,
+        precise: Filter.precise,
+      }
+      const url = `${Config.RootUrl}${states.AccountKey}/SearchAccountDraw`
+      states.buttonLoading = true
+      states.pageLoading = false
+      states.loading = true
+      const d = await Fetch(url, data, 'PUT', token)
+      // console.log(d)
+      if (d.status == 0) {
+        states.data = d.data
+        states.temp = d.data
+        states.total = d.data.length
+        states.loading = false
+        states.buttonLoading = false
+      }else{
+        e.message = d.message
+        states.checkTemp = []
+        states.loading = false
+        states.buttonLoading = false
+        ShowMessage(e)
+      }
+    }
+
     const pushRouterToDrawed = () => {
       const AccountKey = router.currentRoute._value.params.key
       router.push(`/accountDrawed/${AccountKey}`)
@@ -629,9 +713,11 @@ export default defineComponent({
       checkall,
       pullData,
       pullSelectData,
+      SearchSelectData,
       pushRouterToDrawed,
       closeModal,
-      ShowMessage
+      ShowMessage,
+      sellData
     }
   },
 })

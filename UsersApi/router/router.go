@@ -48,6 +48,8 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1HasKey.GET("/AccountDrawDateList", utilsUser.UserVerifyMiddleware(), Account.AccountDrawDateList)
 		userApiV1HasKey.PUT("/PullDrawList", utilsUser.UserVerifyMiddleware(), Account.PullAccountDrawList)
 		userApiV1HasKey.PUT("/PullDrawSelect", utilsUser.UserVerifyMiddleware(), Account.PullAccountDrawSelect)
+		userApiV1HasKey.PUT("/SearchAccountDraw", utilsUser.UserVerifyMiddleware(), Account.SearchAccountDraw)
+		userApiV1HasKey.PUT("/SetSellList", utilsUser.UserProjectsMiddleware(), Account.AccountSetSellList)
 		userApiV1HasKey.GET("/GetAllDateForDrawed", utilsUser.UserVerifyMiddleware(), Account.GetAllDateForAccountDrawed)
 		userApiV1HasKey.GET("/AccountDrawedDateList", utilsUser.UserVerifyMiddleware(), Account.AccountDrawedDateList)
 		userApiV1HasKey.GET("/ExportDrawed", utilsUser.UserVerifyMiddleware(), Account.ExportAccountDrawed)
