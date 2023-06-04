@@ -186,6 +186,12 @@
                       </div>
                     </div>
                   </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="Filter.ignore">
+                      忽略出售中
+                    </label>
+                  </div>
                   <div class="field ml-3">
                     <div class="buttons">
                     <PopoButton
@@ -231,7 +237,7 @@
                       <td>狂暴</td>
                       <td>冰冻</td>
                       <td>瞄准</td>
-                      <td v-if="data[0].Price.length > 0">价格</td>
+                      <td>价格</td>
                       <td>出售中</td>
                       <td>过期时间</td>
                       <td>更新时间</td>
@@ -254,8 +260,8 @@
                       <td>{{item.Crazy}}</td>
                       <td>{{item.Cold}}</td>
                       <td>{{item.Precise}}</td>
-                      <td v-if="item.Price.length > 0">{{item.Price}}</td>
-                      <td>{{item.SellStatus === 0 ? "待出售" : "出售中"}}</td>
+                      <td>{{item.Price}}</td>
+                      <td>{{showSellStatus(item.SellStatus)}}</td>
                       <td><ExpTime :DateTime="item.Exptime" /></td>
                       <td class="potd">
                         <FormaTime :DateTime="item.UpdatedAt" />
@@ -340,6 +346,7 @@ export default defineComponent({
         crazy: 0,
         cold: 0,
         precise: 0,
+        ignore: true
       },
       IMGUri: Config.IMGUri
     })
@@ -675,6 +682,7 @@ export default defineComponent({
         crazy: Filter.crazy,
         cold: Filter.cold,
         precise: Filter.precise,
+        ignore_sell: Filter.ignore
       }
       const url = `${Config.RootUrl}${states.AccountKey}/SearchAccountDraw`
       states.buttonLoading = true
@@ -702,6 +710,21 @@ export default defineComponent({
       router.push(`/accountDrawed/${AccountKey}`)
     }
 
+    const showSellStatus = (status) => {
+      let message = "未出售"
+      switch (status) {
+        case 1:
+          message = "出售中"
+          break
+        case 2:
+          message = "已出售"
+          break
+        default:
+          break
+      }
+      return message
+    }
+
     return {
       ...toRefs(states),
       GetGoldData,
@@ -717,6 +740,7 @@ export default defineComponent({
       pushRouterToDrawed,
       closeModal,
       ShowMessage,
+      showSellStatus,
       sellData
     }
   },

@@ -40,8 +40,12 @@ func SearchAccountDraw(c *gin.Context) {
 			hasStatus = append(hasStatus, item.Status)
 		}
 	}
+	Ignore := false
+	if form.IgnoreSell == true {
+		Ignore = true
+	}
 
-	rows, _ := database.GetDataUseScopes(form, hasStatus, projectsID)
+	rows, _ := database.GetDataUseScopesB(form, hasStatus, projectsID, Ignore)
 
 	if len(rows) != 0 {
 		Data := gin.H{

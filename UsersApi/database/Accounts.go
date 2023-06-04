@@ -178,7 +178,7 @@ func PullDataUseIn(IDs []int) (accounts []*Accounts, err error) {
 		Model(&accounts).
 		Clauses(clause.Returning{}).
 		Where("id IN ?", IDs).
-		Update("new_status", "108")
+		Updates(Accounts{NewStatus: 108, SellStatus: 2})
 	return
 }
 func SetSellUseIn(IDs []int) (accounts []*Accounts, err error) {
@@ -251,10 +251,38 @@ func HasStatus(hasStatus []string) func(db *gorm.DB) *gorm.DB {
 		return db.Where("new_status IN (?)", hasStatus)
 	}
 }
+func IngoreSell(Ignore bool) func(db *gorm.DB) *gorm.DB {
+	if Ignore {
+		return func(db *gorm.DB) *gorm.DB {
+			return db.Where("sell_status = ?", 0)
+		}
+	}
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("")
+	}
+}
 
 func GetDataUseScopes(filter utils.Filter, hasStatus []string, projectsID string) (accounts []*Accounts, err error) {
 	if err = sqlDB.
 		Where("projects_id = ?", projectsID).
+		Scopes(HasStatus(hasStatus)).
+		Scopes(MinGold(filter.MinGold)).
+		Scopes(MaxGold(filter.MaxGold)).
+		Scopes(Multiple(filter.Multiple)).
+		Scopes(Diamond(filter.Diamond)).
+		Scopes(Crazy(filter.Crazy)).
+		Scopes(Cold(filter.Cold)).
+		Scopes(Precise(filter.Precise)).
+		Order("today_gold DESC").
+		Find(&accounts).Error; err != nil {
+		return
+	}
+	return
+}
+func GetDataUseScopesB(filter utils.Filter, hasStatus []string, projectsID string, Ignore bool) (accounts []*Accounts, err error) {
+	if err = sqlDB.
+		Where("projects_id = ?", projectsID).
+		Scopes(IngoreSell(Ignore)).
 		Scopes(HasStatus(hasStatus)).
 		Scopes(MinGold(filter.MinGold)).
 		Scopes(MaxGold(filter.MaxGold)).

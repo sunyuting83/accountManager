@@ -51,6 +51,14 @@ func ProjectsCheckID(id string) (projects *Projects, err error) {
 	return
 }
 
+func FindGames(id string) (projects *Projects, err error) {
+	if err = sqlDB.Preload("Games").
+		First(&projects, "id = ?", id).Error; err != nil {
+		return
+	}
+	return
+}
+
 // Reset Password
 func (projects *Projects) UpdateProjects(id string) {
 	sqlDB.Model(&projects).

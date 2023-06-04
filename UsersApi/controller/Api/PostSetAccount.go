@@ -2,6 +2,7 @@ package controller
 
 import (
 	"colaAPI/UsersApi/database"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -24,15 +25,16 @@ type PostAccount struct {
 }
 
 type SqlData struct {
-	Cover         string `json:"cover" structs:"cover"`
-	TodayGold     int64  `json:"today_gold" structs:"today_gold"`
-	Multiple      int64  `json:"multiple" structs:"multiple"`
-	Diamond       int    `json:"diamond" structs:"diamond"`
-	Crazy         int    `json:"crazy" structs:"crazy"`
-	Cold          int    `json:"cold" structs:"cold"`
-	Precise       int    `json:"precise" structs:"precise"`
-	Exptime       int64  `json:"exptime" structs:"exptime"`
-	YesterdayGold int64  `json:"yesterday_gold" structs:"yesterday_gold"`
+	Cover         string  `json:"cover" structs:"cover"`
+	TodayGold     int64   `json:"today_gold" structs:"today_gold"`
+	Multiple      int64   `json:"multiple" structs:"multiple"`
+	Diamond       int     `json:"diamond" structs:"diamond"`
+	Crazy         int     `json:"crazy" structs:"crazy"`
+	Cold          int     `json:"cold" structs:"cold"`
+	Precise       int     `json:"precise" structs:"precise"`
+	Exptime       int64   `json:"exptime" structs:"exptime"`
+	Price         float64 `json:"price" structs:"price"`
+	YesterdayGold int64   `json:"yesterday_gold" structs:"yesterday_gold"`
 }
 
 func PostSetAccount(c *gin.Context) {
@@ -110,6 +112,18 @@ func PostSetAccount(c *gin.Context) {
 		return
 	}
 
+	project, err := database.FindGames(projectsID)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": "帐号不存在",
+		})
+		return
+	}
+	// fmt.Println(project.Games.UnitPrice / float64(project.Games.SingleNumber*100000000))
+	Price := Decimal(project.Games.BasePrice + ((project.Games.UnitPrice / float64(project.Games.SingleNumber*100000000)) * float64(gold)))
+	// fmt.Println(project.Games.BasePrice, project.Games.UnitPrice, project.Games.SingleNumber, float64(gold))
+	// fmt.Println(Price)
 	updata := &SqlData{
 		Cover:     form.Cover,
 		TodayGold: gold,
@@ -119,6 +133,7 @@ func PostSetAccount(c *gin.Context) {
 		Cold:      Cold,
 		Precise:   Precise,
 		Exptime:   ExpTimeInt,
+		Price:     Price,
 	}
 
 	timeobj := time.Unix(account.UpdatedAt/1000, 0)
@@ -145,4 +160,9 @@ func strToDate(date string) (d int64) {
 		return 0
 	}
 	return res1.Unix()
+}
+
+func Decimal(num float64) float64 {
+	num, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", num), 64)
+	return num
 }
