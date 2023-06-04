@@ -10,3 +10,12 @@ type Games struct {
 	CreatedAt    int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt    int64 `gorm:"autoUpdateTime:milli"`
 }
+
+func GetFirstCalc(ID uint) (game *Games, err error) {
+	if err = sqlDB.
+		Select("BasePrice", "UnitPrice", "SingleNumber").
+		First(&game, "id = ?", ID).Error; err != nil {
+		return
+	}
+	return
+}

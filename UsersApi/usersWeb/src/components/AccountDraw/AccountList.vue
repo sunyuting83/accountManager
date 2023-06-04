@@ -260,7 +260,7 @@
                       <td>{{item.Crazy}}</td>
                       <td>{{item.Cold}}</td>
                       <td>{{item.Precise}}</td>
-                      <td>{{item.Price}}</td>
+                      <td><PriceCalc :Price="item.TodayGold" :Calc="games" /></td>
                       <td>{{showSellStatus(item.SellStatus)}}</td>
                       <td><ExpTime :DateTime="item.Exptime" /></td>
                       <td class="potd">
@@ -302,6 +302,7 @@ import FormaNumber from '@/components/Other/FormaNumber'
 import ExpTime from '@/components/Other/ExpTime'
 import RenewalCard from '@/components/Other/Renewal'
 import PopoButton from '@/components/Other/PopoButton'
+import PriceCalc from '@/components/Other/PriceCalc'
 
 
 import Fetch from '@/helper/fetch'
@@ -310,7 +311,7 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'AccountList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime, RenewalCard, PopoButton },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime, RenewalCard, PopoButton, PriceCalc },
   setup() {
     let states = reactive({
       AccountKey: "",
@@ -324,6 +325,7 @@ export default defineComponent({
       data: [],
       total: 0,
       username: "",
+      games: {},
       buttonLoading: false,
       openerr: {
         active: false,
@@ -425,6 +427,7 @@ export default defineComponent({
         states.temp = d.data
         states.total = d.total
         states.projects = d.projects
+        states.games = d.games
         states.pageLoading = true
         states.loading = false
       }else{
@@ -456,6 +459,7 @@ export default defineComponent({
         states.temp = d.data
         states.total = d.total
         states.projects = d.projects
+        states.games = d.games
         states.pageLoading = true
         states.loading = false
       }else{
@@ -694,6 +698,8 @@ export default defineComponent({
         states.data = d.data
         states.temp = d.data
         states.total = d.data.length
+        states.projects = d.projects
+        states.games = d.games
         states.loading = false
         states.buttonLoading = false
       }else{

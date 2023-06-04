@@ -46,12 +46,15 @@ func SearchAccountDraw(c *gin.Context) {
 	}
 
 	rows, _ := database.GetDataUseScopesB(form, hasStatus, projectsID, Ignore)
+	games, _ := database.GetFirstCalc(Projects.GamesID)
 
 	if len(rows) != 0 {
 		Data := gin.H{
-			"status":  0,
-			"message": "检索成功",
-			"data":    rows,
+			"status":   0,
+			"message":  "检索成功",
+			"data":     rows,
+			"projects": Projects,
+			"games":    games,
 		}
 		c.JSON(http.StatusOK, Data)
 		return
