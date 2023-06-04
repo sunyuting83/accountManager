@@ -69,12 +69,14 @@ func AccountDrawDateList(c *gin.Context) {
 	if len(dataList) == 0 {
 		dataList = make([]*database.Accounts, 0)
 	}
+	games, _ := database.GetFirstCalc(Projects.GamesID)
 
 	Data := gin.H{
 		"status":   0,
 		"data":     dataList,
 		"projects": Projects,
 		"total":    count,
+		"games":    games,
 	}
 	c.JSON(http.StatusOK, Data)
 }

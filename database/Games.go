@@ -103,6 +103,15 @@ func (game *Games) UpdateGames() {
 	sqlDB.Save(&game)
 }
 
+func GetFirstCalc(ID uint) (game *Games, err error) {
+	if err = sqlDB.
+		Select("BasePrice", "UnitPrice", "SingleNumber").
+		First(&game, "id = ?", ID).Error; err != nil {
+		return
+	}
+	return
+}
+
 /*
 , func(db *gorm.DB) *gorm.DB {
 	return sqlDB.Select("ID", "GamesID", "StatusJSON", "UsersID")

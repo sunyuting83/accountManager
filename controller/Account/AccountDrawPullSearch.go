@@ -1,10 +1,11 @@
 package controller
 
 import (
-	"colaAPI/UsersApi/database"
-	"colaAPI/UsersApi/utils"
+	"colaAPI/database"
+	"colaAPI/utils"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,8 +21,8 @@ func SearchAccountDraw(c *gin.Context) {
 	}
 
 	projectsID, _ := GetProjects(c)
-
-	Projects, err := database.ProjectsCheckID(projectsID)
+	ProjectsID, _ := strconv.ParseInt(projectsID, 10, 64)
+	Projects, err := database.ProjectsCheckID(ProjectsID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  1,

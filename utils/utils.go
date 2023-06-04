@@ -54,14 +54,15 @@ type RedisConfig struct {
 }
 
 type Filter struct {
-	MinGold  int64 `form:"mingold" json:"mingold" xml:"mingold"  binding:"required"`
-	MaxGold  int64 `form:"maxgold" json:"maxgold" xml:"maxgold"  binding:"required"`
-	Multiple int64 `form:"multiple" json:"multiple" xml:"multiple"  binding:"required"`
-	Diamond  int64 `form:"diamond" json:"diamond" xml:"diamond"`
-	Crazy    int64 `form:"crazy" json:"crazy" xml:"crazy"`
-	Cold     int64 `form:"cold" json:"cold" xml:"cold"`
-	Precise  int64 `form:"precise" json:"precise" xml:"precise"`
-	GameID   int64 `form:"gameid" json:"gameid" xml:"gameid"`
+	MinGold    int64 `form:"mingold" json:"mingold" xml:"mingold"  binding:"required"`
+	MaxGold    int64 `form:"maxgold" json:"maxgold" xml:"maxgold"  binding:"required"`
+	Multiple   int64 `form:"multiple" json:"multiple" xml:"multiple"  binding:"required"`
+	Diamond    int64 `form:"diamond" json:"diamond" xml:"diamond"`
+	Crazy      int64 `form:"crazy" json:"crazy" xml:"crazy"`
+	Cold       int64 `form:"cold" json:"cold" xml:"cold"`
+	Precise    int64 `form:"precise" json:"precise" xml:"precise"`
+	GameID     int64 `form:"gameid" json:"gameid" xml:"gameid"`
+	IgnoreSell bool  `form:"ignore_sell" json:"ignore_sell"`
 }
 
 // GetCurrentPath Get Current Path
