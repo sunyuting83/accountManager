@@ -6,7 +6,7 @@ Database:
   Username: acc_manage
   Password: aaa123123
   DBType: pgsql
-  DBHost: 192.168.1.90
+  DBHost: 192.168.1.128
   DBProt: "5432"
   DBName: acc_manage
 UsersApi:
