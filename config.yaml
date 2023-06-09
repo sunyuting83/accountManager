@@ -16,6 +16,6 @@ ManagerApi:
   port: "13005"
   SECRET_KEY: ADij1fXkrupev1HrVfSvIFDdyOmgTg1v
 Redis:
-  Host: 192.168.1.90:6379
+  Host: 192.168.1.128:6379
   Password: zH05aXvMzFpy8vDY
   DB: 1
