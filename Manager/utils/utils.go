@@ -23,10 +23,15 @@ type Config struct {
 	Database   Database    `yaml:"Database"`
 	UsersApi   UsersApi    `yaml:"UsersApi"`
 	ManagerApi ManagerApi  `yaml:"ManagerApi"`
+	Users      Users       `yaml:"Users"`
 	Redis      RedisConfig `yaml:"Redis"`
 }
 
 type UsersApi struct {
+	Port       string `yaml:"port"`
+	SECRET_KEY string `yaml:"SECRET_KEY"`
+}
+type Users struct {
 	Port       string `yaml:"port"`
 	SECRET_KEY string `yaml:"SECRET_KEY"`
 }
@@ -133,6 +138,17 @@ func CheckConfig(OS, CurrentPath string) (conf *Config, err error) {
 	if len(confYaml.ManagerApi.SECRET_KEY) <= 0 {
 		secret_key := randSeq(32)
 		confYaml.ManagerApi.SECRET_KEY = secret_key
+		config, _ := yaml.Marshal(&confYaml)
+		os.WriteFile(ConfigFile, config, 0644)
+	}
+	if len(confYaml.Users.Port) <= 0 {
+		confYaml.Users.Port = "13006"
+		config, _ := yaml.Marshal(&confYaml)
+		os.WriteFile(ConfigFile, config, 0644)
+	}
+	if len(confYaml.Users.SECRET_KEY) <= 0 {
+		secret_key := randSeq(32)
+		confYaml.Users.SECRET_KEY = secret_key
 		config, _ := yaml.Marshal(&confYaml)
 		os.WriteFile(ConfigFile, config, 0644)
 	}

@@ -26,7 +26,6 @@ type Config struct {
 	Users      Users       `yaml:"Users"`
 	Redis      RedisConfig `yaml:"Redis"`
 }
-
 type UsersApi struct {
 	Port       string `yaml:"port"`
 	SECRET_KEY string `yaml:"SECRET_KEY"`
@@ -93,6 +92,7 @@ func CheckConfig(OS, CurrentPath string) (conf *Config, err error) {
 	if err != nil {
 		return confYaml, errors.New("读取配置文件出错\n10秒后程序自动关闭")
 	}
+
 	if len(confYaml.Port) <= 0 {
 		confYaml.Port = "13002"
 		config, _ := yaml.Marshal(&confYaml)
