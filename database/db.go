@@ -30,7 +30,7 @@ func InitDB(pwd string, confYaml *utils.Config) {
 
 	// SetConnMaxLifetime 设置了连接可复用的最大时间。
 	Eloquent.SetConnMaxLifetime(time.Hour)
-	sqlDB.AutoMigrate(&Users{}, &Games{}, &Projects{}, &DrawLogs{}, &Comput{}, &Accounts{}, &Filed{}, &Manager{})
+	sqlDB.AutoMigrate(&Users{}, &Games{}, &Projects{}, &DrawLogs{}, &Comput{}, &Accounts{}, &Filed{}, &Manager{}, &CoinManager{}, &CoinUsers{})
 
 	var (
 		manager *Manager
