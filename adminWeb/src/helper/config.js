@@ -6,13 +6,13 @@ const IndexUrl = `${CROSUrl}${RootUrl}`
 const Name = '管理员帐号'
 const Limit = 100
 const GlobalTitle = `${Name}-后台管理`
-const ImagesRoot = 'https://pic7.58cdn.com.cn/nowater/webim/'
+// const ImagesRoot = 'https://pic7.58cdn.com.cn/nowater/webim/'
 const images = [
-  `${ImagesRoot}big/n_v26a171fb1a3394f2abcfce3e1d0e2b662.jpg`,
-  `${ImagesRoot}big/n_v224cd0671e0f4483d95f395494dd3a891.jpg`,
-  `${ImagesRoot}small/n_v224cd0671e0f4483d95f395494dd3a891.jpg`,
+  ``,
+  `https://kjimg10.360buyimg.com/ott/jfs/t20250611/133512/21/38815/17870/64872694F64c3f48a/42b7ef7069520cd9.png`,
+  ``,
   `https://image.suning.cn/uimg/ZR/share_order/158501870837440052.jpg`,
-  `${ImagesRoot}big/n_v25205eb943f014624a20825a567ec7802.jpg`
+  `https://img.pddpic.com/goods_mms/2022-08-17/3750025f-3037-4a2d-8ab2-33806e59aa86.jpeg`
 ]
 const Api = {
   'login': `${RootUrl}AdminLogin`,

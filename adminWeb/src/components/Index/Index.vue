@@ -53,7 +53,7 @@
               <Identify :identifyCode="identifyCode" @click="refreshCode" />
             </div>
           </div>
-          <button class="button is-block is-danger is-large is-fullwidth" :disabled="form.usernameErr !== '1' && form.usernameErr.length === 0  && form.passwordErr !== '1' && form.passwordErr.length === 0  && form.codeErr !== '1' && form.codeErr.length === 0 ? false : true" @click="onSubmit">登陆</button>
+          <button class="button is-block is-info is-large is-fullwidth" :disabled="form.usernameErr !== '1' && form.usernameErr.length === 0  && form.passwordErr !== '1' && form.passwordErr.length === 0  && form.codeErr !== '1' && form.codeErr.length === 0 ? false : true" @click="onSubmit">登陆</button>
         </div>
       </div>
     </div>
