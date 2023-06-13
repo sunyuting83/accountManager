@@ -4,12 +4,16 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
+	"fmt"
+	"io"
 	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/gin-gonic/gin"
 	"gopkg.in/yaml.v2"
@@ -73,6 +77,76 @@ func GetCurrentPath() (string, error) {
 	}
 	dir := filepath.Dir(path)
 	return dir, nil
+}
+
+func DownloadFile(URL, filepath string) error {
+	// 创建HTTP客户端，并设置15秒超时时间
+	client := http.Client{
+		Timeout: 15 * time.Second,
+	}
+
+	// 创建HTTP请求
+	req, err := http.NewRequest("GET", URL, nil)
+	if err != nil {
+		return err
+	}
+
+	// 发送HTTP请求
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	fmt.Println(resp.StatusCode)
+	// 检查HTTP状态码
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unable to download file, status code: %d", resp.StatusCode)
+	}
+
+	// 创建文件
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	// 下载文件
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CheckGeoIP(OS, CurrentPath string) {
+	LinkPathStr := "/"
+	if OS == "windows" {
+		LinkPathStr = "\\"
+	}
+	GeoPath := strings.Join([]string{CurrentPath, "GeoIP"}, LinkPathStr)
+	if !IsExist(GeoPath) {
+		os.MkdirAll(GeoPath, 0755)
+	}
+	// fmt.Println(GeoPath)
+	GeoFile := strings.Join([]string{CurrentPath, "GeoIP", "Country.mmdb"}, LinkPathStr)
+	if !IsExist(GeoFile) {
+		ProxyUri := []string{
+			"",
+			"https://github.91chi.fun/",
+			"https://ghproxy.com/",
+			"https://github.abskoop.workers.dev/",
+			"https://gh.api.99988866.xyz/",
+		}
+		ghuri := "https://github.com/Dreamacro/maxmind-geoip/releases/latest/download/Country.mmdb"
+		for _, item := range ProxyUri {
+			uri := strings.Join([]string{item, ghuri}, "")
+			err := DownloadFile(uri, GeoFile)
+			if err == nil {
+				break
+			}
+		}
+	}
 }
 
 // CheckConfig check config
@@ -246,4 +320,20 @@ func MD5(a string) string {
 	md5Ctx.Write(data)
 	cipherStr := md5Ctx.Sum(nil)
 	return hex.EncodeToString(cipherStr)
+}
+
+// 字符全部大写
+func ConvertToUpperCase(str string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) {
+			return unicode.ToUpper(r)
+		}
+		return r
+	}, str)
+}
+
+// 判断字符串是否包含特殊字符
+func ContainsSpecialCharacters(str string) bool {
+	regex := regexp.MustCompile(`[^a-zA-Z0-9]`)
+	return regex.MatchString(str)
 }

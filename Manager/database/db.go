@@ -30,7 +30,22 @@ func InitDB(confYaml *utils.Config) {
 
 	// SetConnMaxLifetime 设置了连接可复用的最大时间。
 	Eloquent.SetConnMaxLifetime(time.Hour)
-	sqlDB.AutoMigrate(&CoinManager{})
+	// sqlDB.AutoMigrate(&CoinManager{})
+	var (
+		manager *CoinManager
+	)
+
+	if m := sqlDB.First(&manager); m.Error != nil {
+		pwd := utils.MD5(strings.Join([]string{confYaml.AdminPWD, confYaml.ManagerApi.SECRET_KEY}, ""))
+		if m.Error.Error() == "record not found" {
+			u := CoinManager{
+				UserName:  "admin",
+				Password:  pwd,
+				NewStatus: 0,
+			}
+			sqlDB.Create(&u)
+		}
+	}
 }
 
 func GetDB(confYaml *utils.Config) {

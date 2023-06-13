@@ -2,6 +2,7 @@ package router
 
 import (
 	"colaAPI/Users/controller"
+	Users "colaAPI/Users/controller/Users"
 	utilsUser "colaAPI/Users/utils"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,8 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 	userApiV1HasKey.Use(utilsUser.SetConfigMiddleWare(SECRET_KEY, CurrentPath, SECRET_KEY), utilsUser.UserProjectsMiddleware())
 	{
 		router.GET("/", controller.Index)
+		userApiV1.POST("/Regedit", Users.Regedit)
+		userApiV1.POST("/Captcha", Users.Captcha)
 	}
 	return router
 }

@@ -19,6 +19,7 @@ func main() {
 	OS := runtime.GOOS
 	CurrentPath, _ := utils.GetCurrentPath()
 	ConfigFilePath := orm.MakeSqlitePath(CurrentPath)
+	utils.CheckGeoIP(OS, CurrentPath)
 
 	confYaml, err := utils.CheckConfig(OS, ConfigFilePath)
 	if err != nil {

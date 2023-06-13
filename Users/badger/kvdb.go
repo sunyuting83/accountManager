@@ -60,6 +60,21 @@ func SetWithTTL(key []byte, value []byte, ttl int64) {
 	}
 }
 
+func UpdateWithOutTTL(key []byte, value []byte) error {
+	err := BadgerDB.Update(func(txn *badger.Txn) error {
+		item, err := txn.Get(key)
+		if err != nil {
+			return err
+		}
+
+		return item.Value(func(val []byte) error {
+			return txn.Set(key, value)
+		})
+	})
+
+	return err
+}
+
 func Get(key []byte) (string, error) {
 	var ival []byte
 	err := BadgerDB.View(func(txn *badger.Txn) error {

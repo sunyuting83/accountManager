@@ -3,6 +3,7 @@ package router
 import (
 	"colaAPI/Manager/controller"
 	Admin "colaAPI/Manager/controller/Admin"
+	Coin "colaAPI/Manager/controller/Coin"
 	utils "colaAPI/Manager/utils"
 
 	"github.com/gin-gonic/gin"
@@ -30,6 +31,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		adminapiv1.GET("/AdminList", utils.UserVerifyMiddleware(), Admin.AdminList)
 		adminapiv1.PUT("/UpStatus", utils.UserVerifyMiddleware(), Admin.UpStatusAdmin)
 		adminapiv1.POST("/AdminLogin", Admin.Sgin)
+		adminapiv1.POST("/SendCoinToUser", utils.UserVerifyMiddleware(), Coin.SendCoinToUser)
 	}
 	return router
 }
