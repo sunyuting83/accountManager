@@ -92,8 +92,8 @@ func Regedit(c *gin.Context) {
 		})
 		return
 	}
-	// ipStr := c.ClientIP()
-	ipStr := "118.72.212.158"
+	ipStr := c.ClientIP()
+	// ipStr := "118.72.212.158"
 	ip := net.ParseIP(ipStr)
 	// fmt.Println(ipStr, ip)
 
