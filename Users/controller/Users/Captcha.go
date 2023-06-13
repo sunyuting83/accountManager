@@ -4,6 +4,7 @@ import (
 	"bytes"
 	BadgerDB "colaAPI/Users/badger"
 	"encoding/base64"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -52,7 +53,7 @@ func generateCaptcha() string {
 			captcha += strconv.Itoa(randomGenerator.Intn(10))
 		} else {
 			// 生成随机字母（大写）
-			captcha += string('A' + randomGenerator.Intn(26))
+			captcha += fmt.Sprint('A' + randomGenerator.Intn(26))
 		}
 	}
 
