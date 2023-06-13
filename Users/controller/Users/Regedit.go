@@ -34,7 +34,7 @@ func Regedit(c *gin.Context) {
 	if len(form.UserName) < 4 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status":  1,
-			"message": "haven't username",
+			"message": "用户名至少4个字符",
 		})
 		return
 	}
@@ -45,8 +45,8 @@ func Regedit(c *gin.Context) {
 		})
 		return
 	}
-	ignoreUserName := "admin|manage"
-	if strings.ContainsAny(form.UserName, ignoreUserName) {
+	ignoreUserName := "admin|manage|Admin|Manage|root|Root|ROOT|ADMIN|MANAGE"
+	if strings.Contains(form.UserName, ignoreUserName) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status":  1,
 			"message": "非法用户名",
@@ -129,6 +129,15 @@ func Regedit(c *gin.Context) {
 	SECRET_KEY := secret_key.(string)
 	PASSWD := utils.MD5(strings.Join([]string{form.Password, SECRET_KEY}, ""))
 
+	ParentID := uint(0)
+	referrer := c.DefaultQuery("referrer", "0")
+	if referrer != "0" {
+		Referrer, err := database.CheckUserKey(referrer)
+		if err == nil {
+			ParentID = Referrer.ID
+		}
+	}
+
 	LocalAddress := "未知"
 
 	if ipStr == "127.0.0.1" {
@@ -158,6 +167,7 @@ func Regedit(c *gin.Context) {
 
 	var adduser *database.CoinUsers
 	adduser.UserName = form.UserName
+	adduser.ParentID = ParentID
 	adduser.Password = PASSWD
 	adduser.NewStatus = 0
 	adduser.Coin = 0.0
