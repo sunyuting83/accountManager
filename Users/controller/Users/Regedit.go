@@ -45,8 +45,9 @@ func Regedit(c *gin.Context) {
 		})
 		return
 	}
-	ignoreUserName := "admin|manage|Admin|Manage|root|Root|ROOT|ADMIN|MANAGE"
-	if strings.Contains(form.UserName, ignoreUserName) {
+	UserName := strings.ToLower(form.UserName)
+	ignoreUserName := "admin|manage|root|user"
+	if containsElement(UserName, ignoreUserName) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status":  1,
 			"message": "非法用户名",
@@ -91,16 +92,19 @@ func Regedit(c *gin.Context) {
 		})
 		return
 	}
-	ipStr := c.ClientIP()
+	// ipStr := c.ClientIP()
+	ipStr := "118.72.212.158"
 	ip := net.ParseIP(ipStr)
+	// fmt.Println(ipStr, ip)
 
 	IPCount, err := BadgerDB.Get([]byte(ipStr))
-	if err != nil && err.Error() != "Key not found" {
+	if err != nil && err.Error() == "Key not found" {
 		var ttl int64 = 60 * 60 * 24 // ttl以秒为单位
 		BadgerDB.SetWithTTL([]byte(ipStr), []byte("1"), ttl)
-		IPCount = "1"
+		IPCount = "0"
 	}
 	ipCount, _ := strconv.Atoi(IPCount)
+	// fmt.Println(ipCount)
 	if ipCount != 0 && ipCount >= 5 {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
@@ -110,7 +114,7 @@ func Regedit(c *gin.Context) {
 	}
 	// 获取IP 写入Cache Key IP地址 Value 已注册数量 如果数量超过5返回错误 1天内同IP只能注册5个帐号 超时 1天
 
-	user, err := database.CheckUserName(form.UserName)
+	user, err := database.CheckUserName(UserName)
 	if err != nil && err.Error() != "record not found" {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
@@ -129,12 +133,12 @@ func Regedit(c *gin.Context) {
 	SECRET_KEY := secret_key.(string)
 	PASSWD := utils.MD5(strings.Join([]string{form.Password, SECRET_KEY}, ""))
 
-	ParentID := uint(0)
+	var ParentID *uint = nil
 	referrer := c.DefaultQuery("referrer", "0")
 	if referrer != "0" {
 		Referrer, err := database.CheckUserKey(referrer)
 		if err == nil {
-			ParentID = Referrer.ID
+			ParentID = &Referrer.ID
 		}
 	}
 
@@ -154,19 +158,20 @@ func Regedit(c *gin.Context) {
 		if err != nil {
 			LocalAddress = "未知"
 		}
-
+		// fmt.Println(record)
 		// 读取位置信息
-		cityName := record.City.Names["cn"]
-		countryName := record.Country.Names["cn"]
-		LocalAddress = strings.Join([]string{countryName, cityName}, "")
+		cityName := record.City.Names["zh-CN"]
+		countryName := record.Country.Names["zh-CN"]
+		subdivisions := record.Subdivisions[0].Names["zh-CN"]
+		LocalAddress = strings.Join([]string{countryName, subdivisions, cityName}, "-")
 	}
 
 	tiemNow := time.Now().Format("2006-01-02_15:04:05")
-	WalletAddress := utils.MD5(strings.Join([]string{ipStr, form.UserName, tiemNow, form.Password, SECRET_KEY}, ""))
+	WalletAddress := utils.MD5(strings.Join([]string{ipStr, UserName, tiemNow, form.Password, SECRET_KEY}, ""))
 	WalletAddress = WalletAddress[:16]
 
-	var adduser *database.CoinUsers
-	adduser.UserName = form.UserName
+	var adduser database.CoinUsers
+	adduser.UserName = UserName
 	adduser.ParentID = ParentID
 	adduser.Password = PASSWD
 	adduser.NewStatus = 0
@@ -185,11 +190,24 @@ func Regedit(c *gin.Context) {
 	}
 	ipCount = ipCount + 1
 	ipCountStr := strconv.Itoa(ipCount)
+	// fmt.Println(ipCount)
 	BadgerDB.UpdateWithOutTTL([]byte(ipStr), []byte(ipCountStr))
 	BadgerDB.Delete([]byte(VCode))
 	c.JSON(http.StatusOK, gin.H{
 		"status":  0,
 		"message": "注册成功",
-		"data":    user,
+		"data":    adduser,
 	})
+}
+
+func containsElement(targetStr, str string) bool {
+	splitStr := strings.Split(str, "|")
+
+	for _, elem := range splitStr {
+		if strings.Contains(targetStr, elem) {
+			return true
+		}
+	}
+
+	return false
 }

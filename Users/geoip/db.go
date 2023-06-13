@@ -14,7 +14,7 @@ func LoadGeoFile() (*geoip2.Reader, error) {
 	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
 		os.MkdirAll(dbPath, 0755)
 	}
-	dbFile := strings.Join([]string{dbPath, "Country.mmdb"}, "/")
+	dbFile := strings.Join([]string{dbPath, "GeoLite2-City.mmdb"}, "/")
 	// fmt.Println(dbFile)
 	db, err := geoip2.Open(dbFile)
 	if err != nil {

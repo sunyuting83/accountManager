@@ -1,11 +1,13 @@
 package utils
 
 import (
+	"compress/gzip"
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -119,6 +121,39 @@ func DownloadFile(URL, filepath string) error {
 	return nil
 }
 
+// UnzipGZ 解压 .gz 文件
+func UnzipGZ(gzFilePath, outputFilePath string) error {
+	// 打开要解压的 .gz 文件
+	gzFile, err := os.Open(gzFilePath)
+	if err != nil {
+		return err
+	}
+	defer gzFile.Close()
+
+	// 创建输出文件
+	outFile, err := os.Create(outputFilePath)
+	if err != nil {
+		return err
+	}
+	defer outFile.Close()
+
+	// 创建 gzip.Reader
+	gzReader, err := gzip.NewReader(gzFile)
+	if err != nil {
+		return err
+	}
+	defer gzReader.Close()
+
+	// 将解压后的数据复制到输出文件
+	_, err = io.Copy(outFile, gzReader)
+	if err != nil {
+		return err
+	}
+
+	log.Println("解压完成")
+	return nil
+}
+
 func CheckGeoIP(OS, CurrentPath string) {
 	LinkPathStr := "/"
 	if OS == "windows" {
@@ -129,8 +164,9 @@ func CheckGeoIP(OS, CurrentPath string) {
 		os.MkdirAll(GeoPath, 0755)
 	}
 	// fmt.Println(GeoPath)
-	GeoFile := strings.Join([]string{CurrentPath, "GeoIP", "Country.mmdb"}, LinkPathStr)
-	if !IsExist(GeoFile) {
+	GeoFileOut := strings.Join([]string{CurrentPath, "GeoIP", "GeoLite2-City.mmdb"}, LinkPathStr)
+	GeoFile := strings.Join([]string{CurrentPath, "GeoIP", "GeoLite2-City.mmdb.gz"}, LinkPathStr)
+	if !IsExist(GeoFileOut) {
 		ProxyUri := []string{
 			"",
 			"https://github.91chi.fun/",
@@ -138,12 +174,16 @@ func CheckGeoIP(OS, CurrentPath string) {
 			"https://github.abskoop.workers.dev/",
 			"https://gh.api.99988866.xyz/",
 		}
-		ghuri := "https://github.com/Dreamacro/maxmind-geoip/releases/latest/download/Country.mmdb"
+		ghuri := "https://cdn.jsdelivr.net/npm/geolite2-city@1.0.0/GeoLite2-City.mmdb.gz"
 		for _, item := range ProxyUri {
 			uri := strings.Join([]string{item, ghuri}, "")
 			err := DownloadFile(uri, GeoFile)
 			if err == nil {
-				break
+				err = UnzipGZ(GeoFile, GeoFileOut)
+				if err == nil {
+					os.Remove(GeoFile)
+					break
+				}
 			}
 		}
 	}

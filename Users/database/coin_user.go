@@ -2,7 +2,7 @@ package database
 
 type CoinUsers struct {
 	ID            uint   `gorm:"primaryKey"`
-	ParentID      uint   `gorm:"foreignKey:ParentID"`
+	ParentID      *uint  `gorm:"foreignKey:ParentID"`
 	UserName      string `gorm:"index"`
 	Password      string
 	NewStatus     int `gorm:"index"`
