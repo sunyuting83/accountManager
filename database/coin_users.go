@@ -10,6 +10,8 @@ type CoinUsers struct {
 	Children      []CoinUsers `gorm:"foreignKey:ParentID"`
 	IPAddress     string
 	LocalAddress  string
+	Email         string
+	PhoneNumber   string
 	WalletAddress string `gorm:"index"`
 	CreatedAt     int64  `gorm:"autoUpdateTime:milli"`
 	UpdatedAt     int64  `gorm:"autoUpdateTime:milli"`

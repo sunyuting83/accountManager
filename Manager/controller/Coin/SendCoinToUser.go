@@ -55,14 +55,28 @@ func SendCoinToUser(c *gin.Context) {
 		})
 		return
 	}
+	// 发放coin到用户
+	userid.Coin += CoinFloat
+	userid.UpCoinToUsers()
 
 	result := utils.GetTokenUserData(c)
 
+	// 记录发放记录
+	var record database.PointsRecord
+
+	record.CoinManagerID = result.UserID
+	record.CoinUsersID = userid.ID
+	record.Coin = CoinFloat
+	record.Insert()
+
+	var issued database.IssuedNumber
+	issued.IssuedNumber += CoinFloat
+	issued.UpCoinTotalNumber()
+
 	c.JSON(http.StatusOK, gin.H{
-		"status":    0,
-		"message":   "添加成功",
-		"data":      result,
-		"UserID":    CoinFloat,
-		"CoinCount": userid,
+		"status":  0,
+		"message": "发放成功",
+		"coin":    CoinFloat,
+		"UserID":  userid.ID,
 	})
 }
