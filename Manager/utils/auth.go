@@ -52,8 +52,8 @@ func GetTokenUserData(c *gin.Context) (result *CacheToken) {
 	return
 }
 
-// UserVerifyMiddleware Verify middleware
-func UserVerifyMiddleware() gin.HandlerFunc {
+// AdminVerifyMiddleware Verify middleware
+func AdminVerifyMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if len(token) > 67 {
