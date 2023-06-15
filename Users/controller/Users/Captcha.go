@@ -3,14 +3,12 @@ package controller
 import (
 	"bytes"
 	BadgerDB "colaAPI/Users/badger"
-	"encoding/base64"
 	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/png"
 	"math/rand"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -23,21 +21,31 @@ import (
 func Captcha(c *gin.Context) {
 	// 生成随机验证码
 	captcha := generateCaptcha()
-	// fmt.Println(captcha)
+	fmt.Println(captcha)
 	current_path, _ := c.Get("current_path")
 	CurrentPath := current_path.(string)
 
 	// 生成图片并获取Base64编码
-	imageBase64 := generateImage(captcha, CurrentPath)
+	image := generateImage(captcha, CurrentPath)
 	var ttl int64 = 60 * 5 // ttl以秒为单位
-	imageBase64 = strings.Join([]string{"data:image/png;base64", imageBase64}, ",")
+	// imageBase64 = strings.Join([]string{"data:image/png;base64", imageBase64}, ",")
 
 	BadgerDB.SetWithTTL([]byte(captcha), []byte(captcha), ttl)
-	c.JSON(http.StatusOK, gin.H{
-		"status":  0,
-		"message": "获取成功",
-		"image":   imageBase64,
-	})
+	c.Writer.Write(image)
+}
+
+func generateRandomLetter() string {
+	rand.Seed(time.Now().UnixNano())
+
+	// 生成随机数字 0 或 1
+	random := rand.Intn(2)
+
+	// 生成随机字母（大写或小写）
+	if random == 0 {
+		return string('A' + rand.Intn(26))
+	} else {
+		return string('a' + rand.Intn(26))
+	}
 }
 
 // 生成随机验证码
@@ -45,15 +53,13 @@ func generateCaptcha() string {
 	source := rand.NewSource(time.Now().UnixNano())
 	randomGenerator := rand.New(source)
 
-	// 生成4位随机数字和字母的验证码
 	captcha := ""
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 6; i++ {
+		// fmt.Println(randomGenerator.Intn(2))
 		if randomGenerator.Intn(2) == 0 {
-			// 生成随机数字
 			captcha += strconv.Itoa(randomGenerator.Intn(10))
 		} else {
-			// 生成随机字母（大写）
-			captcha += fmt.Sprint('A' + randomGenerator.Intn(26))
+			captcha += generateRandomLetter()
 		}
 	}
 
@@ -61,19 +67,17 @@ func generateCaptcha() string {
 }
 
 // 生成验证码图片并返回Base64编码
-func generateImage(captcha, CurrentPath string) string {
+func generateImage(captcha, CurrentPath string) []byte {
 	// 创建图片对象
-	img := image.NewRGBA(image.Rect(0, 0, 160, 42))
+	width, height := 160, 42
+	img := image.NewRGBA(image.Rect(0, 0, width, height))
 
 	// 设置图片背景色为随机颜色
 	bgColor := getRandomColor()
 	draw.Draw(img, img.Bounds(), &image.Uniform{bgColor}, image.Point{}, draw.Src)
 
-	// 设置文字颜色为随机颜色
-	textColor := getRandomColor()
-
 	// 在图片上绘制验证码文字和干扰线
-	fontSize := 20.0
+	// fontSize := randomFontSize()
 	fontDPI := 72.0
 	fontFile := strings.Join([]string{CurrentPath, "font", "arial.ttf"}, "/") // 字体文件路径
 	// fontFile := "./arial.ttf" // 字体文件路径
@@ -94,40 +98,40 @@ func generateImage(captcha, CurrentPath string) string {
 	c := freetype.NewContext()
 	c.SetDPI(fontDPI)
 	c.SetFont(font)
-	c.SetFontSize(fontSize)
 	c.SetClip(img.Bounds())
 	c.SetDst(img)
-	c.SetSrc(image.NewUniform(textColor))
 
 	// 绘制验证码文字
 	pt := freetype.Pt(10, 30)
 	for _, char := range captcha {
+		fontSize := randomFontSize()
+		c.SetFontSize(fontSize)
+		c.SetSrc(image.NewUniform(getRandomColor()))
+
 		_, err = c.DrawString(string(char), pt)
 		if err != nil {
 			panic(err)
 		}
-		pt.X += c.PointToFixed(fontSize * 1.5)
+		pt.X += c.PointToFixed(fontSize + randomCharacterSpacing())
 	}
 
 	// 绘制干扰线
-	for i := 0; i < 10; i++ {
-		startX := rand.Intn(130)
-		startY := rand.Intn(42)
-		endX := rand.Intn(130)
-		endY := rand.Intn(42)
-		drawLine(img, startX, startY, endX, endY, textColor)
+	for i := 0; i < len(captcha)*2; i++ {
+		startX := rand.Intn(width)
+		startY := rand.Intn(height)
+		endX := rand.Intn(width)
+		endY := rand.Intn(height)
+		drawLine(img, startX, startY, endX, endY, getRandomColor())
 	}
 
 	// 生成Base64编码
 	var buf bytes.Buffer
-	err = png.Encode(&buf, img)
-	if err != nil {
-		panic(err)
-	}
+	png.Encode(&buf, img)
 
-	imageBase64 := base64.StdEncoding.EncodeToString(buf.Bytes())
+	// imageBase64 := base64.StdEncoding.EncodeToString(buf.Bytes())
 
-	return imageBase64
+	return buf.Bytes()
+
 }
 
 // 绘制线条
@@ -153,6 +157,14 @@ func drawLine(img *image.RGBA, startX, startY, endX, endY int, color color.RGBA)
 		x += xIncrement
 		y += yIncrement
 	}
+}
+
+// 生成随机字符间距
+func randomCharacterSpacing() float64 {
+	minSpacing := -3
+	maxSpacing := 3
+	spacing := rand.Intn(maxSpacing-minSpacing+1) + minSpacing
+	return float64(spacing)
 }
 
 // 加载字体文件
@@ -183,4 +195,12 @@ func abs(x float64) float64 {
 		return -x
 	}
 	return x
+}
+
+func randomFontSize() float64 {
+	source := rand.NewSource(time.Now().UnixNano())
+	randomGenerator := rand.New(source)
+	fontSize := randomGenerator.Intn(15) + 18 // 随机生成18-32之间的整数
+
+	return float64(fontSize)
 }
