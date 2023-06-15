@@ -3,7 +3,6 @@ package controller
 import (
 	"bytes"
 	BadgerDB "colaAPI/Users/badger"
-	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -21,7 +20,7 @@ import (
 func Captcha(c *gin.Context) {
 	// 生成随机验证码
 	captcha := generateCaptcha()
-	fmt.Println(captcha)
+	// fmt.Println(captcha)
 	current_path, _ := c.Get("current_path")
 	CurrentPath := current_path.(string)
 
