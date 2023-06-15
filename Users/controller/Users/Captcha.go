@@ -112,7 +112,7 @@ func generateImage(captcha, CurrentPath string) []byte {
 		if err != nil {
 			panic(err)
 		}
-		pt.X += c.PointToFixed(fontSize + randomCharacterSpacing())
+		pt.X += c.PointToFixed(randomCharacterSpacing(fontSize))
 	}
 
 	// 绘制干扰线
@@ -160,11 +160,11 @@ func drawLine(img *image.RGBA, startX, startY, endX, endY int, color color.RGBA)
 }
 
 // 生成随机字符间距
-func randomCharacterSpacing() float64 {
-	minSpacing := -3
-	maxSpacing := 3
+func randomCharacterSpacing(fontsize float64) float64 {
+	minSpacing := -2
+	maxSpacing := 1
 	spacing := rand.Intn(maxSpacing-minSpacing+1) + minSpacing
-	return float64(spacing)
+	return fontsize + float64(spacing)
 }
 
 // 加载字体文件
