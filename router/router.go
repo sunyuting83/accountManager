@@ -19,7 +19,7 @@ import (
 func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64, Users_SECRET_KEY string) *gin.Engine {
 	router := gin.Default()
 	router.MaxMultipartMemory = FormMemory << 20
-	router.Use(utils.CORSMiddleware())
+	router.Use(utils.CORSMiddleware(), utils.ThrottleMiddleware())
 	router.StaticFS("/css", http.Dir("static/css"))
 	router.StaticFS("/js", http.Dir("static/js"))
 	router.StaticFile("/favicon.ico", "static/favicon.ico")

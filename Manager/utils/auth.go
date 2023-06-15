@@ -9,6 +9,9 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"log"
+	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,6 +24,15 @@ type CacheToken struct {
 	UserID uint
 	Token  string
 }
+
+const (
+	cachePrefix = "ip_counter_"
+	ttl         = 1
+	maxRequests = 50
+	interval    = 1
+	banCacheKey = "ip_banned"
+	banCacheTTL = 24 * 60 * 60
+)
 
 var result *CacheToken
 
@@ -204,4 +216,68 @@ func DecryptByAes(data string, PwdKey []byte) ([]byte, error) {
 		return nil, err
 	}
 	return AesDecrypt(dataByte, PwdKey)
+}
+
+// ThrottleMiddleware 是限流中间件
+func ThrottleMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ip := c.ClientIP()
+
+		if IsBanned(ip) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "IP banned"})
+			c.Abort()
+			return
+		}
+
+		count, err := IncrementCounter(ip)
+		if err != nil {
+			log.Println(err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+			c.Abort()
+			return
+		}
+
+		if count > maxRequests {
+			BanIP(ip)
+			c.JSON(http.StatusForbidden, gin.H{"error": "IP banned"})
+			c.Abort()
+			return
+		}
+
+		c.Set("count", count)
+
+		c.Next()
+	}
+}
+
+// IncrementCounter 增加 IP 计数器
+func IncrementCounter(ip string) (int, error) {
+	key := []byte(cachePrefix + ip)
+	var count int
+
+	item, err := BadgerDB.Get(key)
+	if err != nil && err.Error() == "Key not found" {
+		count = 1
+		BadgerDB.SetWithTTL(key, []byte(strconv.Itoa(count)), ttl)
+		return count, nil
+	}
+	count, _ = strconv.Atoi(item)
+	count++
+	BadgerDB.UpdateWithOutTTL(key, []byte(strconv.Itoa(count)))
+
+	return count, nil
+}
+
+// IsBanned 检查 IP 是否被禁止访问
+func IsBanned(ip string) bool {
+	banKey := []byte(banCacheKey + ip)
+
+	_, err := BadgerDB.Get(banKey)
+	return err == nil
+}
+
+// BanIP 禁止 IP 访问
+func BanIP(ip string) {
+	banKey := []byte(banCacheKey + ip)
+	BadgerDB.SetWithTTL(banKey, []byte("1"), banCacheTTL)
 }
