@@ -1,9 +1,8 @@
 package controller
 
 import (
-	"colaAPI/UsersApi/database"
-	"colaAPI/UsersApi/utils"
-	UserUtils "colaAPI/UsersApi/utils"
+	"colaAPI/Users/database"
+	"colaAPI/Users/utils"
 	"net/http"
 	"strings"
 
@@ -32,7 +31,7 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
-	result := UserUtils.GetTokenUserData(c)
+	result := utils.GetTokenUserData(c)
 
 	user, err := database.UserCheckID(int64(result.UserID))
 	if err != nil && err.Error() != "record not found" {
