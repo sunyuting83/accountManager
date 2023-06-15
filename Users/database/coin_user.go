@@ -35,3 +35,24 @@ func CheckUserKey(key string) (users *CoinUsers, err error) {
 	}
 	return
 }
+
+func UserCheckUser(username, password string) (user *CoinUsers, err error) {
+	if err = sqlDB.First(&user, "user_name = ? AND new_status = ? AND password = ?", username, "0", password).Error; err != nil {
+		return
+	}
+	return
+}
+
+// Check ID
+func UserCheckID(id int64) (user *CoinUsers, err error) {
+	if err = sqlDB.First(&user, "id = ?", id).Error; err != nil {
+		return
+	}
+	return
+}
+
+// Reset Password
+func (user *CoinUsers) UserResetPassword(id int64) {
+	// time.Sleep(time.Duration(100) * time.Millisecond)
+	sqlDB.Model(&user).Where("id = ?", id).Updates(&user)
+}

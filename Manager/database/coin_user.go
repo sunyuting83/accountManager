@@ -93,6 +93,18 @@ func GetAllUsersList() (coinuser *[]CoinUsers, err error) {
 	return
 }
 
+func SearchUsers(key string) (coinuser *[]CoinUsers, err error) {
+	if err = sqlDB.
+		Model(&CoinUsers{}).
+		Select("id, user_name, new_status, parent_id, coin, local_address, wallet_address, created_at").
+		Where("user_name LIKE ?", "%"+key+"%").
+		Order("id desc").
+		Find(&coinuser).Error; err != nil {
+		return
+	}
+	return
+}
+
 // Reset Password
 func (coinuser *CoinUsers) UserResetPassword(username string) (coinusers CoinUsers, err error) {
 	// time.Sleep(time.Duration(100) * time.Millisecond)

@@ -21,6 +21,9 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		router.GET("/", controller.Index)
 		userApiV1.POST("/Regedit", Users.Regedit)
 		userApiV1.POST("/Captcha", Users.Captcha)
+		userApiV1.POST("/Login", Users.Sgin)
+		userApiV1.PUT("/RePassword", utilsUser.UserVerifyMiddleware(), Users.ResetPassword)
+		userApiV1.GET("/CheckLogin", utilsUser.UserVerifyMiddleware(), Users.CheckLogin)
 	}
 	return router
 }
