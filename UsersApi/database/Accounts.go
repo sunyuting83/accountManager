@@ -187,7 +187,7 @@ func SetSellUseIn(IDs []int) (accounts []*Accounts, err error) {
 		Model(&accounts).
 		Clauses(clause.Returning{}).
 		Where("id IN ?", IDs).
-		Update("sell_status", "1")
+		UpdateColumns(Accounts{SellStatus: 1})
 	return
 }
 

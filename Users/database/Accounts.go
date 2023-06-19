@@ -4,7 +4,6 @@ import (
 	"colaAPI/Users/utils"
 
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type Accounts struct {
@@ -65,26 +64,13 @@ func (accounts *Accounts) GetCountWithSellStatus(gameid uint) (count int64, err 
 }
 
 // Account List
-func (account *Accounts) GetInList(ProjectsID string, statusList []string, page, Limit int) (accounts []*Accounts, err error) {
-	p := makePage(page, Limit)
-	if err = sqlDB.
-		Where("projects_id = ? and new_status IN ?", ProjectsID, statusList).
-		Order("today_gold DESC").
-		Limit(Limit).Offset(p).
-		Find(&accounts).Error; err != nil {
-		return
-	}
-	return
-}
-
-// Account List
 func GetAccountList(page, Limit int, GameID uint) (accounts *[]Accounts, err error) {
 	p := makePage(page, Limit)
 	if err = sqlDB.
 		Where("sell_status = 1 AND new_status != 108").
 		Scopes(WithGameID(GameID)).
 		Preload("Games").
-		Order("updated_at desc").
+		Order("today_gold desc").
 		Limit(Limit).Offset(p).
 		Find(&accounts).Error; err != nil {
 		return
@@ -152,15 +138,6 @@ func HasStatus(hasStatus []string) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("new_status IN (?)", hasStatus)
 	}
-}
-
-func SetSellUseIn(IDs []int) (accounts []*Accounts, err error) {
-	sqlDB.
-		Model(&accounts).
-		Clauses(clause.Returning{}).
-		Where("id IN ?", IDs).
-		Update("sell_status", "1")
-	return
 }
 
 func GetDataUseScopes1(filter utils.Filter, hasStatus []string, projectsID string) (accounts []Accounts, err error) {
