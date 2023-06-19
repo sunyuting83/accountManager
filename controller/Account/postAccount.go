@@ -294,6 +294,7 @@ func PostAccount(c *gin.Context) {
 				Remarks = strings.TrimRight(Remarks, itemSplit)
 				account = append(account, database.Accounts{
 					ProjectsID:    uint(ProjectsID),
+					GameID:        Projects.GamesID,
 					ComputID:      0,
 					PhoneNumber:   PhoneNumber,
 					PhonePassword: PhonePassword,

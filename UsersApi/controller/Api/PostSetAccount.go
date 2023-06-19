@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
 )
 
@@ -124,16 +123,18 @@ func PostSetAccount(c *gin.Context) {
 	Price := Decimal(project.Games.BasePrice + ((project.Games.UnitPrice / float64(project.Games.SingleNumber*100000000)) * float64(gold)))
 	// fmt.Println(project.Games.BasePrice, project.Games.UnitPrice, project.Games.SingleNumber, float64(gold))
 	// fmt.Println(Price)
-	updata := &SqlData{
-		Cover:     form.Cover,
-		TodayGold: gold,
-		Multiple:  Multiple,
-		Diamond:   Diamond,
-		Crazy:     Crazy,
-		Cold:      Cold,
-		Precise:   Precise,
-		Exptime:   ExpTimeInt,
-		Price:     Price,
+	updata := make(map[string]interface{})
+	updata["Cover"] = form.Cover
+	updata["TodayGold"] = gold
+	updata["Multiple"] = Multiple
+	updata["Diamond"] = Diamond
+	updata["Crazy"] = Crazy
+	updata["Cold"] = Cold
+	updata["Precise"] = Precise
+	updata["Exptime"] = ExpTimeInt
+	updata["Price"] = Price
+	if account.GameID == nil {
+		updata["GameID"] = project.GamesID
 	}
 
 	timeobj := time.Unix(account.UpdatedAt/1000, 0)
@@ -142,11 +143,11 @@ func PostSetAccount(c *gin.Context) {
 	timeStr := nowTime.Format("20060102")
 	// fmt.Println(olDate, timeStr)
 	if timeStr > olDate {
-		updata.YesterdayGold = account.TodayGold
+		updata["YesterdayGold"] = account.TodayGold
 	}
 
-	updataMAP := structs.Map(&updata)
-	account.UpdataOneAccount(projectsID, form.Account, updataMAP)
+	// updataMAP := structs.Map(&updata)
+	account.UpdataOneAccount(projectsID, form.Account, updata)
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  0,

@@ -10,6 +10,7 @@ import (
 type Accounts struct {
 	ID            uint `gorm:"primaryKey"`
 	ProjectsID    uint
+	GameID        *uint
 	ComputID      uint
 	PhoneNumber   string
 	PhonePassword string
