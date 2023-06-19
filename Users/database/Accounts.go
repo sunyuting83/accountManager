@@ -29,6 +29,7 @@ type Accounts struct {
 	Exptime       int64
 	Price         float64
 	Remarks       string
+	Games         Games `gorm:"foreignKey:GameID"`
 	CreatedAt     int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt     int64 `gorm:"autoUpdateTime:milli"`
 }
@@ -43,9 +44,21 @@ func makePage(p, Limit int) int {
 	return page
 }
 
+func WithGameID(GameID uint) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if GameID > 0 {
+			db.Where("game_id = ?", GameID)
+		}
+		return db.Where("")
+	}
+}
+
 // Get Count
-func (accounts *Accounts) GetCount(ProjectsID, Status string) (count int64, err error) {
-	if err = sqlDB.Model(&accounts).Where("projects_id = ? and new_status = ?", ProjectsID, Status).Count(&count).Error; err != nil {
+func (accounts *Accounts) GetCountWithSellStatus(gameid uint) (count int64, err error) {
+	if err = sqlDB.Model(&accounts).
+		Where("sell_status = 1").
+		Scopes(WithGameID(gameid)).
+		Count(&count).Error; err != nil {
 		return
 	}
 	return
@@ -65,10 +78,12 @@ func (account *Accounts) GetInList(ProjectsID string, statusList []string, page,
 }
 
 // Account List
-func GetAccountList(page, Limit int, ProjectsID, Status string) (accounts *[]Accounts, err error) {
+func GetAccountList(page, Limit int, GameID uint) (accounts *[]Accounts, err error) {
 	p := makePage(page, Limit)
 	if err = sqlDB.
-		Where("projects_id = ? and new_status = ?", ProjectsID, Status).
+		Where("sell_status = 1 AND new_status != 108").
+		Scopes(WithGameID(GameID)).
+		Preload("Games").
 		Order("updated_at desc").
 		Limit(Limit).Offset(p).
 		Find(&accounts).Error; err != nil {

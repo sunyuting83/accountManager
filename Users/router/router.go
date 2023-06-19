@@ -2,6 +2,7 @@ package router
 
 import (
 	"colaAPI/Users/controller"
+	Accounts "colaAPI/Users/controller/Accounts"
 	Users "colaAPI/Users/controller/Users"
 	utilsUser "colaAPI/Users/utils"
 
@@ -24,6 +25,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1.POST("/Login", Users.Sgin)
 		userApiV1.PUT("/RePassword", utilsUser.UserVerifyMiddleware(), Users.ResetPassword)
 		userApiV1.GET("/CheckLogin", utilsUser.UserVerifyMiddleware(), Users.CheckLogin)
+		userApiV1.GET("/GetProducts", utilsUser.UserVerifyMiddleware(), Accounts.GetAccountsList)
 	}
 	return router
 }
