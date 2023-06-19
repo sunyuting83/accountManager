@@ -125,6 +125,7 @@ export default defineComponent({
     states.openModal.username = localStorage.getItem('user')
     states.userid = localStorage.getItem('userid')
     states.skin = localStorage.getItem('header_style')
+    if (states.skin == null) states.skin = "info"
     // console.log(states.openModal.username)
     const LogOut =() =>{
       setStorage(false)

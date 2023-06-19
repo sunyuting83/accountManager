@@ -134,16 +134,31 @@ func Precise(Precise int64) func(db *gorm.DB) *gorm.DB {
 		return db.Where("")
 	}
 }
-func HasStatus(hasStatus []string) func(db *gorm.DB) *gorm.DB {
-	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("new_status IN (?)", hasStatus)
+
+func (accounts *Accounts) GetCountUseScopesB(filter *utils.Filter, page, Limit int, GameID uint) (count int64, err error) {
+	if err = sqlDB.Model(&accounts).
+		Where("sell_status = 1 AND new_status != 108").
+		Scopes(WithGameID(GameID)).
+		Preload("Games").
+		Scopes(MinGold(filter.MinGold)).
+		Scopes(MaxGold(filter.MaxGold)).
+		Scopes(Multiple(filter.Multiple)).
+		Scopes(Diamond(filter.Diamond)).
+		Scopes(Crazy(filter.Crazy)).
+		Scopes(Cold(filter.Cold)).
+		Scopes(Precise(filter.Precise)).
+		Count(&count).Error; err != nil {
+		return
 	}
+	return
 }
 
-func GetDataUseScopes1(filter utils.Filter, hasStatus []string, projectsID string) (accounts []Accounts, err error) {
+func GetDataUseScopesB(filter *utils.Filter, page, Limit int, GameID uint) (accounts *[]Accounts, err error) {
+	p := makePage(page, Limit)
 	if err = sqlDB.
-		Where("projects_id = ?", projectsID).
-		Scopes(HasStatus(hasStatus)).
+		Where("sell_status = 1 AND new_status != 108").
+		Scopes(WithGameID(GameID)).
+		Preload("Games").
 		Scopes(MinGold(filter.MinGold)).
 		Scopes(MaxGold(filter.MaxGold)).
 		Scopes(Multiple(filter.Multiple)).
@@ -152,6 +167,7 @@ func GetDataUseScopes1(filter utils.Filter, hasStatus []string, projectsID strin
 		Scopes(Cold(filter.Cold)).
 		Scopes(Precise(filter.Precise)).
 		Order("today_gold DESC").
+		Limit(Limit).Offset(p).
 		Find(&accounts).Error; err != nil {
 		return
 	}

@@ -15,11 +15,8 @@ func GetAccountsList(c *gin.Context) {
 	var gameid string = c.DefaultQuery("gameid", "0")
 	pageInt, _ := strconv.Atoi(page)
 	LimitInt, _ := strconv.Atoi(Limit)
-	GameID64, err := strconv.ParseUint(gameid, 10, 64)
+	GameID64, _ := strconv.Atoi(gameid)
 	GameID := uint(GameID64)
-	if err != nil {
-		GameID = 0
-	}
 
 	var account *database.Accounts
 	count, err := account.GetCountWithSellStatus(GameID)
