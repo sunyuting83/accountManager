@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -376,4 +377,45 @@ func ConvertToUpperCase(str string) string {
 func ContainsSpecialCharacters(str string) bool {
 	regex := regexp.MustCompile(`[^a-zA-Z0-9]`)
 	return regex.MatchString(str)
+}
+
+func Decimal(num float64) float64 {
+	num, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", num), 64)
+	return num
+}
+
+func ReplaceFromThirdChar(str string, length int) string {
+	if len(str) <= length {
+		return str
+	}
+
+	// 将字符串转换为字符切片
+	strChars := []rune(str)
+
+	// 从第三位开始替换为 "*"
+	for i := length; i < len(strChars); i++ {
+		strChars[i] = '*'
+	}
+
+	// 将字符切片转换回字符串
+	return string(strChars)
+}
+
+func ConvertNumber(num int64) string {
+	const (
+		tenThousand       = 10000
+		oneHundredMillion = 100000000
+	)
+
+	if num >= oneHundredMillion {
+		// 大于等于一亿
+		value := float64(num) / float64(oneHundredMillion)
+		return strings.Join([]string{strconv.FormatFloat(value, 'f', 1, 64), "亿"}, "")
+	} else if num >= tenThousand {
+		// 大于等于一万
+		value := float64(num) / float64(tenThousand)
+		return strings.Join([]string{strconv.FormatFloat(value, 'f', 1, 64), "万"}, "")
+	}
+
+	return strconv.FormatInt(num, 10)
 }

@@ -60,19 +60,24 @@ func SetWithTTL(key []byte, value []byte, ttl int64) {
 	}
 }
 
-func UpdateWithOutTTL(key []byte, value []byte) error {
-	err := BadgerDB.Update(func(txn *badger.Txn) error {
+func UpdateWithOutTTL(key []byte, value []byte) {
+	var existingTTL uint64
+	BadgerDB.View(func(txn *badger.Txn) error {
 		item, err := txn.Get(key)
 		if err != nil {
 			return err
 		}
 
-		return item.Value(func(val []byte) error {
-			return txn.Set(key, value)
-		})
+		existingTTL = item.ExpiresAt()
+		// fmt.Println(existingTTL)
+		return nil
 	})
 
-	return err
+	if existingTTL > 0 {
+		// 原有键存在 TTL，将其应用于更新后的键值对
+		ttlDuration := int64(existingTTL) / time.Second.Nanoseconds()
+		SetWithTTL(key, value, ttlDuration)
+	}
 }
 
 func Get(key []byte) (string, error) {

@@ -3,7 +3,6 @@ package controller
 import (
 	"colaAPI/Users/database"
 	"colaAPI/Users/utils"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -19,7 +18,21 @@ func SearchProducts(c *gin.Context) {
 	var crazy string = c.DefaultQuery("crazy", "0")
 	var cold string = c.DefaultQuery("cold", "0")
 	var precise string = c.DefaultQuery("precise", "0")
-	var gameid string = c.DefaultQuery("gameid", "0")
+	var gameid string = c.Query("gameid")
+	if len(gameid) <= 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": "必须包含游戏ID",
+		})
+		return
+	}
+	if !isNumeric(gameid) {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": "非法请求",
+		})
+		return
+	}
 	pageInt, _ := strconv.Atoi(page)
 	LimitInt, _ := strconv.Atoi(Limit)
 	GameID64, _ := strconv.Atoi(gameid)
@@ -42,7 +55,6 @@ func SearchProducts(c *gin.Context) {
 	var account *database.Accounts
 	count, err := account.GetCountUseScopesB(form, pageInt, LimitInt, GameID)
 	if err != nil {
-		fmt.Println(err)
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
 			"message": "haven't project",
@@ -51,7 +63,6 @@ func SearchProducts(c *gin.Context) {
 	}
 	rows, err := database.GetDataUseScopesB(form, pageInt, LimitInt, GameID)
 	if err != nil {
-		fmt.Println(err)
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
 			"message": "haven't project",
@@ -66,4 +77,8 @@ func SearchProducts(c *gin.Context) {
 		"total":  count,
 	}
 	c.JSON(http.StatusOK, Data)
+}
+func isNumeric(str string) bool {
+	_, err := strconv.ParseFloat(str, 64)
+	return err == nil
 }

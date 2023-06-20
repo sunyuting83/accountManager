@@ -56,8 +56,8 @@ func SendCoinToUser(c *gin.Context) {
 		return
 	}
 	// 发放coin到用户
-	userid.Coin += CoinFloat
-	userid.UpCoinToCoinUsers()
+	Coin := userid.Coin + CoinFloat
+	userid.UpCoinToCoinUsers(Coin)
 
 	result := utils.GetTokenUserData(c)
 

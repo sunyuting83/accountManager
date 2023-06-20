@@ -32,8 +32,9 @@ func UserCheckID(id int64) (coinuser *CoinUsers, err error) {
 	return
 }
 
-func (coinuser *CoinUsers) UpCoinToCoinUsers() {
-	sqlDB.Save(&coinuser)
+func (coinuser *CoinUsers) UpCoinToCoinUsers(Coin float64) {
+	sqlDB.Model(&coinuser).
+		UpdateColumns(CoinUsers{Coin: Coin})
 }
 
 func UserCheckUserName(username string) (coinuser *CoinUsers, err error) {

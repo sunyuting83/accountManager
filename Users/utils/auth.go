@@ -9,7 +9,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"log"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -28,8 +28,7 @@ type CacheToken struct {
 const (
 	cachePrefix = "ip_counter_"
 	ttl         = 1
-	maxRequests = 50
-	interval    = 1
+	maxRequests = 20
 	banCacheKey = "ip_banned"
 	banCacheTTL = 24 * 60 * 60
 )
@@ -223,6 +222,10 @@ func ThrottleMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ip := c.ClientIP()
 
+		// BadgerDB.Delete([]byte(banCacheKey + ip))
+		// key := []byte(cachePrefix + ip)
+		// BadgerDB.Delete(key)
+
 		if IsBanned(ip) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "IP banned"})
 			c.Abort()
@@ -231,7 +234,7 @@ func ThrottleMiddleware() gin.HandlerFunc {
 
 		count, err := IncrementCounter(ip)
 		if err != nil {
-			log.Println(err)
+			// log.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 			c.Abort()
 			return
@@ -244,7 +247,7 @@ func ThrottleMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("count", count)
+		// c.Set("count", count)
 
 		c.Next()
 	}
@@ -263,6 +266,7 @@ func IncrementCounter(ip string) (int, error) {
 	}
 	count, _ = strconv.Atoi(item)
 	count++
+	fmt.Println(count)
 	BadgerDB.UpdateWithOutTTL(key, []byte(strconv.Itoa(count)))
 
 	return count, nil
@@ -273,6 +277,7 @@ func IsBanned(ip string) bool {
 	banKey := []byte(banCacheKey + ip)
 
 	_, err := BadgerDB.Get(banKey)
+	// fmt.Println(ban)
 	return err == nil
 }
 

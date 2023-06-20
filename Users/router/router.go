@@ -3,6 +3,7 @@ package router
 import (
 	"colaAPI/Users/controller"
 	Accounts "colaAPI/Users/controller/Accounts"
+	Orders "colaAPI/Users/controller/Orders"
 	Users "colaAPI/Users/controller/Users"
 	utilsUser "colaAPI/Users/utils"
 
@@ -27,6 +28,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1.GET("/CheckLogin", utilsUser.UserVerifyMiddleware(), Users.CheckLogin)
 		userApiV1.GET("/GetProducts", utilsUser.UserVerifyMiddleware(), Accounts.GetAccountsList)
 		userApiV1.GET("/SearchProducts", utilsUser.UserVerifyMiddleware(), Accounts.SearchProducts)
+		userApiV1.POST("/PostOrders", utilsUser.UserVerifyMiddleware(), Orders.PostOrders)
 	}
 	return router
 }

@@ -28,6 +28,7 @@ type Accounts struct {
 	Exptime       int64
 	Price         float64
 	Remarks       string
+	Projects      Projects
 	Games         Games `gorm:"foreignKey:GameID"`
 	CreatedAt     int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt     int64 `gorm:"autoUpdateTime:milli"`
@@ -72,6 +73,28 @@ func GetAccountList(page, Limit int, GameID uint) (accounts *[]Accounts, err err
 		Preload("Games").
 		Order("today_gold desc").
 		Limit(Limit).Offset(p).
+		Find(&accounts).Error; err != nil {
+		return
+	}
+	return
+}
+
+// Account List
+func GetAccountsWithIn(IDs []int) (accounts *[]Accounts, err error) {
+	if err = sqlDB.
+		Where("sell_status = 1 AND new_status != 108 AND id IN ?", IDs).
+		Preload("Games").
+		Preload("Projects.Users").
+		Find(&accounts).Error; err != nil {
+		return
+	}
+	return
+}
+
+// Account List
+func GetFailedAccountsWithIn(IDs []int) (accounts *[]Accounts, err error) {
+	if err = sqlDB.
+		Where("id IN ?", IDs).
 		Find(&accounts).Error; err != nil {
 		return
 	}
