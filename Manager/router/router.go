@@ -40,6 +40,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		adminapiv1.PUT("/UpStatusUser", utils.AdminVerifyMiddleware(), User.UpStatusUser)
 		adminapiv1.GET("/GetManagerList", utils.AdminVerifyMiddleware(), Manager.GetManagerList)
 		adminapiv1.POST("/SplitForManager", utils.AdminVerifyMiddleware(), Manager.SplitForManager)
+		adminapiv1.POST("/SplitForProjects", utils.AdminVerifyMiddleware(), Manager.SplitForProjects)
 	}
 	return router
 }

@@ -9,8 +9,8 @@ import (
 )
 
 type SplitManager struct {
-	ManagerID  int64   `form:"manager_id" json:"manager_id" xml:"manager_id"  binding:"required"`
-	Proportion float64 `form:"proportion" json:"proportion" xml:"proportion"  binding:"required"`
+	ManagerID int64   `form:"manager_id" json:"manager_id" xml:"manager_id"  binding:"required"`
+	Percent   float64 `form:"percent" json:"percent" xml:"percent"  binding:"required"`
 }
 
 func SplitForManager(c *gin.Context) {
@@ -39,22 +39,15 @@ func SplitForManager(c *gin.Context) {
 		return
 	}
 
-	if form.Proportion <= 0 {
+	if form.Percent <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  1,
 			"message": "分成比例必须是数字",
 		})
 		return
 	}
-	ProportionFloat64 := utils.Decimal(form.Proportion)
-	err = database.SetSplitManager(uint(form.ManagerID), ProportionFloat64)
-	if err != nil && err.Error() != "record not found" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  1,
-			"message": "查询数据失败",
-		})
-		return
-	}
+	PercentFloat64 := utils.Decimal(form.Percent)
+	err = database.SetSplitManager(uint(form.ManagerID), PercentFloat64)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

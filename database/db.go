@@ -44,6 +44,7 @@ func InitDB(pwd string, confYaml *utils.Config) {
 		&IssuedNumber{},
 		&PointsRecord{},
 		&SplitManager{},
+		&SplitProjects{},
 	)
 
 	var (

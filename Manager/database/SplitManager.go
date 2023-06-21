@@ -1,34 +1,26 @@
 package database
 
-import "fmt"
-
 type SplitManager struct {
-	ID         uint `gorm:"primaryKey"`
-	ManagerID  uint
-	Proportion float64
+	ID        uint `gorm:"primaryKey"`
+	ManagerID uint
+	Percent   float64
 }
 
-func (splitManager *SplitManager) Insert() (err error) {
-	sqlDB.Save(&splitManager)
-	return nil
-}
-
-func SetSplitManager(id uint, Proportion float64) error {
+func SetSplitManager(id uint, Percent float64) error {
 	var splitManager *SplitManager
 	result := sqlDB.First(&splitManager, SplitManager{ManagerID: id})
-	if result.Error != nil {
+	if result.Error != nil && result.Error.Error() != "record not found" {
 		return result.Error
 	}
-	if result.RowsAffected == 0 {
-		fmt.Println("here")
+	if result.RowsAffected == 0 && result.Error.Error() != "record not found" {
 		// 更新字段
-		result = sqlDB.UpdateColumns(SplitManager{Proportion: Proportion})
+		result = sqlDB.UpdateColumns(SplitManager{Percent: Percent})
 		if result.Error != nil {
 			return result.Error
 		}
 	} else {
 		splitManager.ManagerID = id
-		splitManager.Proportion = Proportion
+		splitManager.Percent = Percent
 		result = sqlDB.Save(&splitManager)
 		if result.Error != nil {
 			return result.Error
