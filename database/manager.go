@@ -3,13 +3,14 @@ package database
 import "fmt"
 
 type Manager struct {
-	ID        uint   `gorm:"primaryKey"`
-	UserName  string `gorm:"index"`
-	Password  string
-	NewStatus int `gorm:"index"`
-	Users     []Users
-	CreatedAt int64 `gorm:"autoUpdateTime:milli"`
-	UpdatedAt int64 `gorm:"autoUpdateTime:milli"`
+	ID           uint   `gorm:"primaryKey"`
+	UserName     string `gorm:"index"`
+	Password     string
+	NewStatus    int `gorm:"index"`
+	Users        []Users
+	SplitManager SplitManager
+	CreatedAt    int64 `gorm:"autoUpdateTime:milli"`
+	UpdatedAt    int64 `gorm:"autoUpdateTime:milli"`
 }
 
 func (manager *Manager) Insert() (err error) {

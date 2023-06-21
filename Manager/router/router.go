@@ -4,6 +4,7 @@ import (
 	"colaAPI/Manager/controller"
 	Admin "colaAPI/Manager/controller/Admin"
 	Coin "colaAPI/Manager/controller/Coin"
+	Manager "colaAPI/Manager/controller/Manager"
 	User "colaAPI/Manager/controller/User"
 	utils "colaAPI/Manager/utils"
 
@@ -37,6 +38,8 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		adminapiv1.GET("/UserList", utils.AdminVerifyMiddleware(), User.UsersList)
 		adminapiv1.GET("/UsersAllList", utils.AdminVerifyMiddleware(), User.UsersAllList)
 		adminapiv1.PUT("/UpStatusUser", utils.AdminVerifyMiddleware(), User.UpStatusUser)
+		adminapiv1.GET("/GetManagerList", utils.AdminVerifyMiddleware(), Manager.GetManagerList)
+		adminapiv1.POST("/SplitForManager", utils.AdminVerifyMiddleware(), Manager.SplitForManager)
 	}
 	return router
 }

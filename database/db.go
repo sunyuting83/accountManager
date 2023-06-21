@@ -43,6 +43,7 @@ func InitDB(pwd string, confYaml *utils.Config) {
 		&CoinUsers{},
 		&IssuedNumber{},
 		&PointsRecord{},
+		&SplitManager{},
 	)
 
 	var (
