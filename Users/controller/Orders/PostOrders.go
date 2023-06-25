@@ -111,9 +111,9 @@ func PostOrders(c *gin.Context) {
 			if remainder > 0 {
 				ProjectsCoin = ProjectsCoin + remainder
 			}
-			database.UpCoinToCoinManager(CoinManagerCoin, CoinManager)
-			database.UpCoinToManager(ManagerCoin, item.Projects.Users.ManagerID)
-			database.UpCoinToUsers(ProjectsCoin, item.Projects.UsersID)
+			database.UpCoinToCoinManager(CoinManagerCoin, CoinManager)           // 更新需要累加 未完成
+			database.UpCoinToManager(ManagerCoin, item.Projects.Users.ManagerID) // 更新需要累加 未完成
+			database.UpCoinToUsers(ProjectsCoin, item.Projects.UsersID)          // 更新需要累加 未完成
 			// fmt.Println(item.Total, ProjectsCoin, ManagerCoin, CoinManagerCoin, remainder)
 			var blockchain database.BlockChain
 			// UsersID 工作室
