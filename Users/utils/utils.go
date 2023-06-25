@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"math/rand"
 	"net/http"
 	"os"
@@ -339,6 +340,12 @@ func GetDateTime() (int64, int64, int64) {
 	return startTime.Unix(), end.Unix(), yTime.Unix()
 }
 
+func GetDateTimeStr() string {
+	d := time.Now()
+	date := d.Format("20060102150405")
+	return date
+}
+
 func GetSqlDateTime(date string) (int64, int64) {
 	//获取当前时区
 	loc, _ := time.LoadLocation("Local")
@@ -380,8 +387,17 @@ func ContainsSpecialCharacters(str string) bool {
 }
 
 func Decimal(num float64) float64 {
-	num, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", num), 64)
-	return num
+	decimal := 2
+	d := float64(1)
+	if decimal > 0 {
+		// 10的N次方
+		d = math.Pow10(decimal)
+	}
+	// math.trunc作用就是返回浮点数的整数部分
+	// 再除回去，小数点后无效的0也就不存在了
+	res := strconv.FormatFloat(math.Floor(num*d)/d, 'f', -1, 64)
+	floatNum, _ := strconv.ParseFloat(res, 64)
+	return floatNum
 }
 
 func ReplaceFromThirdChar(str string, length int) string {

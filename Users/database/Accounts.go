@@ -4,6 +4,7 @@ import (
 	"colaAPI/Users/utils"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Accounts struct {
@@ -88,6 +89,14 @@ func GetAccountsWithIn(IDs []int) (accounts *[]Accounts, err error) {
 		Find(&accounts).Error; err != nil {
 		return
 	}
+	return
+}
+func UpAccountsWithIn(IDs []string) (accounts []*Accounts, err error) {
+	sqlDB.
+		Model(&accounts).
+		Clauses(clause.Returning{}).
+		Where("id IN ?", IDs).
+		UpdateColumns(Accounts{SellStatus: 2, NewStatus: 108})
 	return
 }
 

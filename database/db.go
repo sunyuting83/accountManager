@@ -45,6 +45,8 @@ func InitDB(pwd string, confYaml *utils.Config) {
 		&PointsRecord{},
 		&SplitManager{},
 		&SplitProjects{},
+		&BlockChain{},
+		&Order{},
 	)
 
 	var (

@@ -8,6 +8,7 @@ type CoinUsers struct {
 	NewStatus     int `gorm:"index"`
 	Coin          float64
 	Children      []CoinUsers `gorm:"foreignKey:ParentID"`
+	Order         []Order
 	IPAddress     string
 	LocalAddress  string
 	Email         string

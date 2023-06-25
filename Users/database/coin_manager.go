@@ -9,3 +9,11 @@ type CoinManager struct {
 	CreatedAt int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt int64 `gorm:"autoUpdateTime:milli"`
 }
+
+func UpCoinToCoinManager(Coin float64, id []string) {
+	for _, item := range id {
+		sqlDB.Model(&CoinManager{}).
+			Where("id = ?", item).
+			UpdateColumns(CoinManager{Coin: Coin})
+	}
+}

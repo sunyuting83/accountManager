@@ -1,10 +1,12 @@
 package controller
 
 import (
-	Accounts "colaAPI/Users/controller/Accounts"
 	"colaAPI/Users/database"
 	"colaAPI/Users/utils"
+	"math"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,6 +27,17 @@ func PostOrders(c *gin.Context) {
 
 	tempList := RemoveRepeatedList(form.List)
 	if len(tempList) != 0 {
+		ProjectsPercent := 7.00
+		var CoinManager []string
+		SpiltPercent, err := database.GetSplittedPercent()
+		if err == nil {
+			ProjectsPercent = SpiltPercent.Percent
+			if strings.Contains(SpiltPercent.Manager, "|||") {
+				CoinManager = strings.Split(SpiltPercent.Manager, "|||")
+			} else {
+				CoinManager[0] = SpiltPercent.Manager
+			}
+		}
 		accountList, err := database.GetAccountsWithIn(tempList)
 		if err != nil && err.Error() == "record not found" {
 			c.JSON(http.StatusOK, gin.H{
@@ -34,6 +47,13 @@ func PostOrders(c *gin.Context) {
 			return
 		}
 		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "获取数据失败",
+			})
+			return
+		}
+		if len(*accountList) == 0 {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  1,
 				"message": "获取数据失败",
@@ -59,17 +79,68 @@ func PostOrders(c *gin.Context) {
 			})
 			return
 		}
+
+		NewID := make([]string, 0)
+		for _, item := range *accountList {
+			idStr := strconv.Itoa(int(item.ID))
+			NewID = append(NewID, idStr)
+		}
+		database.UpAccountsWithIn(NewID)
+
+		Accounts := strings.Join(NewID, "|||")
+
+		OrderCode := MakeOrderCode(UsersID)
+		var order database.Order
+		order.Coin = NewData.Total
+		order.OrderCode = OrderCode
+		order.CoinUsersID = UsersID
+		order.AccountsID = Accounts
+		order.Insert()
+
+		// 获取所有作者和工作室ID,并计算分成
+		for _, item := range NewData.UniqueItem {
+			ManagerPercent, _ := database.CheckSplitManagerID(item.Projects.Users.ManagerID)
+			CoinManagerPercent := 10.00 - (ProjectsPercent + ManagerPercent.Percent)
+			ProjectsCoin, ManagerCoin, CoinManagerCoin := splitAmount(item.Total, ProjectsPercent, ManagerPercent.Percent, CoinManagerPercent)
+			remainder := utils.Decimal(item.Total - (roundUpToTwoDecimalPlaces(ProjectsCoin) + ManagerCoin + CoinManagerCoin))
+			// fmt.Println(len(CoinManager))
+			ProjectsCoin = utils.Decimal(ProjectsCoin)
+			if len(CoinManager) > 1 {
+				CoinManagerCoin = CoinManagerCoin / float64(len(CoinManager))
+			}
+			if remainder > 0 {
+				ProjectsCoin = ProjectsCoin + remainder
+			}
+			database.UpCoinToCoinManager(CoinManagerCoin, CoinManager)
+			database.UpCoinToManager(ManagerCoin, item.Projects.Users.ManagerID)
+			database.UpCoinToUsers(ProjectsCoin, item.Projects.UsersID)
+			// fmt.Println(item.Total, ProjectsCoin, ManagerCoin, CoinManagerCoin, remainder)
+			var blockchain database.BlockChain
+			// UsersID 工作室
+			blockchain.UsersID = item.Projects.UsersID
+			blockchain.UsersCoin = ProjectsCoin
+			blockchain.UsersPercent = ProjectsPercent
+			// ManagerID 作者
+			blockchain.ManagerID = item.Projects.Users.ManagerID
+			blockchain.ManagerCoin = ManagerCoin
+			blockchain.ManagerPercent = ManagerPercent.Percent
+			// CoinManagerIDs 分润帐号 CoinManagerCoin 单帐号分润金额 CoinManagerPercent 分润总比例 需要除以 len(CoinManagerIDs)
+			blockchain.CoinManagerIDs = SpiltPercent.Manager
+			blockchain.CoinManagerCoin = CoinManagerCoin
+			blockchain.CoinManagerPercent = CoinManagerPercent
+			blockchain.Insert()
+		}
+
 		ResponseData := gin.H{
 			"status": 0,
 			"user":   user,
-			"data":   NewData,
 			"total":  NewData.Total,
 			"credit": utils.Decimal(user.Coin - NewData.Total),
 		}
 		FaileData := filterArray(tempList, accountList)
 		if len(FaileData) != 0 {
 			failedata, _ := database.GetFailedAccountsWithIn(FaileData)
-			newData := Accounts.MakeDataList(failedata)
+			newData := MakeDataList(failedata)
 			ResponseData["FailedData"] = newData
 		}
 		c.JSON(http.StatusOK, ResponseData)
@@ -167,4 +238,27 @@ func filterArray(arr1 []int, arr2 *[]database.Accounts) []int {
 	}
 
 	return filtered
+}
+
+func splitAmount(amount, Projects, Manager, CoinManager float64) (float64, float64, float64) {
+	share1 := (Projects / 10) * amount
+	share2 := (Manager / 10) * amount
+	share3 := (CoinManager / 10) * amount
+
+	return share1, share2, share3
+}
+
+func roundUpToTwoDecimalPlaces(f float64) float64 {
+	return math.Floor(f*100) / 100
+}
+
+func MakeOrderCode(id uint) string {
+	idStr := strconv.Itoa(int(id))
+	if id < 10 {
+		idStr = "0" + idStr
+	}
+	before := "2023001"
+	datetime := utils.GetDateTimeStr()
+	orderCode := strings.Join([]string{before, idStr, datetime}, "")
+	return orderCode
 }

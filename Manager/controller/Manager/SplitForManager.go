@@ -2,7 +2,7 @@ package controller
 
 import (
 	"colaAPI/Manager/database"
-	"colaAPI/Users/utils"
+	"colaAPI/Manager/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
