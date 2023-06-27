@@ -1,5 +1,7 @@
 package database
 
+import "gorm.io/gorm"
+
 type CoinManager struct {
 	ID        uint   `gorm:"primaryKey"`
 	UserName  string `gorm:"index"`
@@ -14,6 +16,6 @@ func UpCoinToCoinManager(Coin float64, id []string) {
 	for _, item := range id {
 		sqlDB.Model(&CoinManager{}).
 			Where("id = ?", item).
-			UpdateColumns(CoinManager{Coin: Coin})
+			Update("coin", gorm.Expr("coin + ?", Coin))
 	}
 }

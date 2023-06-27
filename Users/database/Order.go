@@ -10,7 +10,10 @@ type Order struct {
 	UpdatedAt   int64 `gorm:"autoUpdateTime:milli"`
 }
 
-func (order *Order) Insert() (err error) {
-	sqlDB.Create(&order)
-	return nil
+func (order *Order) Insert() (id uint, err error) {
+	result := sqlDB.Create(&order)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	return order.ID, nil
 }

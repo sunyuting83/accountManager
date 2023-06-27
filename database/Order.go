@@ -5,7 +5,7 @@ type Order struct {
 	OrderCode   string `gorm:"index"`
 	Coin        float64
 	CoinUsersID uint
-	AccountsID  string
+	Accounts    []Accounts
 	CreatedAt   int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt   int64 `gorm:"autoUpdateTime:milli"`
 }

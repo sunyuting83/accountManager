@@ -85,17 +85,31 @@ func PostOrders(c *gin.Context) {
 			idStr := strconv.Itoa(int(item.ID))
 			NewID = append(NewID, idStr)
 		}
-		database.UpAccountsWithIn(NewID)
-
-		Accounts := strings.Join(NewID, "|||")
+		UPaccountList, err := database.UpAccountsWithIn(NewID)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "购买失败",
+			})
+			return
+		}
+		if len(*accountList) != len(UPaccountList) {
+			upIDs := make([]int, 0)
+			for _, item := range UPaccountList {
+				upIDs = append(upIDs, int(item.ID))
+			}
+			accountList, _ = database.GetAccountsWithIn(upIDs)
+			NewData = MakeDataList(accountList)
+		}
 
 		OrderCode := MakeOrderCode(UsersID)
 		var order database.Order
 		order.Coin = NewData.Total
 		order.OrderCode = OrderCode
 		order.CoinUsersID = UsersID
-		order.AccountsID = Accounts
-		order.Insert()
+		orderID, _ := order.Insert()
+		database.UpOrderIDForAccountsWithIn(NewID, orderID)
+		database.UpCoinToCoinUser(UsersID, NewData.Total)
 
 		// 获取所有作者和工作室ID,并计算分成
 		for _, item := range NewData.UniqueItem {

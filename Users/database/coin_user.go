@@ -1,5 +1,7 @@
 package database
 
+import "gorm.io/gorm"
+
 type CoinUsers struct {
 	ID            uint   `gorm:"primaryKey"`
 	ParentID      *uint  `gorm:"foreignKey:ParentID"`
@@ -55,4 +57,10 @@ func UserCheckID(id int64) (user *CoinUsers, err error) {
 func (user *CoinUsers) UserResetPassword(id int64) {
 	// time.Sleep(time.Duration(100) * time.Millisecond)
 	sqlDB.Model(&user).Where("id = ?", id).Updates(&user)
+}
+
+func UpCoinToCoinUser(id uint, Coin float64) {
+	sqlDB.Model(&CoinUsers{}).
+		Where("id = ?", id).
+		Update("coin", gorm.Expr("coin - ?", Coin))
 }

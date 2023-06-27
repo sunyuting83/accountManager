@@ -12,6 +12,7 @@ type Accounts struct {
 	ProjectsID    uint
 	GameID        uint
 	ComputID      uint
+	OrderID       uint
 	PhoneNumber   string
 	PhonePassword string
 	UserName      string
@@ -98,6 +99,13 @@ func UpAccountsWithIn(IDs []string) (accounts []*Accounts, err error) {
 		Where("id IN ?", IDs).
 		UpdateColumns(Accounts{SellStatus: 2, NewStatus: 108})
 	return
+}
+
+func UpOrderIDForAccountsWithIn(IDs []string, OrderID uint) {
+	sqlDB.
+		Model(&Accounts{}).
+		Where("id IN ?", IDs).
+		UpdateColumns(Accounts{OrderID: OrderID})
 }
 
 // Account List

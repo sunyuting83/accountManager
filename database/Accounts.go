@@ -12,6 +12,7 @@ type Accounts struct {
 	ProjectsID    uint
 	GameID        uint
 	ComputID      uint
+	OrderID       uint
 	PhoneNumber   string
 	PhonePassword string
 	UserName      string
