@@ -60,7 +60,6 @@ func PostOrders(c *gin.Context) {
 			})
 			return
 		}
-
 		NewData := MakeDataList(accountList)
 
 		UsersID := utils.GetCurrentUserID(c)
@@ -125,6 +124,8 @@ func PostOrders(c *gin.Context) {
 			if remainder > 0 {
 				ProjectsCoin = ProjectsCoin + remainder
 			}
+			CoinManagerCoin = utils.Decimal(CoinManagerCoin)
+			ManagerCoin = utils.Decimal(ManagerCoin)
 			database.UpCoinToCoinManager(CoinManagerCoin, CoinManager)           // 更新需要累加 未完成
 			database.UpCoinToManager(ManagerCoin, item.Projects.Users.ManagerID) // 更新需要累加 未完成
 			database.UpCoinToUsers(ProjectsCoin, item.Projects.UsersID)          // 更新需要累加 未完成
@@ -142,6 +143,7 @@ func PostOrders(c *gin.Context) {
 			blockchain.CoinManagerIDs = SpiltPercent.Manager
 			blockchain.CoinManagerCoin = CoinManagerCoin
 			blockchain.CoinManagerPercent = CoinManagerPercent
+			blockchain.OrderID = orderID
 			blockchain.Insert()
 		}
 
@@ -154,7 +156,7 @@ func PostOrders(c *gin.Context) {
 		FaileData := filterArray(tempList, accountList)
 		if len(FaileData) != 0 {
 			failedata, _ := database.GetFailedAccountsWithIn(FaileData)
-			newData := MakeDataList(failedata)
+			newData := MakeFaileDataList(failedata)
 			ResponseData["FailedData"] = newData
 		}
 		c.JSON(http.StatusOK, ResponseData)
@@ -184,15 +186,6 @@ func RemoveRepeatedList(personList []int) (result []int) {
 	return
 }
 
-//	func MakeDataList(dataList *[]database.Accounts) float64 {
-//		// fmt.Println(len(*dataList))
-//		Total := 0.0
-//		for _, item := range *dataList {
-//			Price := utils.Decimal(item.Games.BasePrice + ((item.Games.UnitPrice / float64(item.Games.SingleNumber*100000000)) * float64(item.TodayGold)))
-//			Total += Price
-//		}
-//		return Total
-//	}
 type TotalData struct {
 	Total      float64
 	UniqueItem []UniqueItem
@@ -275,4 +268,46 @@ func MakeOrderCode(id uint) string {
 	datetime := utils.GetDateTimeStr()
 	orderCode := strings.Join([]string{before, idStr, datetime}, "")
 	return orderCode
+}
+
+type ResponseDatas struct {
+	ID        uint `gorm:"primaryKey"`
+	GameID    uint
+	GameName  string
+	Account   string
+	Cover     string
+	Gold      string
+	Multiple  int64
+	Diamond   int
+	Crazy     int
+	Precise   int
+	Cold      int
+	Price     float64
+	Remarks   string
+	UpdatedAt int64 `gorm:"autoUpdateTime:milli"`
+}
+
+func MakeFaileDataList(dataList *[]database.Accounts) []*ResponseDatas {
+	DataList := make([]*ResponseDatas, len(*dataList))
+	if len(*dataList) != 0 {
+		for i, item := range *dataList {
+			ResponsItems := &ResponseDatas{
+				ID:        item.ID,
+				GameID:    item.GameID,
+				GameName:  item.Games.GameName,
+				Account:   utils.ReplaceFromThirdChar(item.UserName, 2),
+				Cover:     item.Cover,
+				Gold:      utils.ConvertNumber(item.TodayGold),
+				Multiple:  item.Multiple,
+				Diamond:   item.Diamond,
+				Crazy:     item.Crazy,
+				Precise:   item.Precise,
+				Cold:      item.Cold,
+				Remarks:   item.Remarks,
+				UpdatedAt: item.UpdatedAt,
+			}
+			DataList[i] = ResponsItems
+		}
+	}
+	return DataList
 }
