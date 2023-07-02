@@ -36,6 +36,7 @@ func GetOrdersDetail(c *gin.Context) {
 type OrderResponseData struct {
 	ID          uint
 	OrderCode   string
+	Status      int
 	Coin        float64
 	CoinUsersID uint
 	Accounts    []*AccountsData
@@ -45,6 +46,7 @@ type OrderResponseData struct {
 
 type AccountsData struct {
 	ID        uint
+	Status    int
 	GameName  string
 	Account   string
 	Password  string
@@ -66,6 +68,7 @@ func MakeOrderData(data *database.Order) *OrderResponseData {
 	var result *OrderResponseData = &OrderResponseData{
 		ID:          data.ID,
 		OrderCode:   data.OrderCode,
+		Status:      data.NewStatus,
 		Coin:        data.Coin,
 		CoinUsersID: data.CoinUsersID,
 		Accounts:    DataList,
@@ -74,11 +77,18 @@ func MakeOrderData(data *database.Order) *OrderResponseData {
 	}
 	for i, item := range data.Accounts {
 		item.Price = utils.Decimal(item.Games.BasePrice + ((item.Games.UnitPrice / float64(item.Games.SingleNumber*100000000)) * float64(item.TodayGold)))
+		Account := item.UserName
+		Password := item.Password
+		if item.SellStatus == 120 {
+			Account = utils.ReplaceFromThirdChar(item.UserName, 2)
+			Password = ""
+		}
 		ResponsItems := &AccountsData{
 			ID:        item.ID,
+			Status:    item.NewStatus,
 			GameName:  item.Games.GameName,
-			Account:   item.UserName,
-			Password:  item.Password,
+			Account:   Account,
+			Password:  Password,
 			Cover:     item.Cover,
 			Gold:      utils.ConvertNumber(item.TodayGold),
 			Multiple:  item.Multiple,

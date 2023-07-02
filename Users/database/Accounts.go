@@ -101,6 +101,14 @@ func UpAccountsWithIn(IDs []string) (accounts []*Accounts, err error) {
 	return
 }
 
+func UpAccountsToRefund(ID []int) (accounts []*Accounts, err error) {
+	sqlDB.
+		Model(&accounts).
+		Where("id = IN", ID).
+		UpdateColumns(Accounts{SellStatus: 120})
+	return
+}
+
 func UpOrderIDForAccountsWithIn(IDs []string, OrderID uint) {
 	sqlDB.
 		Model(&Accounts{}).

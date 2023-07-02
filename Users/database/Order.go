@@ -3,8 +3,10 @@ package database
 type Order struct {
 	ID          uint   `gorm:"primaryKey"`
 	OrderCode   string `gorm:"index"`
+	NewStatus   int
 	Coin        float64
 	CoinUsersID uint
+	Remarks     string
 	Accounts    []Accounts
 	CreatedAt   int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt   int64 `gorm:"autoUpdateTime:milli"`
@@ -47,5 +49,21 @@ func GetOrdersDetail(id string) (order *Order, err error) {
 		First(&order, "id = ?", id).Error; err != nil {
 		return
 	}
+	return
+}
+
+func GetOrdersDetailForRefund(id string) (order *Order, err error) {
+	if err = sqlDB.
+		First(&order, "id = ? AND new_status = ?", id, 0).Error; err != nil {
+		return
+	}
+	return
+}
+
+func UpOrdersToRefunding(ID string, status int, Remarks string) (order []*Order, err error) {
+	sqlDB.
+		Model(&order).
+		Where("id = ?", ID).
+		UpdateColumns(Order{NewStatus: status, Remarks: Remarks})
 	return
 }

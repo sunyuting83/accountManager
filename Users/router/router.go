@@ -31,6 +31,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1.POST("/PostOrders", utilsUser.UserVerifyMiddleware(), Orders.PostOrders)
 		userApiV1.GET("/GetOrdersList", utilsUser.UserVerifyMiddleware(), Orders.GetOrdersList)
 		userApiV1.GET("/GetOrdersDetail", utilsUser.UserVerifyMiddleware(), Orders.GetOrdersDetail)
+		userApiV1.POST("/OrderRefund", utilsUser.UserVerifyMiddleware(), Orders.OrderRefund)
 	}
 	return router
 }
