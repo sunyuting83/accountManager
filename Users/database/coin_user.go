@@ -1,6 +1,10 @@
 package database
 
-import "gorm.io/gorm"
+import (
+	"strings"
+
+	"gorm.io/gorm"
+)
 
 type CoinUsers struct {
 	ID            uint   `gorm:"primaryKey"`
@@ -59,8 +63,8 @@ func (user *CoinUsers) UserResetPassword(id int64) {
 	sqlDB.Model(&user).Where("id = ?", id).Updates(&user)
 }
 
-func UpCoinToCoinUser(id uint, Coin float64) {
+func UpCoinToCoinUser(id uint, Coin float64, operator string) {
 	sqlDB.Model(&CoinUsers{}).
 		Where("id = ?", id).
-		Update("coin", gorm.Expr("coin - ?", Coin))
+		Update("coin", gorm.Expr(strings.Join([]string{"coin ", operator, " ?"}, ""), Coin))
 }

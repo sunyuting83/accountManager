@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -108,7 +109,7 @@ func PostOrders(c *gin.Context) {
 		order.CoinUsersID = UsersID
 		orderID, _ := order.Insert()
 		database.UpOrderIDForAccountsWithIn(NewID, orderID)
-		database.UpCoinToCoinUser(UsersID, NewData.Total)
+		database.UpCoinToCoinUser(UsersID, NewData.Total, "-")
 
 		// 获取所有作者和工作室ID,并计算分成
 		for _, item := range NewData.UniqueItem {
@@ -159,6 +160,17 @@ func PostOrders(c *gin.Context) {
 			newData := MakeFaileDataList(failedata)
 			ResponseData["FailedData"] = newData
 		}
+
+		d := time.Now()
+		dateMonths := d.Format("2006-01-02")
+
+		var bill database.Bill
+		bill.Coin = NewData.Total
+		bill.CoinUsersID = &user.ID
+		bill.OrderID = &orderID
+		bill.NewStatus = 3
+		bill.Months = dateMonths
+		bill.Insert()
 		c.JSON(http.StatusOK, ResponseData)
 		return
 	}

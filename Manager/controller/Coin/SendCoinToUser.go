@@ -5,6 +5,7 @@ import (
 	"colaAPI/Manager/utils"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -72,6 +73,16 @@ func SendCoinToUser(c *gin.Context) {
 	var issued database.IssuedNumber
 	issued.IssuedNumber += CoinFloat
 	issued.UpCoinTotalNumber()
+
+	d := time.Now()
+	dateMonths := d.Format("2006-01-02")
+
+	var bill database.Bill
+	bill.Coin = CoinFloat
+	bill.CoinUsersID = &userid.ID
+	bill.NewStatus = 0
+	bill.Months = dateMonths
+	bill.Insert()
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  0,

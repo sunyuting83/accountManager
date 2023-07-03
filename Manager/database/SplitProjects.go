@@ -1,7 +1,5 @@
 package database
 
-import "fmt"
-
 type SplitProjects struct {
 	ID      uint `gorm:"primaryKey"`
 	Percent float64
@@ -21,7 +19,7 @@ func SetSplitProjects(Percent float64, ManagerID string) error {
 			return result.Error
 		}
 	} else {
-		fmt.Println("where")
+		// fmt.Println("where")
 		result = sqlDB.UpdateColumns(&SplitProjects{ID: 1, Percent: Percent, Manager: ManagerID})
 		if result.Error != nil {
 			return result.Error

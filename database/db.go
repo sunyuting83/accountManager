@@ -47,6 +47,7 @@ func InitDB(pwd string, confYaml *utils.Config) {
 		&SplitProjects{},
 		&BlockChain{},
 		&Order{},
+		&Bill{},
 	)
 
 	var (
