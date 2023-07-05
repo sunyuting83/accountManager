@@ -52,11 +52,19 @@ func Sgin(c *gin.Context) {
 	SECRET_KEY := secret_key.(string)
 
 	PASSWD := utils.MD5(strings.Join([]string{form.Password, SECRET_KEY}, ""))
+	_, err := database.CheckUserName(form.UserName)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": "用户不存在",
+		})
+		return
+	}
 	login, err := database.UserCheckUser(form.UserName, PASSWD)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
-			"message": "用户不存在或密码错误" + err.Error(),
+			"message": "密码错误",
 		})
 		return
 	}
