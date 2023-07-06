@@ -45,7 +45,7 @@ func GetAccountsList(c *gin.Context) {
 }
 
 type ResponseDatas struct {
-	ID        uint `gorm:"primaryKey"`
+	ID        uint
 	GameID    uint
 	GameName  string
 	Account   string
@@ -58,7 +58,8 @@ type ResponseDatas struct {
 	Cold      int
 	Price     float64
 	Remarks   string
-	UpdatedAt int64 `gorm:"autoUpdateTime:milli"`
+	UpdatedAt int64
+	Key       uint `json:"key"`
 }
 
 func MakeDataList(dataList *[]database.Accounts) []*ResponseDatas {
@@ -83,6 +84,7 @@ func MakeDataList(dataList *[]database.Accounts) []*ResponseDatas {
 			Price:     item.Price,
 			Remarks:   item.Remarks,
 			UpdatedAt: item.UpdatedAt,
+			Key:       item.ID,
 		}
 		DataList[i] = ResponsItems
 	}
