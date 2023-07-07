@@ -7,3 +7,13 @@ type Games struct {
 	UnitPrice    float64
 	SingleNumber int64
 }
+
+// Account List
+func GetGamesList() (games *[]Games, err error) {
+	if err = sqlDB.
+		Order("id desc").
+		Find(&games).Error; err != nil {
+		return
+	}
+	return
+}
