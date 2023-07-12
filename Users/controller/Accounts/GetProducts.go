@@ -45,21 +45,22 @@ func GetAccountsList(c *gin.Context) {
 }
 
 type ResponseDatas struct {
-	ID        uint
-	GameID    uint
-	GameName  string
-	Account   string
-	Cover     string
-	Gold      string
-	Multiple  int64
-	Diamond   int
-	Crazy     int
-	Precise   int
-	Cold      int
-	Price     float64
-	Remarks   string
-	UpdatedAt int64
-	Key       uint `json:"key"`
+	ID         uint
+	GameID     uint
+	GameName   string
+	Account    string
+	Cover      string
+	Gold       string
+	Multiple   int64
+	Diamond    int
+	Crazy      int
+	Precise    int
+	Cold       int
+	Price      float64
+	Remarks    string
+	UpdatedAt  int64
+	Key        uint `json:"key"`
+	SellStatus int
 }
 
 func MakeDataList(dataList *[]database.Accounts) []*ResponseDatas {
@@ -70,21 +71,22 @@ func MakeDataList(dataList *[]database.Accounts) []*ResponseDatas {
 			item.Price = utils.Decimal(item.Games.BasePrice + ((item.Games.UnitPrice / float64(item.Games.SingleNumber*100000000)) * float64(item.TodayGold)))
 		}
 		ResponsItems := &ResponseDatas{
-			ID:        item.ID,
-			GameID:    item.GameID,
-			GameName:  item.Games.GameName,
-			Account:   utils.ReplaceFromThirdChar(item.UserName, 2),
-			Cover:     item.Cover,
-			Gold:      utils.ConvertNumber(item.TodayGold),
-			Multiple:  item.Multiple,
-			Diamond:   item.Diamond,
-			Crazy:     item.Crazy,
-			Precise:   item.Precise,
-			Cold:      item.Cold,
-			Price:     item.Price,
-			Remarks:   item.Remarks,
-			UpdatedAt: item.UpdatedAt,
-			Key:       item.ID,
+			ID:         item.ID,
+			GameID:     item.GameID,
+			GameName:   item.Games.GameName,
+			Account:    utils.ReplaceFromThirdChar(item.UserName, 2),
+			Cover:      item.Cover,
+			Gold:       utils.ConvertNumber(item.TodayGold),
+			Multiple:   item.Multiple,
+			Diamond:    item.Diamond,
+			Crazy:      item.Crazy,
+			Precise:    item.Precise,
+			Cold:       item.Cold,
+			Price:      item.Price,
+			Remarks:    item.Remarks,
+			UpdatedAt:  item.UpdatedAt,
+			Key:        item.ID,
+			SellStatus: item.SellStatus,
 		}
 		DataList[i] = ResponsItems
 	}

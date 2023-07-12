@@ -92,6 +92,17 @@ func GetAccountsWithIn(IDs []int) (accounts *[]Accounts, err error) {
 	}
 	return
 }
+
+// Account List
+func GetCartWithIn(IDs []int) (accounts *[]Accounts, err error) {
+	if err = sqlDB.
+		Where("sell_status = 1 AND new_status != 108 AND id IN ?", IDs).
+		Preload("Games").
+		Find(&accounts).Error; err != nil {
+		return
+	}
+	return
+}
 func UpAccountsWithIn(IDs []string) (accounts []*Accounts, err error) {
 	sqlDB.
 		Model(&accounts).
