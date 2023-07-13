@@ -30,6 +30,10 @@ export function GetGamesList() {
   return window['go']['main']['App']['GetGamesList']();
 }
 
+export function GetOrdersList(arg1) {
+  return window['go']['main']['App']['GetOrdersList'](arg1);
+}
+
 export function GetProducts(arg1) {
   return window['go']['main']['App']['GetProducts'](arg1);
 }

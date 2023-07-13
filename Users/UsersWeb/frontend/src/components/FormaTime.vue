@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineProps, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { FormatDateTime } from '../../wailsjs/go/main/App'
 
 const props = defineProps({

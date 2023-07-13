@@ -4,7 +4,7 @@
     <div :style="{ padding: '24px'}">
       <div class="content">
         <a-row :style="{'margin-bottom': '1rem'}">
-          <a-col :span="18" v-if="gameState.status == 0">
+          <a-col :span="12" v-if="gameState.status == 0">
             <a-space>
               <span>
                 <a-button type="link" :disabled="gameID == 0 ? true : false " @click="()=>{changeGame(0)}">所有游戏</a-button>
@@ -14,10 +14,11 @@
               </span>
             </a-space>
           </a-col>
-          <a-col :span="6" :style="{'text-align': 'right'}">
+          <a-col :span="12" :style="{'text-align': 'right'}">
             <a-space v-if="state.selectedRowKeys.length > 0">
+              总价：{{state.total}} 
               <a-button type="primary" :disabled="state.selectedRowKeys.length > 0 ? false : true " @click="pushCart">加入购物车</a-button>
-              <a-button type="primary" danger :disabled="state.selectedRowKeys.length > 0 ? false : true ">直接购买</a-button>
+              <a-button type="primary" danger :disabled="state.selectedRowKeys.length > 0 ? false : true " @click="postCart">直接购买</a-button>
             </a-space>
           </a-col>
         </a-row>
@@ -55,7 +56,7 @@ import { onMounted, computed, ref, h } from 'vue'
 import { InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
 import { notification } from 'ant-design-vue'
 import { Empty } from 'ant-design-vue';
-import { GetProducts, GetGamesList, AddCart } from '../../../wailsjs/go/main/App'
+import { GetProducts, GetGamesList, AddCart, PostOrders } from '../../../wailsjs/go/main/App'
 type Key = string | number;
 
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE
@@ -141,7 +142,6 @@ const dataState = ref<ProductResponse>({
   total: 0,
   data: [],
 })
-
 
 const gameState = ref<GamesResponse>({
   status: 0,
@@ -241,11 +241,29 @@ const sucNotification = (text: string) => {
 interface State {
   selectedRowKeys: Key[];
   loading: boolean;
+  total: number;
 }
 const state = ref<State>({
   selectedRowKeys: [],
   loading: false,
+  total: 0,
 })
+
+const postCart = async() => {
+  state.value.loading = true
+  let IDList: number[] = [];
+  const d = state.value.selectedRowKeys
+  d.forEach((k) => IDList = [...IDList, Number(k)])
+  const data = await PostOrders(IDList)
+  if (data.status == 0) {
+    state.value.loading = false
+    sucNotification(`购买成功，请转至订单详情查看 总价：${data.total} 余额： ${data.credit} 失败： ${data.FailedData.length}条`)
+    getProducts()
+  }else{
+    state.value.loading = false
+    errNotification(data.message)
+  }
+}
 
 
 const pushCart = async() => {
@@ -260,9 +278,38 @@ const pushCart = async() => {
 
 const hasSelected = computed(() => state.value.selectedRowKeys.length > 0);
 
+const toDecimal2 = (x: number) => { 
+  var f = parseFloat(String(x)); 
+    if (isNaN(f)) { 
+      return 0 
+    } 
+    var f = Math.round(x*100)/100; 
+    var s = f.toString(); 
+    var rs = s.indexOf('.'); 
+    if (rs < 0) { 
+        rs = s.length; 
+        s += '.'; 
+    } 
+    while (s.length <= rs + 2) { 
+      s += '0'; 
+    } 
+    return Number(s)
+} 
+
+const makeTotal = () => {
+  let total = 0
+  dataState.value.data.map((e) => {
+    state.value.selectedRowKeys.map(el => {
+      if (el == e.ID) total += e.Price
+    })
+  })
+  state.value.total = toDecimal2(total)
+}
+
 const onSelectChange = (selectedRowKeys: Key[]) => {
   // console.log('selectedRowKeys changed: ', selectedRowKeys);
-  state.value.selectedRowKeys = selectedRowKeys;
+  state.value.selectedRowKeys = selectedRowKeys
+  makeTotal()
 }
 
 </script>

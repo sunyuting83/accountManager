@@ -149,10 +149,10 @@ func PostOrders(c *gin.Context) {
 		}
 
 		ResponseData := gin.H{
-			"status": 0,
-			"user":   user,
-			"total":  NewData.Total,
-			"credit": utils.Decimal(user.Coin - NewData.Total),
+			"status":     0,
+			"total":      NewData.Total,
+			"credit":     utils.Decimal(user.Coin - NewData.Total),
+			"FailedData": make([]interface{}, 0),
 		}
 		FaileData := filterArray(tempList, accountList)
 		if len(FaileData) != 0 {
@@ -304,19 +304,7 @@ func MakeFaileDataList(dataList *[]database.Accounts) []*ResponseDatas {
 	if len(*dataList) != 0 {
 		for i, item := range *dataList {
 			ResponsItems := &ResponseDatas{
-				ID:        item.ID,
-				GameID:    item.GameID,
-				GameName:  item.Games.GameName,
-				Account:   utils.ReplaceFromThirdChar(item.UserName, 2),
-				Cover:     item.Cover,
-				Gold:      utils.ConvertNumber(item.TodayGold),
-				Multiple:  item.Multiple,
-				Diamond:   item.Diamond,
-				Crazy:     item.Crazy,
-				Precise:   item.Precise,
-				Cold:      item.Cold,
-				Remarks:   item.Remarks,
-				UpdatedAt: item.UpdatedAt,
+				ID: item.ID,
 			}
 			DataList[i] = ResponsItems
 		}

@@ -15,6 +15,8 @@ export function GetCart():Promise<{[key: string]: any}>;
 
 export function GetGamesList():Promise<{[key: string]: any}>;
 
+export function GetOrdersList(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
+
 export function GetProducts(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
 export function GetUsers():Promise<{[key: string]: any}>;

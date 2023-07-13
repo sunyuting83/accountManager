@@ -7,22 +7,12 @@
       theme="dark"
       mode="inline"
       @click="handleClick">
-      <a-sub-menu key="sub1">
-        <template #title>
-          <span>
-            <user-outlined />
-            <span>用户中心</span>
-          </span>
-        </template>
-        <a-menu-item key="user">
-          <span>
-            <user-outlined />
-            <span>用户中心</span>
-          </span>
-        </a-menu-item>
-        <a-menu-item key="2">Bill</a-menu-item>
-        <a-menu-item key="3">Alex</a-menu-item>
-      </a-sub-menu>
+      <a-menu-item key="user">
+        <span>
+          <user-outlined />
+          <span>用户中心</span>
+        </span>
+      </a-menu-item>
       <a-menu-item key="product">
         <desktop-outlined />
         <span>产品列表</span>
@@ -30,6 +20,10 @@
       <a-menu-item key="cart">
         <shopping-cart-outlined />
         <span>购物车</span>
+      </a-menu-item>
+      <a-menu-item key="order">
+        <account-book-outlined />
+        <span>订单管理</span>
       </a-menu-item>
       <a-menu-item key="logout">
         <export-outlined />
@@ -40,15 +34,11 @@
 </template>
 <script lang="ts">
 import {
-  PieChartOutlined,
   DesktopOutlined,
   UserOutlined,
-  TeamOutlined,
-  FileOutlined,
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  ExportOutlined,
   ShoppingCartOutlined,
+  AccountBookOutlined,
+  ExportOutlined,
 } from '@ant-design/icons-vue';
 import { defineComponent, ref } from 'vue'
 import { Logout } from '../../../wailsjs/go/main/App'
@@ -62,15 +52,11 @@ export default defineComponent({
       }
   },
   components: {
-    PieChartOutlined,
     DesktopOutlined,
     UserOutlined,
-    TeamOutlined,
-    FileOutlined,
-    MenuUnfoldOutlined,
-    MenuFoldOutlined,
-    ExportOutlined,
     ShoppingCartOutlined,
+    AccountBookOutlined,
+    ExportOutlined,
   },
   setup() {
     const openKeys = ref<string[]>(['sub1']);

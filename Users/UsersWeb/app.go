@@ -115,6 +115,11 @@ func (a *App) PostOrders(ids []int) map[string]interface{} {
 	return data
 }
 
+func (a *App) GetOrdersList(params map[string]interface{}) map[string]interface{} {
+	data := HTTPRequest("GET", "GetOrdersList", params)
+	return data
+}
+
 func (a *App) FormatDateTime(timestamp int64) string {
 	t := time.Unix(timestamp/1000, 0)
 	return t.Format("2006-01-02 15:04:05")
