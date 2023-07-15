@@ -90,7 +90,9 @@ export default defineComponent({
       }
       const data = await Login(params)
       if (data.status == 0) {
-        router.push("/main")
+        router.push({
+          'name': 'user',
+        })
       }else {
         openNotification(data.message)
       }

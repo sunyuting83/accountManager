@@ -17,7 +17,8 @@ func GetOrdersDetail(c *gin.Context) {
 		})
 		return
 	}
-	data, err := database.GetOrdersDetail(orderID)
+	UsersID := utils.GetCurrentUserID(c)
+	data, err := database.GetOrdersDetail(orderID, UsersID)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,

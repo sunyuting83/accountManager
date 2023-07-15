@@ -30,6 +30,10 @@ export function GetGamesList() {
   return window['go']['main']['App']['GetGamesList']();
 }
 
+export function GetOrdersDetail(arg1) {
+  return window['go']['main']['App']['GetOrdersDetail'](arg1);
+}
+
 export function GetOrdersList(arg1) {
   return window['go']['main']['App']['GetOrdersList'](arg1);
 }
@@ -48,6 +52,10 @@ export function Login(arg1) {
 
 export function Logout() {
   return window['go']['main']['App']['Logout']();
+}
+
+export function OrderRefund(arg1) {
+  return window['go']['main']['App']['OrderRefund'](arg1);
 }
 
 export function PostOrders(arg1) {

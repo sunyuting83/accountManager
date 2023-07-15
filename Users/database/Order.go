@@ -42,19 +42,19 @@ func GetOrdersList(page, Limit int, id uint) (order *[]Order, err error) {
 	return
 }
 
-func GetOrdersDetail(id string) (order *Order, err error) {
+func GetOrdersDetail(id string, userid uint) (order *Order, err error) {
 	if err = sqlDB.
 		Preload("Accounts").
 		Preload("Accounts.Games").
-		First(&order, "id = ?", id).Error; err != nil {
+		First(&order, "id = ? AND coin_users_id = ?", id, userid).Error; err != nil {
 		return
 	}
 	return
 }
 
-func GetOrdersDetailForRefund(id string) (order *Order, err error) {
+func GetOrdersDetailForRefund(id string, uid uint) (order *Order, err error) {
 	if err = sqlDB.
-		First(&order, "id = ? AND new_status = ?", id, 0).Error; err != nil {
+		First(&order, "id = ? AND new_status = ? AND coin_users_id = ?", id, 0, uid).Error; err != nil {
 		return
 	}
 	return

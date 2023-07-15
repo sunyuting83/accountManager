@@ -15,16 +15,8 @@ func GetOrdersList(c *gin.Context) {
 	pageInt, _ := strconv.Atoi(page)
 	LimitInt, _ := strconv.Atoi(Limit)
 	UsersID := utils.GetCurrentUserID(c)
-	user, err := database.UserCheckID(int64(UsersID))
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  1,
-			"message": "get users failed",
-		})
-		return
-	}
 	var orders *database.Order
-	count, err := orders.GetOrdersCount(user.ID)
+	count, err := orders.GetOrdersCount(UsersID)
 	if count == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
@@ -39,7 +31,7 @@ func GetOrdersList(c *gin.Context) {
 		})
 		return
 	}
-	dataList, err := database.GetOrdersList(pageInt, LimitInt, user.ID)
+	dataList, err := database.GetOrdersList(pageInt, LimitInt, UsersID)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,

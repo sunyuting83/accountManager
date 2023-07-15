@@ -65,7 +65,9 @@ export default defineComponent({
       if (e.key == "logout") {
         clickLogout()
       }else{
-        router.push('/main/'+e.key)
+        router.push({
+          'name': String(e.key),
+        })
       }
     };
     const clickLogout = async() => {
@@ -73,7 +75,9 @@ export default defineComponent({
       const data = await Logout()
       // console.log(data)
       if (data.status == 0) {
-        router.push('/login')
+        router.push({
+          'name': 'login',
+        })
       }
     }
     return {

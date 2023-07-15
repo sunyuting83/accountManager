@@ -2,6 +2,7 @@ package controller
 
 import (
 	"colaAPI/Users/database"
+	"colaAPI/Users/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,7 +29,8 @@ func OrderRefund(c *gin.Context) {
 		})
 		return
 	}
-	_, err := database.GetOrdersDetailForRefund(form.ID)
+	UsersID := utils.GetCurrentUserID(c)
+	_, err := database.GetOrdersDetailForRefund(form.ID, UsersID)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,

@@ -19,9 +19,13 @@ onMounted(async() => {
   const data = await CheckLogin()
   // console.log(data)
   if (data === null || data.status === 1) {
-    router.push("login")
+    router.push({
+      'name': 'login',
+    })
   }else{
-    router.push("main/user")
+    router.push({
+      'name': 'user',
+    })
   }
 })
 </script>

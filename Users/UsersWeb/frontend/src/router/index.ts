@@ -6,6 +6,8 @@ import Users from '../components/Main/Users.vue'
 import Product from '../components/Main/Product.vue'
 import Cart from '../components/Main/Cart.vue'
 import Order from '../components/Main/Order.vue'
+import OrdersDetail from '../components/Main/OrdersDetail.vue'
+
 
 const routerHistory = createWebHistory()
 
@@ -44,6 +46,11 @@ const constantRoutes = [
         path: 'order',
         name: 'order',
         component: Order,
+      },
+      {
+        path: 'OrdersDetail:order_id',
+        name: 'OrdersDetail',
+        component: OrdersDetail,
       }
     ]
   },

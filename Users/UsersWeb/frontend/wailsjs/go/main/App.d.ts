@@ -15,6 +15,8 @@ export function GetCart():Promise<{[key: string]: any}>;
 
 export function GetGamesList():Promise<{[key: string]: any}>;
 
+export function GetOrdersDetail(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
+
 export function GetOrdersList(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
 export function GetProducts(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
@@ -24,5 +26,7 @@ export function GetUsers():Promise<{[key: string]: any}>;
 export function Login(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
 export function Logout():Promise<{[key: string]: any}>;
+
+export function OrderRefund(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
 export function PostOrders(arg1:Array<number>):Promise<{[key: string]: any}>;

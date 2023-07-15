@@ -22,7 +22,7 @@
               <a-tag color="orange" v-if="record.NewStatus == 4">已单号退款</a-tag>
             </template>
             <template v-if="column.dataIndex==='Active'">
-              <a-button type="primary" size="small" ghost >订单详情</a-button>
+              <a-button type="primary" size="small" ghost @click="() => {pushOrderDetail(record.ID)}">订单详情</a-button>
             </template>
           </template>
         </a-table>
@@ -37,7 +37,8 @@ import { InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
 import { notification } from 'ant-design-vue'
 import { Empty } from 'ant-design-vue';
 import { GetOrdersList } from '../../../wailsjs/go/main/App'
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE
 
 const columns = [
@@ -112,22 +113,31 @@ interface PageHeaderData {
 }
 
 const pageHeader = ref<PageHeaderData>({
-  title: "订单详情",
-  subtitle: '订单详情',
+  title: "订单管理",
+  subtitle: '订单管理详情',
   routers: [
     {
       path:'main',
-      breadcrumbName: '订单'
+      breadcrumbName: '订单管理'
     },
     {
       path:'main',
-      breadcrumbName: '订单'
+      breadcrumbName: '订单管理'
     }
   ],
 })
 onMounted(() => {
   getOrders()
 })
+
+const pushOrderDetail = (id: number) => {
+  router.push({
+    'name': 'OrdersDetail',
+    'params': {
+      'order_id': id,
+    }
+  })
+}
 
 const getOrders = async(page:string = "1", pageSize:string = "20",) => {
   state.value.loading = true

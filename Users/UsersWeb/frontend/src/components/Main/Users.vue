@@ -9,7 +9,7 @@
             <a-descriptions-item label="钱包地址">{{userState.users.WalletAddress}}</a-descriptions-item>
             <a-descriptions-item label="E-mail">{{userState.users.Email}}</a-descriptions-item>
             <a-descriptions-item label="电话">{{userState.users.PhoneNumber}}</a-descriptions-item>
-            <a-descriptions-item label="最后登陆时间"><FormaTime :DateTime=userState.users.UpdatedAt /></a-descriptions-item>
+            <a-descriptions-item label="最后登陆时间">{{foramTime(userState.users.UpdatedAt)}}</a-descriptions-item>
             <a-descriptions-item label="最后登陆IP">{{userState.users.IPAddress}}</a-descriptions-item>
             <a-descriptions-item label="所在地">
               {{userState.users.LocalAddress}}
@@ -44,7 +44,6 @@ import { onMounted, ref, h } from 'vue'
 import { InfoCircleOutlined } from '@ant-design/icons-vue'
 import { notification } from 'ant-design-vue'
 import { GetUsers } from '../../../wailsjs/go/main/App'
-import FormaTime from '../FormaTime.vue'
 
 interface PageHeaderData {
   title: string;
@@ -127,6 +126,16 @@ const openNotification = (text: string) => {
     text,
     icon: () => h(InfoCircleOutlined, { style: 'color: #ff1855' }),
   });
+}
+const foramTime = (d: number) => {
+  const date = new Date(d)
+  const Y = date.getFullYear()
+  const M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1)
+  const D = date.getDate()
+  const H = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours()
+  const minute = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
+  const S = date.getSeconds() < 10 ? `0${date.getSeconds()}` : date.getSeconds()
+  return `${Y}-${M}-${D} ${H}:${minute}:${S}`
 }
 </script>
 <style scoped>
