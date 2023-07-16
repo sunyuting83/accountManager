@@ -16,7 +16,7 @@
             </a-descriptions-item>
             <a-descriptions-item label="下单时间">{{foramTime(dataState.data.CreatedAt)}}</a-descriptions-item>
             <a-descriptions-item label="更新时间" :span="2">{{foramTime(dataState.data.UpdatedAt)}}</a-descriptions-item>
-            <a-descriptions-item label="订单金额" :span="3">${{dataState.data.Coin}}</a-descriptions-item>
+            <a-descriptions-item label="订单金额" :span="3">￥{{dataState.data.Coin}}</a-descriptions-item>
             <a-descriptions-item label="备注" :span="3">
               {{dataState.data.Remarks}}
             </a-descriptions-item>
@@ -28,32 +28,46 @@
                     <a-button type="primary" size="small" small @click="orderRefund">确定</a-button>
                   </a-space>
                 </template>
-                <a-button type="primary">整单退款</a-button>
+                <a-button type="primary" :disabled="dataState.data.Status == 0 ? false : true ">整单退款</a-button>
               </a-popover>
             </a-descriptions-item>
           </a-descriptions>
           <a-table
             sticky
+            :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
             :style="{'margin-top': '1rem'}"
             :columns="columns"
+            :rowKey="(record: Account) => record.ID"
             :data-source="dataState.data.Accounts"
             :loading="state.loading"
             size="small"
             :scroll="{ x: 1500 }">
             <template v-slot:bodyCell="{column,record}">
-              <template v-if="column.dataIndex==='Active'">
-                <a-popover v-model:open="state.visible" placement="topLeft" arrow-point-at-center title="确定退款吗？" trigger="click">
+              <template v-if="column.dataIndex==='Cover'">
+                <a-popover placement="bottomRight" arrow-point-at-center v-if="record.Cover.length != 0">
                   <template #content>
-                    <a-textarea v-model:value="remarks" placeholder="请输入备注" size="small" allow-clear />
-                    <a-space :style="{'margin-top':'10px'}">
-                      <a-button type="primary" size="small" small>确定</a-button>
-                    </a-space>
+                    <img :src="record.Cover" />
                   </template>
-                  <a-button type="primary" ghost>退款</a-button>
+                  <img :src="record.Cover" :style="{'width': '55px'}" />
                 </a-popover>
+              </template>
+              <template v-if="column.dataIndex==='Status'">
+                <a-tag color="error" v-if="record.Status == 120">退款中</a-tag>
+                <a-tag color="green" v-else>正常</a-tag>
               </template>
             </template>
           </a-table>
+          <div v-if="state.selectedRowKeys.length > 0">
+            <a-popover v-model:open="state.visible" placement="topLeft" arrow-point-at-center title="确定退款吗？" trigger="click">
+              <template #content>
+                <a-textarea v-model:value="remarks" placeholder="请输入备注" size="small" allow-clear />
+                <a-space :style="{'margin-top':'10px'}">
+                  <a-button type="primary" size="small" small @click="accountRefund">确定</a-button>
+                </a-space>
+              </template>
+              <a-button type="primary" :disabled="state.selectedRowKeys.length > 0 ? false : true ">退款选中帐号</a-button>
+            </a-popover>
+          </div>
         </div>
       </div>
     </div>
@@ -61,10 +75,10 @@
 </template>
 <script lang="ts" setup>
 import PageHeader from './PageHeader.vue'
-import { onMounted, ref, h } from 'vue'
-import { InfoCircleOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
+import { onMounted, ref, h, computed } from 'vue'
+import { InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
 import { notification, Empty } from 'ant-design-vue'
-import { GetOrdersDetail, OrderRefund } from '../../../wailsjs/go/main/App'
+import { GetOrdersDetail, OrderRefund, AccountRefund } from '../../../wailsjs/go/main/App'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const remarks = ref<string>('')
@@ -85,16 +99,27 @@ const columns = [
     fixed: 'left',
   },
   {
+    title: '图片',
+    dataIndex: 'Cover',
+  },
+  {
+    title: '状态',
+    dataIndex: 'Status',
+  },
+  {
     title: '游戏名称',
     dataIndex: 'GameName',
   },
   {
-    title: '金币',
-    dataIndex: 'Gold',
+    title: '单价',
+    dataIndex: 'Price',
+    customRender: function (t: any) {
+      return `￥${t.value}`
+    },
   },
   {
-    title: '炮台',
-    dataIndex: 'Multiple',
+    title: '金币',
+    dataIndex: 'Gold',
   },
   {
     title: '炮台',
@@ -117,10 +142,6 @@ const columns = [
     dataIndex: 'Precise',
   },
   {
-    title: '单价',
-    dataIndex: 'Price',
-  },
-  {
     title: '更新时间',
     dataIndex: 'UpdatedAt',
     customRender: function (t: any) {
@@ -131,11 +152,6 @@ const columns = [
   {
     title: '备注',
     dataIndex: 'Remarks',
-  },
-  {
-    title: '操作',
-    dataIndex: 'Active',
-    fixed: 'right',
   }
 ];
 
@@ -224,6 +240,7 @@ const getOrders = async() => {
     order_id: OrderID,
   }
   const data = await GetOrdersDetail(params)
+  console.log(data)
   if (data.status == 0) {
     state.value.loading = false
     dataState.value = data as OrderResponse
@@ -280,13 +297,38 @@ const orderRefund = async() => {
   }
 }
 
+const accountRefund = async() => {
+  const params = {
+    id: OrderID,
+    account_list: state.value.selectedRowKeys,
+    remarks: remarks.value
+  }
+  const data = await AccountRefund(params)
+  if (data.status == 0) {
+    remarks.value = ""
+    sucNotification(data.message)
+    getOrders()
+  }else {
+    remarks.value = ""
+    errNotification(data.message)
+  }
+}
+
 interface State {
-  loading: boolean;
-  visible: boolean;
+  loading: boolean
+  visible: boolean
+  selectedRowKeys: Number[]
 }
 const state = ref<State>({
   loading: false,
-  visible: false
+  visible: false,
+  selectedRowKeys: [],
 })
+const hasSelected = computed(() => state.value.selectedRowKeys.length > 0)
+
+const onSelectChange = (selectedRowKeys: Number[]) => {
+  // console.log('selectedRowKeys changed: ', selectedRowKeys);
+  state.value.selectedRowKeys = selectedRowKeys
+}
 
 </script>

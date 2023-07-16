@@ -86,7 +86,7 @@ func MakeOrderData(data *database.Order) *OrderResponseData {
 		}
 		ResponsItems := &AccountsData{
 			ID:        item.ID,
-			Status:    item.NewStatus,
+			Status:    item.SellStatus,
 			GameName:  item.Games.GameName,
 			Account:   Account,
 			Password:  Password,

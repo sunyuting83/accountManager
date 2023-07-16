@@ -25,13 +25,27 @@
         <a-empty :image="simpleImage" v-if="dataState.data.length == 0" />
         <a-table
           v-else
+          sticky
           :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
+          :style="{'margin-top': '1rem'}"
           :columns="columns"
+          :rowKey="(record: ProductDatas) => record.ID"
           :data-source="dataState.data"
           :loading="state.loading"
           size="small"
-          :pagination="false"
-        />
+          :scroll="{ x: 1500 }"
+          :pagination="false">
+          <template v-slot:bodyCell="{column,record}">
+            <template v-if="column.dataIndex==='Cover'">
+              <a-popover placement="bottomRight" arrow-point-at-center v-if="record.Cover.length != 0">
+                <template #content>
+                  <img :src="record.Cover" />
+                </template>
+                <img :src="record.Cover" :style="{'width': '55px'}" />
+              </a-popover>
+            </template>
+          </template>
+        </a-table>
         <a-pagination
           v-model:current="current"
           :total="dataState.total"
@@ -57,14 +71,28 @@ import { InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
 import { notification } from 'ant-design-vue'
 import { Empty } from 'ant-design-vue';
 import { GetProducts, GetGamesList, AddCart, PostOrders } from '../../../wailsjs/go/main/App'
-type Key = string | number;
 
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE
+
 
 const columns = [
   {
     title: '帐号',
     dataIndex: 'Account',
+    fixed: 'left',
+    width: 150
+  },
+  {
+    title: '单价',
+    dataIndex: 'Price',
+    customRender: function (t: any) {
+      return `￥${t.value}`
+    },
+    fixed: 'left',
+  },
+  {
+    title: '图片',
+    dataIndex: 'Cover',
   },
   {
     title: '游戏名称',
@@ -73,10 +101,6 @@ const columns = [
   {
     title: '金币',
     dataIndex: 'Gold',
-  },
-  {
-    title: '炮台',
-    dataIndex: 'Multiple',
   },
   {
     title: '炮台',
@@ -99,10 +123,10 @@ const columns = [
     dataIndex: 'Precise',
   },
   {
-    title: '价格',
-    dataIndex: 'Price',
-  },
-];
+    title: '备注',
+    dataIndex: 'Remarks',
+  }
+]
 
 interface ProductDatas {
   Account: string;
@@ -239,7 +263,7 @@ const sucNotification = (text: string) => {
 }
 
 interface State {
-  selectedRowKeys: Key[];
+  selectedRowKeys: Number[];
   loading: boolean;
   total: number;
 }
@@ -306,7 +330,7 @@ const makeTotal = () => {
   state.value.total = toDecimal2(total)
 }
 
-const onSelectChange = (selectedRowKeys: Key[]) => {
+const onSelectChange = (selectedRowKeys: Number[]) => {
   // console.log('selectedRowKeys changed: ', selectedRowKeys);
   state.value.selectedRowKeys = selectedRowKeys
   makeTotal()

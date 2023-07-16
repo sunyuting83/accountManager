@@ -17,14 +17,25 @@
         <a-empty :image="simpleImage" v-if="dataState.data.length == 0" />
         <a-table
           v-else
+          sticky
+          :style="{'margin-top': '1rem'}"
           :columns="columns"
+          :rowKey="(record: ProductDatas) => record.ID"
           :data-source="dataState.data"
           :loading="state.loading"
           size="small"
+          :scroll="{ x: 1500 }"
           :pagination={pageSize:20}
-          :hideOnSinglePage="true"
-        >
+          :hideOnSinglePage="true">
           <template v-slot:bodyCell="{column,record}">
+            <template v-if="column.dataIndex==='Cover'">
+              <a-popover placement="bottomRight" arrow-point-at-center v-if="record.Cover.length != 0">
+                <template #content>
+                  <img :src="record.Cover" />
+                </template>
+                <img :src="record.Cover" :style="{'width': '55px'}" />
+              </a-popover>
+            </template>
             <template v-if="column.dataIndex==='Status'">
               <a-tag color="green" v-if="record.SellStatus == 1">待出售</a-tag>
               <a-tag color="default" v-else>已出售</a-tag>
@@ -53,6 +64,24 @@ const columns = [
   {
     title: '帐号',
     dataIndex: 'Account',
+    fixed: 'left',
+    width: 150
+  },
+  {
+    title: '单价',
+    dataIndex: 'Price',
+    customRender: function (t: any) {
+      return `￥${t.value}`
+    },
+    fixed: 'left',
+  },
+  {
+    title: '状态',
+    dataIndex: 'Status',
+  },
+  {
+    title: '图片',
+    dataIndex: 'Cover',
   },
   {
     title: '游戏名称',
@@ -61,10 +90,6 @@ const columns = [
   {
     title: '金币',
     dataIndex: 'Gold',
-  },
-  {
-    title: '炮台',
-    dataIndex: 'Multiple',
   },
   {
     title: '炮台',
@@ -87,18 +112,15 @@ const columns = [
     dataIndex: 'Precise',
   },
   {
-    title: '价格',
-    dataIndex: 'Price',
-  },
-  {
-    title: '状态',
-    dataIndex: 'Status',
+    title: '备注',
+    dataIndex: 'Remarks',
   },
   {
     title: '删除',
     dataIndex: 'Delete',
+    fixed: 'right',
   }
-];
+]
 
 interface ProductDatas {
   Account: string;

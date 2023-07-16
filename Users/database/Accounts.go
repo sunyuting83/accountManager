@@ -116,7 +116,7 @@ func UpAccountsToRefund(ID []int) (accounts []*Accounts, err error) {
 	sqlDB.
 		Model(&accounts).
 		Where("id = IN", ID).
-		UpdateColumns(Accounts{SellStatus: 120})
+		UpdateColumn("sell_status", 120)
 	return
 }
 

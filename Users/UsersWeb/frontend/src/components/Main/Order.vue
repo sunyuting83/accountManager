@@ -49,6 +49,9 @@ const columns = [
   {
     title: '金额',
     dataIndex: 'Coin',
+    customRender: function (t: any) {
+      return `￥${t.value}`
+    }
   },
   {
     title: '订单状态',

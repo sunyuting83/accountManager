@@ -11,6 +11,7 @@ import (
 type OrderDetail struct {
 	ID          string `form:"id" json:"id" xml:"id"  binding:"required"`
 	AccountList []int  `form:"account_list" json:"account_list" xml:"account_list"  binding:"required"`
+	Remarks     string `form:"remarks" json:"remarks" xml:"remarks"`
 }
 
 func AccountRefund(c *gin.Context) {
@@ -57,7 +58,7 @@ func AccountRefund(c *gin.Context) {
 		})
 		return
 	}
-	_, err = database.UpOrdersToRefunding(form.ID, 2, "")
+	_, err = database.UpOrdersToRefunding(form.ID, 2, form.Remarks)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
