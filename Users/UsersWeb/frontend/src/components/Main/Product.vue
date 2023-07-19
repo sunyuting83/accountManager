@@ -1,4 +1,46 @@
 <template>
+  <a-drawer
+    v-model:visible="open"
+    class="custom-class"
+    root-class-name="root-class-name"
+    :root-style="{ color: 'blue' }"
+    style="{color: red}"
+    title="筛选"
+    placement="right"
+  >
+    <a-form :model="formState" :label-col="labelCol" :wrapper-col="wrapperCol">
+      <a-form-item label="选择游戏">
+        <a-select
+        ref="select"
+          v-model:value="formState.gameid"
+          style="width: 100%"
+        >
+          <a-select-option :value="item.ID" v-for="(item) in gameState.data" :key="item.ID">{{item.GameName}}</a-select-option>
+        </a-select>
+      </a-form-item>
+      <a-form-item label="金币>=">
+        <a-input v-model:value="formState.gold" type="number" />
+      </a-form-item>
+      <a-form-item label="炮台>=">
+        <a-input v-model:value="formState.multiple" type="number" />
+      </a-form-item>
+      <a-form-item label="钻石>=">
+        <a-input v-model:value="formState.diamond" type="number" />
+      </a-form-item>
+      <a-form-item label="狂暴>=">
+        <a-input v-model:value="formState.crazy" type="number" />
+      </a-form-item>
+      <a-form-item label="冰冻>=">
+        <a-input v-model:value="formState.cold" type="number" />
+      </a-form-item>
+      <a-form-item label="精准>=">
+        <a-input v-model:value="formState.precise" type="number" />
+      </a-form-item>
+      <a-form-item :wrapper-col="{ offset: 6, span: 18 }">
+        <a-button type="primary" html-type="submit" @click="onSubmit">搜索</a-button>
+      </a-form-item>
+    </a-form>
+  </a-drawer>
   <a-layout-content :style="{background: '#fff' }">
     <PageHeader :data="pageHeader" />
     <div :style="{ padding: '24px'}">
@@ -12,6 +54,7 @@
               <span v-for="(item) in gameState.data" :key="item.ID">
                 <a-button type="link" :disabled="item.ID == gameID ? true : false " @click="()=>{changeGame(item.ID)}">{{item.GameName}}</a-button>
               </span>
+              <a-button type="primary" :disabled="open ? true : false " @click="showDrawer">筛选</a-button>
             </a-space>
           </a-col>
           <a-col :span="12" :style="{'text-align': 'right'}">
@@ -66,7 +109,8 @@
 </template>
 <script lang="ts" setup>
 import PageHeader from './PageHeader.vue'
-import { onMounted, computed, ref, h } from 'vue'
+import { onMounted, computed, ref, h, reactive, toRaw } from 'vue'
+import type { UnwrapRef } from 'vue'
 import { InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
 import { notification } from 'ant-design-vue'
 import { Empty } from 'ant-design-vue';
@@ -74,6 +118,29 @@ import { GetProducts, GetGamesList, AddCart, PostOrders } from '../../../wailsjs
 
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE
 
+interface FormState {
+  gameid: number;
+  gold: number;
+  multiple: number;
+  diamond: number;
+  crazy: number;
+  cold: number;
+  precise: number;
+}
+const formState: UnwrapRef<FormState> = reactive({
+  gameid: 0,
+  gold: 0,
+  multiple: 0,
+  diamond: 0,
+  crazy: 0,
+  cold: 0,
+  precise: 0,
+});
+const onSubmit = () => {
+  console.log('submit!', toRaw(formState))
+}
+const labelCol = { span: 6 }
+const wrapperCol = { span: 18 }
 
 const columns = [
   {
@@ -221,6 +288,9 @@ const getProducts = async(page:string = "1", pageSize:string = "20", gameid:stri
     // userState.value = data as User
     // console.log(data)
     gameState.value = games as GamesResponse
+    if (games.data.length > 0) {
+      formState.gameid = games.data[0].ID
+    }
   }
   state.value.loading = true
   const params = {
@@ -336,4 +406,9 @@ const onSelectChange = (selectedRowKeys: Number[]) => {
   makeTotal()
 }
 
+const open = ref<boolean>(false)
+
+const showDrawer = () => {
+  open.value = true
+}
 </script>
