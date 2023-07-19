@@ -39,11 +39,17 @@ func (a *App) AddCart(c []int) map[string]interface{} {
 		errResponse["message"] = "参数不能为空"
 		return errResponse
 	}
+	token, err := BadgerDB.Get([]byte("token"))
+	if err != nil {
+		errResponse["message"] = err.Error()
+		return errResponse
+	}
 	newCartList := RemoveRepeatedList(c)
-	cart, err := BadgerDB.GetToken([]byte("cart"))
+	cartCache := strings.Join([]string{token, "cart"}, "_")
+	cart, err := BadgerDB.GetToken([]byte(cartCache))
 	if err != nil {
 		paramsByte, _ := json.Marshal(newCartList)
-		BadgerDB.Set([]byte("cart"), paramsByte)
+		BadgerDB.Set([]byte(cartCache), paramsByte)
 		errResponse["status"] = 0
 		errResponse["message"] = "添加成功"
 		return errResponse
@@ -53,7 +59,7 @@ func (a *App) AddCart(c []int) map[string]interface{} {
 	CartList := FilterUniqueValues(newCartList, inttt)
 	// CartListByte := IntSliceToByteSlice(CartList)
 	CartListByte, _ := json.Marshal(CartList)
-	BadgerDB.Set([]byte("cart"), CartListByte)
+	BadgerDB.Set([]byte(cartCache), CartListByte)
 	errResponse["status"] = 0
 	errResponse["message"] = "添加成功"
 	return errResponse
@@ -66,16 +72,30 @@ func (a *App) CleanCart() map[string]interface{} {
 	Response["data"] = make([]interface{}, 0)
 	// BadgerDB.Delete([]byte("cart"))
 	// return errResponse
-	BadgerDB.Delete([]byte("cart"))
+	token, err := BadgerDB.Get([]byte("token"))
+	if err != nil {
+		Response["status"] = 1
+		Response["message"] = err.Error()
+		return Response
+	}
+	cartCache := strings.Join([]string{token, "cart"}, "_")
+	BadgerDB.Delete([]byte(cartCache))
 	return Response
 }
 
 func (a *App) GetCart() map[string]interface{} {
 	var errResponse = make(map[string]interface{})
 	errResponse["status"] = 0
+	token, err := BadgerDB.Get([]byte("token"))
+	if err != nil {
+		errResponse["status"] = 1
+		errResponse["message"] = err.Error()
+		return errResponse
+	}
+	cartCache := strings.Join([]string{token, "cart"}, "_")
 	// BadgerDB.Delete([]byte("cart"))
 	// return errResponse
-	cart, err := BadgerDB.GetToken([]byte("cart"))
+	cart, err := BadgerDB.GetToken([]byte(cartCache))
 	if err != nil {
 		errResponse["data"] = make([]map[string]interface{}, 0)
 		return errResponse
@@ -91,7 +111,13 @@ func (a *App) GetCart() map[string]interface{} {
 func (a *App) DeleteCart(ID int) map[string]interface{} {
 	var errResponse = make(map[string]interface{})
 	errResponse["status"] = 1
-	cart, err := BadgerDB.GetToken([]byte("cart"))
+	token, err := BadgerDB.Get([]byte("token"))
+	if err != nil {
+		errResponse["message"] = err.Error()
+		return errResponse
+	}
+	cartCache := strings.Join([]string{token, "cart"}, "_")
+	cart, err := BadgerDB.GetToken([]byte(cartCache))
 	if err != nil {
 		errResponse["message"] = "发生错误"
 		return errResponse
@@ -100,7 +126,7 @@ func (a *App) DeleteCart(ID int) map[string]interface{} {
 	json.Unmarshal(cart, &inttt)
 	newList := filterValue(inttt, ID)
 	paramsByte, _ := json.Marshal(newList)
-	BadgerDB.Set([]byte("cart"), paramsByte)
+	BadgerDB.Set([]byte(cartCache), paramsByte)
 	errResponse["status"] = 0
 	errResponse["message"] = "删除成功"
 	return errResponse
