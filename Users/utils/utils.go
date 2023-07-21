@@ -171,6 +171,7 @@ func CheckGeoIP(OS, CurrentPath string) {
 	if !IsExist(GeoFileOut) {
 		ProxyUri := []string{
 			"",
+			"https://mirrors.goproxyauth.com/",
 			"https://github.91chi.fun/",
 			"https://ghproxy.com/",
 			"https://github.abskoop.workers.dev/",
