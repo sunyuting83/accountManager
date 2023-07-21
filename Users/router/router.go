@@ -4,6 +4,7 @@ import (
 	"colaAPI/Users/controller"
 	Accounts "colaAPI/Users/controller/Accounts"
 	Orders "colaAPI/Users/controller/Orders"
+	Transfer "colaAPI/Users/controller/Transfer"
 	Users "colaAPI/Users/controller/Users"
 	utilsUser "colaAPI/Users/utils"
 
@@ -25,6 +26,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1.PUT("/RePassword", utilsUser.UserVerifyMiddleware(), Users.ResetPassword)
 		userApiV1.GET("/CheckLogin", utilsUser.UserVerifyMiddleware(), Users.CheckLogin)
 		userApiV1.GET("/GetUsers", utilsUser.UserVerifyMiddleware(), Users.GetUsers)
+		userApiV1.GET("/GetLedger", utilsUser.UserVerifyMiddleware(), Users.GetLedger)
 		userApiV1.GET("/GetProducts", utilsUser.UserVerifyMiddleware(), Accounts.GetAccountsList)
 		userApiV1.GET("/SearchProducts", utilsUser.UserVerifyMiddleware(), Accounts.SearchProducts)
 		userApiV1.GET("/GetGamesList", utilsUser.UserVerifyMiddleware(), Accounts.GetGamesList)
@@ -34,6 +36,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1.GET("/GetOrdersDetail", utilsUser.UserVerifyMiddleware(), Orders.GetOrdersDetail)
 		userApiV1.POST("/OrderRefund", utilsUser.UserVerifyMiddleware(), Orders.OrderRefund)
 		userApiV1.POST("/AccountRefund", utilsUser.UserVerifyMiddleware(), Orders.AccountRefund)
+		userApiV1.POST("/Transfer", utilsUser.UserVerifyMiddleware(), Transfer.Transfer)
 	}
 	return router
 }

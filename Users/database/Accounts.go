@@ -200,7 +200,6 @@ func (accounts *Accounts) GetCountUseScopesB(filter *utils.Filter, page, Limit i
 		Scopes(WithGameID(GameID)).
 		Preload("Games").
 		Scopes(MinGold(filter.MinGold)).
-		Scopes(MaxGold(filter.MaxGold)).
 		Scopes(Multiple(filter.Multiple)).
 		Scopes(Diamond(filter.Diamond)).
 		Scopes(Crazy(filter.Crazy)).
@@ -219,7 +218,6 @@ func GetDataUseScopesB(filter *utils.Filter, page, Limit int, GameID uint) (acco
 		Scopes(WithGameID(GameID)).
 		Preload("Games").
 		Scopes(MinGold(filter.MinGold)).
-		Scopes(MaxGold(filter.MaxGold)).
 		Scopes(Multiple(filter.Multiple)).
 		Scopes(Diamond(filter.Diamond)).
 		Scopes(Crazy(filter.Crazy)).

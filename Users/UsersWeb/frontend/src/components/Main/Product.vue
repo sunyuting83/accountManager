@@ -14,30 +14,31 @@
         ref="select"
           v-model:value="formState.gameid"
           style="width: 100%"
+          @select="handleChange"
         >
           <a-select-option :value="item.ID" v-for="(item) in gameState.data" :key="item.ID">{{item.GameName}}</a-select-option>
         </a-select>
       </a-form-item>
-      <a-form-item label="金币>=">
-        <a-input v-model:value="formState.gold" type="number" />
+      <a-form-item label="金币">
+        <a-input-number v-model:value="formState.gold" addon-before=">=" addon-after="亿"></a-input-number>
       </a-form-item>
-      <a-form-item label="炮台>=">
-        <a-input v-model:value="formState.multiple" type="number" />
+      <a-form-item label="炮台">
+        <a-input-number v-model:value="formState.multiple" addon-before=">=" addon-after="倍"></a-input-number>
       </a-form-item>
-      <a-form-item label="钻石>=">
-        <a-input v-model:value="formState.diamond" type="number" />
+      <a-form-item label="钻石">
+        <a-input-number v-model:value="formState.diamond" addon-before=">=" addon-after="个"></a-input-number>
       </a-form-item>
-      <a-form-item label="狂暴>=">
-        <a-input v-model:value="formState.crazy" type="number" />
+      <a-form-item label="狂暴">
+        <a-input-number v-model:value="formState.crazy" addon-before=">=" addon-after="个"></a-input-number>
       </a-form-item>
-      <a-form-item label="冰冻>=">
-        <a-input v-model:value="formState.cold" type="number" />
+      <a-form-item label="冰冻">
+        <a-input-number v-model:value="formState.cold" addon-before=">=" addon-after="个"></a-input-number>
       </a-form-item>
-      <a-form-item label="精准>=">
-        <a-input v-model:value="formState.precise" type="number" />
+      <a-form-item label="精准">
+        <a-input-number v-model:value="formState.precise" addon-before=">=" addon-after="个"></a-input-number>
       </a-form-item>
       <a-form-item :wrapper-col="{ offset: 6, span: 18 }">
-        <a-button type="primary" html-type="submit" @click="onSubmit">搜索</a-button>
+        <a-button type="primary" :disabled="formState.gold > 0 ? false : true " html-type="submit" @click="getSearchData">搜索</a-button>
       </a-form-item>
     </a-form>
   </a-drawer>
@@ -114,7 +115,7 @@ import type { UnwrapRef } from 'vue'
 import { InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
 import { notification } from 'ant-design-vue'
 import { Empty } from 'ant-design-vue';
-import { GetProducts, GetGamesList, AddCart, PostOrders } from '../../../wailsjs/go/main/App'
+import { GetProducts, GetGamesList, AddCart, PostOrders, SearchProducts } from '../../../wailsjs/go/main/App'
 
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE
 
@@ -135,10 +136,7 @@ const formState: UnwrapRef<FormState> = reactive({
   crazy: 0,
   cold: 0,
   precise: 0,
-});
-const onSubmit = () => {
-  console.log('submit!', toRaw(formState))
-}
+})
 const labelCol = { span: 6 }
 const wrapperCol = { span: 18 }
 
@@ -279,11 +277,14 @@ onMounted(() => {
 
 const changeGame = (id:number) => {
   gameID.value = id
+  state.value.search = false
   getProducts("1","20",String(id))
 }
 
 const getProducts = async(page:string = "1", pageSize:string = "20", gameid:string = String(gameID.value)) => {
+  const search = state.value.search
   const games = await GetGamesList()
+  
   if (games.status == 0) {
     // userState.value = data as User
     // console.log(data)
@@ -293,21 +294,48 @@ const getProducts = async(page:string = "1", pageSize:string = "20", gameid:stri
     }
   }
   state.value.loading = true
-  const params = {
-    page: page,
-    limit: pageSize,
-    gameid: gameid,
-  }
-  const data = await GetProducts(params)
-  if (data.status == 0) {
-    // userState.value = data as User
-    // console.log(data)
-    dataState.value = data as ProductResponse
-    state.value.loading = false
+  let params = {}
+  if (search) {
+    console.log(gameID.value)
+    params = {
+      page: page,
+      limit: pageSize,
+      gameid: String(gameID.value),
+      gold: String(formState.gold * 100000000),
+      multiple: String(formState.multiple),
+      diamond: String(formState.diamond),
+      crazy: String(formState.crazy),
+      cold: String(formState.cold),
+      precise: String(formState.precise),
+    }
+    const data = await SearchProducts(params)
+    if (data.status == 0) {
+      // userState.value = data as User
+      // console.log(data)
+      dataState.value = data as ProductResponse
+      state.value.loading = false
+    }else {
+      state.value.loading = false
+      errNotification(data.message)
+    }
   }else {
-    state.value.loading = false
-    errNotification(data.message)
+    params = {
+      page: page,
+      limit: pageSize,
+      gameid: gameid
+    }
+    const data = await GetProducts(params)
+    if (data.status == 0) {
+      // userState.value = data as User
+      // console.log(data)
+      dataState.value = data as ProductResponse
+      state.value.loading = false
+    }else {
+      state.value.loading = false
+      errNotification(data.message)
+    }
   }
+  
 }
 
 const changePage = (page: number, pageSize: number) => {
@@ -336,11 +364,13 @@ interface State {
   selectedRowKeys: Number[];
   loading: boolean;
   total: number;
+  search: boolean;
 }
 const state = ref<State>({
   selectedRowKeys: [],
   loading: false,
   total: 0,
+  search: false,
 })
 
 const postCart = async() => {
@@ -410,5 +440,14 @@ const open = ref<boolean>(false)
 
 const showDrawer = () => {
   open.value = true
+}
+
+const getSearchData = () => {
+  state.value.search = true
+  getProducts()
+}
+
+const handleChange = (value: number) => {
+  gameID.value = value
 }
 </script>

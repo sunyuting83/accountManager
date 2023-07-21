@@ -65,3 +65,7 @@ export function OrderRefund(arg1) {
 export function PostOrders(arg1) {
   return window['go']['main']['App']['PostOrders'](arg1);
 }
+
+export function SearchProducts(arg1) {
+  return window['go']['main']['App']['SearchProducts'](arg1);
+}

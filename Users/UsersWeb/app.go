@@ -23,7 +23,7 @@ func NewApp() *App {
 	return &App{}
 }
 
-const RootURL = "https://114.116.54.105:11398/api/v1/"
+const RootURL = "http://localhost:13006/api/v1/"
 
 // startup is called when the app starts. The context is saved
 // so we can call the runtime methods
@@ -39,13 +39,13 @@ func (a *App) AddCart(c []int) map[string]interface{} {
 		errResponse["message"] = "参数不能为空"
 		return errResponse
 	}
-	token, err := BadgerDB.Get([]byte("token"))
+	user, err := BadgerDB.Get([]byte("user"))
 	if err != nil {
 		errResponse["message"] = err.Error()
 		return errResponse
 	}
 	newCartList := RemoveRepeatedList(c)
-	cartCache := strings.Join([]string{token, "cart"}, "_")
+	cartCache := strings.Join([]string{user, "cart"}, "_")
 	cart, err := BadgerDB.GetToken([]byte(cartCache))
 	if err != nil {
 		paramsByte, _ := json.Marshal(newCartList)
@@ -72,13 +72,13 @@ func (a *App) CleanCart() map[string]interface{} {
 	Response["data"] = make([]interface{}, 0)
 	// BadgerDB.Delete([]byte("cart"))
 	// return errResponse
-	token, err := BadgerDB.Get([]byte("token"))
+	user, err := BadgerDB.Get([]byte("user"))
 	if err != nil {
 		Response["status"] = 1
 		Response["message"] = err.Error()
 		return Response
 	}
-	cartCache := strings.Join([]string{token, "cart"}, "_")
+	cartCache := strings.Join([]string{user, "cart"}, "_")
 	BadgerDB.Delete([]byte(cartCache))
 	return Response
 }
@@ -86,13 +86,13 @@ func (a *App) CleanCart() map[string]interface{} {
 func (a *App) GetCart() map[string]interface{} {
 	var errResponse = make(map[string]interface{})
 	errResponse["status"] = 0
-	token, err := BadgerDB.Get([]byte("token"))
+	user, err := BadgerDB.Get([]byte("user"))
 	if err != nil {
 		errResponse["status"] = 1
 		errResponse["message"] = err.Error()
 		return errResponse
 	}
-	cartCache := strings.Join([]string{token, "cart"}, "_")
+	cartCache := strings.Join([]string{user, "cart"}, "_")
 	// BadgerDB.Delete([]byte("cart"))
 	// return errResponse
 	cart, err := BadgerDB.GetToken([]byte(cartCache))
@@ -111,12 +111,12 @@ func (a *App) GetCart() map[string]interface{} {
 func (a *App) DeleteCart(ID int) map[string]interface{} {
 	var errResponse = make(map[string]interface{})
 	errResponse["status"] = 1
-	token, err := BadgerDB.Get([]byte("token"))
+	user, err := BadgerDB.Get([]byte("user"))
 	if err != nil {
 		errResponse["message"] = err.Error()
 		return errResponse
 	}
-	cartCache := strings.Join([]string{token, "cart"}, "_")
+	cartCache := strings.Join([]string{user, "cart"}, "_")
 	cart, err := BadgerDB.GetToken([]byte(cartCache))
 	if err != nil {
 		errResponse["message"] = "发生错误"
@@ -189,6 +189,11 @@ func (a *App) GetProducts(params map[string]interface{}) map[string]interface{} 
 	return data
 }
 
+func (a *App) SearchProducts(params map[string]interface{}) map[string]interface{} {
+	data := HTTPRequest("GET", "SearchProducts", params)
+	return data
+}
+
 func (a *App) CheckLogin() map[string]interface{} {
 	var errResponse = make(map[string]interface{})
 	errResponse["status"] = 1
@@ -208,6 +213,8 @@ func (a *App) Login(params map[string]interface{}) map[string]interface{} {
 	if Strval(data["status"]) == "0" {
 		token := Strval(data["token"])
 		BadgerDB.SetWithTTL([]byte("token"), []byte(token), 60*60*24*30)
+		user := Strval(data["username"])
+		BadgerDB.Set([]byte("user"), []byte(user))
 	}
 	return data
 }
@@ -276,12 +283,13 @@ func HTTPRequest(method, uri string, params map[string]interface{}) map[string]i
 	// 发送请求并返回响应
 	client := http.Client{Timeout: 35 * time.Second}
 	resp, err := client.Do(req)
-	if err != nil && resp.StatusCode >= 400 {
-		errResponse["message"] = "403"
+	if err != nil {
+		// fmt.Println(err)
+		errResponse["message"] = err.Error()
 		return errResponse
 	}
-	if err != nil {
-		errResponse["message"] = err.Error()
+	if resp.StatusCode >= 400 {
+		errResponse["message"] = "403"
 		return errResponse
 	}
 	defer resp.Body.Close()
