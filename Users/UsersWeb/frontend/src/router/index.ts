@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AppIndex from '../components/Index.vue'
 import Login from '../components/Auth/Login.vue'
+import Regedit from '../components/Auth/Regedit.vue'
 import Main from '../components/Main/Main.vue'
 import Users from '../components/Main/Users.vue'
 import Product from '../components/Main/Product.vue'
@@ -22,6 +23,11 @@ const constantRoutes = [
     path: '/login',
     name: 'login',
     component: Login
+  },
+  {
+    path: '/regedit',
+    name: 'regedit',
+    component: Regedit
   },
   {
     path: '/main',

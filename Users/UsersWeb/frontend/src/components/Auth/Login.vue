@@ -50,7 +50,7 @@
           </a-form-item>
           <a-form-item>
             Or
-            <a href="">立即注册</a>
+            <a @click="Regedit">立即注册</a>
           </a-form-item>
         </a-form>
       </a-col>
@@ -98,6 +98,12 @@ export default defineComponent({
       }
     };
 
+    const Regedit = () => {
+      router.push({
+        'name': 'regedit',
+      })
+    }
+
     const onFinishFailed = (errorInfo: any) => {
       openNotification("errorInfo")
     };
@@ -117,6 +123,7 @@ export default defineComponent({
       onFinish,
       onFinishFailed,
       disabled,
+      Regedit,
     };
   },
 });
