@@ -45,6 +45,9 @@ import { InfoCircleOutlined } from '@ant-design/icons-vue'
 import { notification } from 'ant-design-vue'
 import { GetUsers } from '../../../wailsjs/go/main/App'
 
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
 interface PageHeaderData {
   title: string;
   subtitle: string;
@@ -117,6 +120,11 @@ onMounted(async() => {
     // console.log(userState.value)
   }else {
     openNotification(data.message)
+    if (data.message == "403") {
+      router.push({
+        'name': 'login',
+      })
+    }
   }
 })
 const openNotification = (text: string) => {

@@ -194,6 +194,11 @@ func (a *App) SearchProducts(params map[string]interface{}) map[string]interface
 	return data
 }
 
+func (a *App) GetLedger(params map[string]interface{}) map[string]interface{} {
+	data := HTTPRequest("GET", "GetLedger", params)
+	return data
+}
+
 func (a *App) CheckLogin() map[string]interface{} {
 	var errResponse = make(map[string]interface{})
 	errResponse["status"] = 1

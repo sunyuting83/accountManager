@@ -14,7 +14,7 @@
         </span>
       </a-menu-item>
       <a-menu-item key="product">
-        <desktop-outlined />
+        <taobao-outlined />
         <span>产品列表</span>
       </a-menu-item>
       <a-menu-item key="cart">
@@ -22,8 +22,12 @@
         <span>购物车</span>
       </a-menu-item>
       <a-menu-item key="order">
-        <account-book-outlined />
+        <barcode-outlined />
         <span>订单管理</span>
+      </a-menu-item>
+      <a-menu-item key="ledger">
+        <account-book-outlined />
+        <span>账单</span>
       </a-menu-item>
       <a-menu-item key="logout">
         <export-outlined />
@@ -34,11 +38,12 @@
 </template>
 <script lang="ts">
 import {
-  DesktopOutlined,
+  TaobaoOutlined,
   UserOutlined,
   ShoppingCartOutlined,
   AccountBookOutlined,
   ExportOutlined,
+  BarcodeOutlined
 } from '@ant-design/icons-vue';
 import { defineComponent, ref } from 'vue'
 import { Logout } from '../../../wailsjs/go/main/App'
@@ -52,11 +57,12 @@ export default defineComponent({
       }
   },
   components: {
-    DesktopOutlined,
+    TaobaoOutlined,
     UserOutlined,
     ShoppingCartOutlined,
     AccountBookOutlined,
     ExportOutlined,
+    BarcodeOutlined,
   },
   setup() {
     const openKeys = ref<string[]>(['sub1']);

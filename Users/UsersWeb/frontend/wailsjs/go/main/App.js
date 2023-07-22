@@ -34,6 +34,10 @@ export function GetGamesList() {
   return window['go']['main']['App']['GetGamesList']();
 }
 
+export function GetLedger(arg1) {
+  return window['go']['main']['App']['GetLedger'](arg1);
+}
+
 export function GetOrdersDetail(arg1) {
   return window['go']['main']['App']['GetOrdersDetail'](arg1);
 }

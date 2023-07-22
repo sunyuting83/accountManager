@@ -240,7 +240,6 @@ const getOrders = async() => {
     order_id: OrderID,
   }
   const data = await GetOrdersDetail(params)
-  console.log(data)
   if (data.status == 0) {
     state.value.loading = false
     dataState.value = data as OrderResponse
@@ -248,6 +247,11 @@ const getOrders = async() => {
   }else {
     state.value.loading = false
     errNotification(data.message)
+    if (data.message == "403") {
+      router.push({
+        'name': 'login',
+      })
+    }
   }
   
 }

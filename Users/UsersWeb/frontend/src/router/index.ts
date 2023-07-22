@@ -6,6 +6,7 @@ import Users from '../components/Main/Users.vue'
 import Product from '../components/Main/Product.vue'
 import Cart from '../components/Main/Cart.vue'
 import Order from '../components/Main/Order.vue'
+import Ledger from '../components/Main/Ledger.vue'
 import OrdersDetail from '../components/Main/OrdersDetail.vue'
 
 
@@ -51,6 +52,11 @@ const constantRoutes = [
         path: 'OrdersDetail:order_id',
         name: 'OrdersDetail',
         component: OrdersDetail,
+      },
+      {
+        path: 'ledger',
+        name: 'ledger',
+        component: Ledger,
       }
     ]
   },

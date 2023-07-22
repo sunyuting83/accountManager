@@ -8,6 +8,7 @@ type Bill struct {
 	Coin            float64
 	NewStatus       int
 	FormCoinUsers   CoinUsers
+	Order           Order
 	Months          string `gorm:"index"`
 	CreatedAt       int64  `gorm:"autoUpdateTime:milli"`
 	UpdatedAt       int64  `gorm:"autoUpdateTime:milli"`
@@ -33,6 +34,7 @@ func GetLedger(page, Limit int, userid uint) (bills *[]Bill, err error) {
 	if err = sqlDB.
 		Where("coin_users_id = ?", userid).
 		Preload("FormCoinUsers").
+		Preload("Order").
 		Order("created_at DESC").
 		Limit(Limit).Offset(p).
 		Find(&bills).Error; err != nil {

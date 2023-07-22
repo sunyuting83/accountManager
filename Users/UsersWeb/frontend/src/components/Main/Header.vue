@@ -13,7 +13,6 @@
   </a-layout-header>
 </template>
 <script lang="ts" setup>
-import { defineProps } from 'vue';
 import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
 const props = defineProps({
   ChangeIt: Function,

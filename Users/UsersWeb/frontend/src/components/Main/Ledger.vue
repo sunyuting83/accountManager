@@ -3,26 +3,24 @@
     <PageHeader :data="pageHeader" />
     <div :style="{ padding: '24px'}" v-if="!state.loading">
       <div class="content">
-        <a-empty :image="simpleImage" v-if="dataState.data.length == 0" />
+        <a-empty :image="simpleImage" v-if="dataState.ledger.length == 0" />
         <a-table
           v-else
           :columns="columns"
-          :data-source="dataState.data"
+          :data-source="dataState.ledger"
           :loading="state.loading"
           size="small"
+          :rowKey="(record: LedgerDatas) => record.ID"
           :pagination={pageSize:20}
           :hideOnSinglePage="true"
         >
           <template v-slot:bodyCell="{column,record}">
-            <template v-if="column.dataIndex==='NewStatus'">
-              <a-tag color="green" v-if="record.NewStatus == 0">正常</a-tag>
-              <a-tag color="red" v-if="record.NewStatus == 1">整单退款中</a-tag>
-              <a-tag color="purple" v-if="record.NewStatus == 2">单号退款中</a-tag>
-              <a-tag color="orange" v-if="record.NewStatus == 3">已整单退款</a-tag>
-              <a-tag color="orange" v-if="record.NewStatus == 4">已单号退款</a-tag>
-            </template>
-            <template v-if="column.dataIndex==='Active'">
-              <a-button type="primary" size="small" ghost @click="() => {pushOrderDetail(record.ID)}">订单详情</a-button>
+            <template v-if="column.dataIndex==='Status'">
+              <a-tag color="green" v-if="record.Status == 0">充值</a-tag>
+              <a-tag color="red" v-if="record.Status == 1">转账给他人</a-tag>
+              <a-tag color="purple" v-if="record.Status == 2">收到转账</a-tag>
+              <a-tag color="orange" v-if="record.Status == 3">消费</a-tag>
+              <a-tag color="orange" v-if="record.Status == 4">退款</a-tag>
             </template>
           </template>
         </a-table>
@@ -33,18 +31,19 @@
 <script lang="ts" setup>
 import PageHeader from './PageHeader.vue'
 import { onMounted, ref, h } from 'vue'
-import { InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
+import { InfoCircleOutlined } from '@ant-design/icons-vue'
 import { notification } from 'ant-design-vue'
 import { Empty } from 'ant-design-vue';
-import { GetOrdersList } from '../../../wailsjs/go/main/App'
+import { GetLedger } from '../../../wailsjs/go/main/App'
 import { useRouter } from 'vue-router'
 const router = useRouter()
+
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE
 
 const columns = [
   {
-    title: '订单号',
-    dataIndex: 'OrderCode',
+    title: '用途',
+    dataIndex: 'StatusName',
   },
   {
     title: '金额',
@@ -54,8 +53,16 @@ const columns = [
     }
   },
   {
-    title: '订单状态',
-    dataIndex: 'NewStatus',
+    title: '状态',
+    dataIndex: 'Status',
+  },
+  {
+    title: '转账人',
+    dataIndex: 'FormCoinUsers',
+  },
+  {
+    title: '订单号',
+    dataIndex: 'OrderCode',
   },
   {
     title: '创建时间',
@@ -63,43 +70,26 @@ const columns = [
     customRender: function (t: any) {
       return foramTime(t.value)
     }
-  },
-  {
-    title: '更新时间',
-    dataIndex: 'UpdatedAt',
-    customRender: function (t: any) {
-      return foramTime(t.value)
-    }
-  },
-  {
-    title: '备注',
-    dataIndex: 'Remarks',
-  },
-  {
-    title: '操作',
-    dataIndex: 'Active',
   }
 ];
 
-interface OrderDatas {
-  OrderCode: string;
-  NewStatus: number;
-  Coin: number;
-  CoinUsersID: number;
+interface LedgerDatas {
   ID: number;
-  Remarks: string;
-  UpdatedAt: number;
+  Coin: number;
+  Status: number;
+  FormCoinUsers: string;
+  OrderCode: string;
   CreatedAt: number;
 }
 
-interface OrderResponse {
+interface LedgerResponse {
   status: number
-  data: Array<OrderDatas>
+  ledger: Array<LedgerDatas>
   total: number
 }
-const dataState = ref<OrderResponse>({
+const dataState = ref<LedgerResponse>({
   status: 1,
-  data: [],
+  ledger: [],
   total: 0,
 })
 
@@ -116,42 +106,34 @@ interface PageHeaderData {
 }
 
 const pageHeader = ref<PageHeaderData>({
-  title: "订单管理",
-  subtitle: '订单管理详情',
+  title: "账单",
+  subtitle: '账单详情',
   routers: [
     {
       path:'main',
-      breadcrumbName: '订单管理'
+      breadcrumbName: '账单'
     },
     {
       path:'main',
-      breadcrumbName: '订单管理'
+      breadcrumbName: '账单'
     }
   ],
 })
 onMounted(() => {
-  getOrders()
+  getLedger()
 })
 
-const pushOrderDetail = (id: number) => {
-  router.push({
-    'name': 'OrdersDetail',
-    'params': {
-      'order_id': id,
-    }
-  })
-}
 
-const getOrders = async(page:string = "1", pageSize:string = "20",) => {
+const getLedger = async(page:string = "1", pageSize:string = "50",) => {
   state.value.loading = true
   const params = {
     page: page,
     limit: pageSize
   }
-  const data = await GetOrdersList(params)
+  const data = await GetLedger(params)
   if (data.status == 0) {
     state.value.loading = false
-    dataState.value = data as OrderResponse
+    dataState.value = data as LedgerResponse
     state.value.loading = false
   }else {
     state.value.loading = false
@@ -184,16 +166,6 @@ const errNotification = (text: string) => {
     icon: () => h(InfoCircleOutlined, { style: 'color: #ff1855' }),
   });
 }
-
-const sucNotification = (text: string) => {
-  notification.open({
-    message: "成功",
-    description:
-    text,
-    icon: () => h(CheckCircleOutlined, { style: 'color: #389e0d' }),
-  });
-}
-
 
 interface State {
   loading: boolean;

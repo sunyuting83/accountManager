@@ -65,6 +65,17 @@
               <a-button type="primary" danger :disabled="state.selectedRowKeys.length > 0 ? false : true " @click="postCart">直接购买</a-button>
             </a-space>
           </a-col>
+          <a-col :span="24" v-if="state.search" :style="{'margin-top': '1rem'}">
+            <a-tag color="processing" closable @close="cleanSearchStatus" v-if="state.search">
+              筛选条件： {{getGameName()}}
+              {{formState.gold > 0 ? ` & 金币 >= ${formState.gold}亿` : ""}}
+              {{formState.multiple > 0 ? ` & 炮台 >= ${formState.diamond}倍` : ""}}
+              {{formState.diamond > 0 ? ` & 钻石 >= ${formState.diamond}个` : ""}}
+              {{formState.cold > 0 ? ` & 冰冻 >= ${formState.cold}个` : ""}}
+              {{formState.crazy > 0 ? ` & 狂暴 >= ${formState.crazy}个` : ""}}
+              {{formState.precise > 0 ? ` & 精准 >= ${formState.precise}个` : ""}}
+            </a-tag>
+          </a-col>
         </a-row>
         <a-empty :image="simpleImage" v-if="dataState.data.length == 0" />
         <a-table
@@ -116,6 +127,9 @@ import { InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
 import { notification } from 'ant-design-vue'
 import { Empty } from 'ant-design-vue';
 import { GetProducts, GetGamesList, AddCart, PostOrders, SearchProducts } from '../../../wailsjs/go/main/App'
+
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE
 
@@ -317,6 +331,11 @@ const getProducts = async(page:string = "1", pageSize:string = "20", gameid:stri
     }else {
       state.value.loading = false
       errNotification(data.message)
+      if (data.message == "403") {
+        router.push({
+          'name': 'login',
+        })
+      }
     }
   }else {
     params = {
@@ -333,6 +352,11 @@ const getProducts = async(page:string = "1", pageSize:string = "20", gameid:stri
     }else {
       state.value.loading = false
       errNotification(data.message)
+      if (data.message == "403") {
+        router.push({
+          'name': 'login',
+        })
+      }
     }
   }
   
@@ -445,9 +469,30 @@ const showDrawer = () => {
 const getSearchData = () => {
   state.value.search = true
   getProducts()
+  setTimeout(()=>{open.value = false}, 500)
 }
 
 const handleChange = (value: number) => {
   gameID.value = value
+}
+
+const getGameName = () => {
+  let gameName = ""
+  gameState.value.data.forEach( (key: GamesDatas) => {if (key.ID == gameID.value) gameName = key.GameName})
+  return gameName
+}
+
+const cleanSearchStatus = () => {
+  state.value.search = false
+  open.value = false
+  gameID.value = 0
+  formState.gameid = 0
+  formState.gold = 0
+  formState.multiple = 0
+  formState.diamond = 0
+  formState.crazy = 0
+  formState.cold = 0
+  formState.precise = 0
+  getProducts()
 }
 </script>
