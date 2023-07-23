@@ -189,6 +189,38 @@ func (a *App) GetProducts(params map[string]interface{}) map[string]interface{} 
 	return data
 }
 
+func (a *App) Captcha() []byte {
+	var req *http.Request
+	var none []byte = make([]byte, 0)
+
+	uri := strings.Join([]string{RootURL, "Captcha"}, "")
+
+	req, _ = http.NewRequest("POST", uri, nil)
+	req.Header.Set("X-Requested-With", "XMLHttpRequest")
+	req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
+
+	// 发送请求并返回响应
+	client := http.Client{Timeout: 35 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return none
+	}
+	if resp.StatusCode >= 400 {
+		return none
+	}
+	defer resp.Body.Close()
+
+	respByte, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return none
+	}
+	if len(respByte) == 0 {
+		return none
+	}
+
+	return respByte
+}
+
 func (a *App) SearchProducts(params map[string]interface{}) map[string]interface{} {
 	data := HTTPRequest("GET", "SearchProducts", params)
 	return data

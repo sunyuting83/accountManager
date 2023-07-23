@@ -5,6 +5,8 @@ export function AccountRefund(arg1:{[key: string]: any}):Promise<{[key: string]:
 
 export function AddCart(arg1:Array<number>):Promise<{[key: string]: any}>;
 
+export function Captcha():Promise<Array<number>>;
+
 export function CheckLogin():Promise<{[key: string]: any}>;
 
 export function CleanCart():Promise<{[key: string]: any}>;

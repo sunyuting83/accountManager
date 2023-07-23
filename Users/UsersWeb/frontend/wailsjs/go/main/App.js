@@ -10,6 +10,10 @@ export function AddCart(arg1) {
   return window['go']['main']['App']['AddCart'](arg1);
 }
 
+export function Captcha() {
+  return window['go']['main']['App']['Captcha']();
+}
+
 export function CheckLogin() {
   return window['go']['main']['App']['CheckLogin']();
 }

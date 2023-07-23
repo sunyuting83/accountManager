@@ -10,8 +10,6 @@
           :rules="rules"
           v-bind="layout"
           @finish="handleFinish"
-          @validate="handleValidate"
-          @finishFailed="handleFinishFailed"
         >
           <a-form-item has-feedback label="用户名" name="username">
             <a-input v-model:value="formState.username" />
@@ -22,8 +20,15 @@
           <a-form-item has-feedback label="重复密码" name="repassword">
             <a-input v-model:value="formState.repassword" type="password" autocomplete="off" />
           </a-form-item>
+          <a-form-item label="验证码" name="vcode">
+            <a-input v-model:value="formState.vcode" />
+            <img :src="vcodeImg" @click="getCaptcha" />
+          </a-form-item>
+          <a-form-item has-feedback label="推荐人" name="referrer">
+            <a-input v-model:value="referrer" />
+          </a-form-item>
           <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
-            <a-button type="primary" html-type="submit">立即注册</a-button>
+            <a-button type="primary" :disabled="disabled" html-type="submit">立即注册</a-button>
             <a-button style="margin-left: 10px" @click="resetForm">重置表单</a-button>
           </a-form-item>
           <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
@@ -35,9 +40,10 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, computed } from 'vue';
 import type { Rule } from 'ant-design-vue/es/form';
-import type { FormInstance } from 'ant-design-vue';
+import { Captcha } from '../../../wailsjs/go/main/App'
+import { ClipboardGetText } from '../../../wailsjs/runtime/runtime'
 import background from '../../assets/images/bbck.jpg'
 import { useRouter } from 'vue-router'
 const router = useRouter()
@@ -45,14 +51,30 @@ interface FormState {
   password: string;
   repassword: string;
   username: string;
+  vcode: string;
 }
-const formRef = ref<FormInstance>();
+const formRef = ref<any>()
 const formState = reactive<FormState>({
   password: '',
   repassword: '',
   username: '',
-});
-let checkAge = async (_rule: Rule, value: string) => {
+  vcode: '',
+})
+
+ClipboardGetText().then((e: string) => {
+  if (e !== '') {
+    if (e.indexOf('&referrer=') !== -1) {
+      const refStr = e.split('&referrer=')[1]
+      referrer.value = refStr.substring(0,16)
+    }
+  }
+})
+
+const disabled = computed(() => {
+  return !(formState.username.length >= 3 && formState.username.length <= 12 && formState.password && formState.password == formState.repassword)
+})
+
+let checkUsername = async (_rule: Rule, value: string) => {
   if (!value) {
     return Promise.reject('请输入用户名');
   }
@@ -66,10 +88,14 @@ let validatePass = async (_rule: Rule, value: string) => {
   if (value === '') {
     return Promise.reject('请输入密码');
   } else {
-    if (formState.repassword !== '') {
-      formRef.value.validateFields('repassword');
+    if (value.length < 6 || value.length > 16) {
+      return Promise.reject('密码必须大于6位或小于16位');
+    } else {
+      if (formState.repassword !== '') {
+        formRef.value.validateFields('repassword');
+      }
+      return Promise.resolve();
     }
-    return Promise.resolve();
   }
 };
 let validatePass2 = async (_rule: Rule, value: string) => {
@@ -85,23 +111,26 @@ let validatePass2 = async (_rule: Rule, value: string) => {
 const rules: Record<string, Rule[]> = {
   password: [{ required: true, validator: validatePass, trigger: 'change' }],
   repassword: [{ validator: validatePass2, trigger: 'change' }],
-  username: [{ validator: checkAge, trigger: 'change' }],
+  username: [{ validator: checkUsername, trigger: 'change' }],
 };
 const layout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 14 },
 };
-const handleFinish = (values: FormState) => {
-  console.log(values, formState);
-};
-const handleFinishFailed = errors => {
-  console.log(errors);
-};
+const handleFinish = async(values: FormState) => {
+  console.log(values, formState)
+}
+
+const vcodeImg = ref<string>()
+const referrer = ref<string>()
+
+const getCaptcha = async() => {
+  const data = await Captcha()
+  vcodeImg.value = `data:image/png;base64,${data}`
+}
+
 const resetForm = () => {
   formRef.value.resetFields();
-};
-const handleValidate = (...args) => {
-  console.log(args);
 }
 
 const pushLogin = () => {
@@ -109,6 +138,7 @@ const pushLogin = () => {
     'name': 'login',
   })
 }
+getCaptcha()
 </script>
 <style>
 .login-form {
