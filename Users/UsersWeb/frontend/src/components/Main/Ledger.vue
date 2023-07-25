@@ -49,7 +49,25 @@ const columns = [
     title: '金额',
     dataIndex: 'Coin',
     customRender: function (t: any) {
-      return `￥${t.value}`
+      let status = ""
+      switch (t.record.Status) {
+      case 0:
+        status = "+ "
+        break
+      case 1:
+        status = "- "
+        break
+      case 2:
+        status = "+ "
+        break
+      case 3:
+        status = "- "
+        break
+      default:
+        status = ""
+        break
+      }
+      return `${status}￥${t.value}`
     }
   },
   {

@@ -1,3 +1,4 @@
+/*.zip
 adminWeb/node_modules
 adminWeb/yarn.lock
 adminWeb/dist
@@ -16,7 +17,6 @@ colaAPI/api.txt
 ImageServer/ImageCache/
 config.yaml.bak
 UsersApi/s.zip
-m.zip
 ImageServer/Client/upimg.exe
 RemoveLog/removeLog
 计算
