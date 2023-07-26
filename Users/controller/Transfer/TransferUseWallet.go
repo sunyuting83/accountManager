@@ -10,13 +10,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type TransferForUser struct {
-	ID   string `form:"id" json:"id" xml:"id"  binding:"required"`
-	Coin string `form:"coin" json:"coin" xml:"coin"  binding:"required"`
+type TransferForUseWallet struct {
+	Wallet string `form:"wallet" json:"wallet" xml:"wallet"  binding:"required"`
+	Coin   string `form:"coin" json:"coin" xml:"coin"  binding:"required"`
 }
 
-func Transfer(c *gin.Context) {
-	var form TransferForUser
+func TransferUseWallet(c *gin.Context) {
+	var form TransferForUseWallet
 	if err := c.ShouldBindJSON(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  1,
@@ -56,19 +56,19 @@ func Transfer(c *gin.Context) {
 		})
 		return
 	}
-	formID, _ := strconv.ParseInt(form.ID, 10, 64)
-	if user.ID == uint(formID) {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  1,
-			"message": "不能转账给自己",
-		})
-		return
-	}
-	formUser, err := database.UserCheckID(formID)
+	// formID, _ := strconv.ParseInt(form.ID, 10, 64)
+	formUser, err := database.CheckUserKey(form.Wallet)
 	if err != nil && err.Error() != "record not found" {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
 			"message": err.Error(),
+		})
+		return
+	}
+	if user.ID == formUser.ID {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": "不能转账给自己",
 		})
 		return
 	}

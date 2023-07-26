@@ -37,6 +37,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		userApiV1.POST("/OrderRefund", utilsUser.UserVerifyMiddleware(), Orders.OrderRefund)
 		userApiV1.POST("/AccountRefund", utilsUser.UserVerifyMiddleware(), Orders.AccountRefund)
 		userApiV1.POST("/Transfer", utilsUser.UserVerifyMiddleware(), Transfer.Transfer)
+		userApiV1.POST("/TransferUseWallet", utilsUser.UserVerifyMiddleware(), Transfer.TransferUseWallet)
 	}
 	return router
 }

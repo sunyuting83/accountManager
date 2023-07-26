@@ -74,10 +74,18 @@ export function PostOrders(arg1) {
   return window['go']['main']['App']['PostOrders'](arg1);
 }
 
+export function RePassword(arg1) {
+  return window['go']['main']['App']['RePassword'](arg1);
+}
+
 export function Regedit(arg1) {
   return window['go']['main']['App']['Regedit'](arg1);
 }
 
 export function SearchProducts(arg1) {
   return window['go']['main']['App']['SearchProducts'](arg1);
+}
+
+export function TransferUseWallet(arg1) {
+  return window['go']['main']['App']['TransferUseWallet'](arg1);
 }

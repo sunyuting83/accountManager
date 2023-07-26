@@ -37,6 +37,10 @@ export function OrderRefund(arg1:{[key: string]: any}):Promise<{[key: string]: a
 
 export function PostOrders(arg1:Array<number>):Promise<{[key: string]: any}>;
 
+export function RePassword(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
+
 export function Regedit(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
 export function SearchProducts(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
+
+export function TransferUseWallet(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;

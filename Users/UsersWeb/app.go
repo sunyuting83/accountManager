@@ -312,6 +312,16 @@ func (a *App) GetUsers() map[string]interface{} {
 	return data
 }
 
+func (a *App) RePassword(params map[string]interface{}) map[string]interface{} {
+	data := HTTPRequest("PUT", "RePassword", params)
+	return data
+}
+
+func (a *App) TransferUseWallet(params map[string]interface{}) map[string]interface{} {
+	data := HTTPRequest("POST", "TransferUseWallet", params)
+	return data
+}
+
 func HTTPRequest(method, uri string, params map[string]interface{}) map[string]interface{} {
 	var req *http.Request
 	var err error
