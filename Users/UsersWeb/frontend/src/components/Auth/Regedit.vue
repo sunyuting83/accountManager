@@ -20,11 +20,11 @@
           <a-form-item has-feedback label="重复密码" name="repassword">
             <a-input v-model:value="formState.repassword" type="password" autocomplete="off" />
           </a-form-item>
-          <a-form-item label="验证码" name="vcode">
+          <a-form-item has-feedback label="验证码" name="vcode">
             <a-input v-model:value="formState.vcode" />
             <img :src="vcodeImg" @click="getCaptcha" />
           </a-form-item>
-          <a-form-item has-feedback label="推荐人" name="referrer">
+          <a-form-item label="推荐人" name="referrer">
             <a-input v-model:value="referrer" />
           </a-form-item>
           <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
@@ -40,18 +40,23 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref, computed, h } from 'vue';
 import type { Rule } from 'ant-design-vue/es/form';
 import { Captcha } from '../../../wailsjs/go/main/App'
 import { ClipboardGetText } from '../../../wailsjs/runtime/runtime'
 import background from '../../assets/images/bbck.jpg'
 import { useRouter } from 'vue-router'
+import { Regedit } from '../../../wailsjs/go/main/App'
+import { InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
+import { notification } from 'ant-design-vue'
+
 const router = useRouter()
 interface FormState {
   password: string;
   repassword: string;
   username: string;
   vcode: string;
+  referrer: string;
 }
 const formRef = ref<any>()
 const formState = reactive<FormState>({
@@ -59,6 +64,7 @@ const formState = reactive<FormState>({
   repassword: '',
   username: '',
   vcode: '',
+  referrer: '',
 })
 
 ClipboardGetText().then((e: string) => {
@@ -106,19 +112,54 @@ let validatePass2 = async (_rule: Rule, value: string) => {
   } else {
     return Promise.resolve();
   }
-};
+}
+
+const checkVcode = async (_rule: Rule, value: string) => {
+  if (value === '') {
+    return Promise.reject('请输入验证码')
+  }if (value.length !== 6) {
+    return Promise.reject('验证码必须等于6位');
+  } else {
+    return Promise.resolve();
+  }
+}
 
 const rules: Record<string, Rule[]> = {
   password: [{ required: true, validator: validatePass, trigger: 'change' }],
   repassword: [{ validator: validatePass2, trigger: 'change' }],
   username: [{ validator: checkUsername, trigger: 'change' }],
+  vcode: [{ validator: checkVcode, trigger: 'change' }],
 };
 const layout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 14 },
 };
 const handleFinish = async(values: FormState) => {
-  console.log(values, formState)
+  const data = await Regedit(values)
+  if (data.status == 0) {
+    sucNotification("注册成功，请登陆")
+    pushLogin()
+  }else{
+    errNotification(data.message)
+  }
+}
+
+const errNotification = (text: string) => {
+  notification.open({
+    message: "发生错误",
+    description:
+    text,
+    icon: () => h(InfoCircleOutlined, { style: 'color: #ff1855' }),
+  });
+}
+
+const sucNotification = (text: string) => {
+  notification.open({
+    message: "成功",
+    description:
+    text,
+    icon: () => h(CheckCircleOutlined, { style: 'color: #389e0d' }),
+  });
 }
 
 const vcodeImg = ref<string>()

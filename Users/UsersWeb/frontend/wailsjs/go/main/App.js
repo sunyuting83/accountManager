@@ -74,6 +74,10 @@ export function PostOrders(arg1) {
   return window['go']['main']['App']['PostOrders'](arg1);
 }
 
+export function Regedit(arg1) {
+  return window['go']['main']['App']['Regedit'](arg1);
+}
+
 export function SearchProducts(arg1) {
   return window['go']['main']['App']['SearchProducts'](arg1);
 }

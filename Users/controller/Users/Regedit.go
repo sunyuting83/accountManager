@@ -76,8 +76,9 @@ func Regedit(c *gin.Context) {
 		return
 	}
 	VCode := utils.ConvertToUpperCase(form.VCode)
-
+	// fmt.Println(VCode)
 	vcode, err := BadgerDB.Get([]byte(VCode))
+	// fmt.Println(vcode)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
@@ -143,27 +144,29 @@ func Regedit(c *gin.Context) {
 	}
 
 	LocalAddress := "未知"
-
-	if ipStr == "127.0.0.1" {
-		LocalAddress = "本机"
-	}
-
-	if ipStr != "127.0.0.1" {
-		geoDB, err := geo.LoadGeoFile()
-		if err != nil {
-			LocalAddress = "未知"
+	// fmt.Println(ipStr)
+	if !isIPv6(ipStr) {
+		if ipStr == "127.0.0.1" {
+			LocalAddress = "本机"
 		}
-		defer geoDB.Close()
-		record, err := geoDB.City(ip)
-		if err != nil {
-			LocalAddress = "未知"
+
+		if ipStr != "127.0.0.1" {
+			geoDB, err := geo.LoadGeoFile()
+			if err != nil {
+				LocalAddress = "未知"
+			}
+			defer geoDB.Close()
+			record, err := geoDB.City(ip)
+			if err != nil {
+				LocalAddress = "未知"
+			}
+			// fmt.Println(record)
+			// 读取位置信息
+			cityName := record.City.Names["zh-CN"]
+			countryName := record.Country.Names["zh-CN"]
+			subdivisions := record.Subdivisions[0].Names["zh-CN"]
+			LocalAddress = strings.Join([]string{countryName, subdivisions, cityName}, "-")
 		}
-		// fmt.Println(record)
-		// 读取位置信息
-		cityName := record.City.Names["zh-CN"]
-		countryName := record.Country.Names["zh-CN"]
-		subdivisions := record.Subdivisions[0].Names["zh-CN"]
-		LocalAddress = strings.Join([]string{countryName, subdivisions, cityName}, "-")
 	}
 
 	tiemNow := time.Now().Format("2006-01-02_15:04:05")
@@ -210,4 +213,9 @@ func containsElement(targetStr, str string) bool {
 	}
 
 	return false
+}
+
+func isIPv6(ipStr string) bool {
+	ip := net.ParseIP(ipStr)
+	return ip != nil && ip.To4() == nil
 }

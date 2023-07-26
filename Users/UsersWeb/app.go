@@ -221,6 +221,49 @@ func (a *App) Captcha() []byte {
 	return respByte
 }
 
+func (a *App) Regedit(params map[string]interface{}) map[string]interface{} {
+	var errResponse = make(map[string]interface{})
+	errResponse["status"] = 1
+	var req *http.Request
+
+	uri := strings.Join([]string{RootURL, "Regedit"}, "")
+	if len(Strval(params["referrer"])) == 16 {
+		uri = strings.Join([]string{uri, "?referrer=", Strval(params["referrer"])}, "")
+	}
+	paramsByte, _ := json.Marshal(params)
+	data := bytes.NewReader(paramsByte)
+	req, _ = http.NewRequest("POST", uri, data)
+	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Requested-With", "XMLHttpRequest")
+	req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
+
+	// 发送请求并返回响应
+	client := http.Client{Timeout: 35 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		errResponse["message"] = err.Error()
+		return errResponse
+	}
+	if resp.StatusCode >= 400 {
+		errResponse["message"] = resp.StatusCode
+		return errResponse
+	}
+	defer resp.Body.Close()
+
+	respByte, err := io.ReadAll(resp.Body)
+	if err != nil {
+		errResponse["message"] = err.Error()
+		return errResponse
+	}
+	if len(respByte) == 0 {
+		errResponse["message"] = err.Error()
+		return errResponse
+	}
+
+	return parseResponse(respByte)
+}
+
 func (a *App) SearchProducts(params map[string]interface{}) map[string]interface{} {
 	data := HTTPRequest("GET", "SearchProducts", params)
 	return data
@@ -286,29 +329,14 @@ func HTTPRequest(method, uri string, params map[string]interface{}) map[string]i
 
 	uri = strings.Join([]string{RootURL, uri}, "")
 	// 根据方法选择请求类型
-	switch strings.ToUpper(method) {
-	case "GET":
-		// GET 请求
+	if strings.ToUpper(method) == "GET" {
 		getRequestParams := buildQueryParams(params)
 		getURL := uri + getRequestParams
 		req, _ = http.NewRequest("GET", getURL, nil)
-	case "POST":
-		// POST 请求
+	} else {
 		paramsByte, _ := json.Marshal(params)
 		data := bytes.NewReader(paramsByte)
-		req, _ = http.NewRequest("POST", uri, data)
-	case "PUT":
-		// PUT 请求
-		paramsByte, _ := json.Marshal(params)
-		data := bytes.NewReader(paramsByte)
-		req, _ = http.NewRequest("PUT", uri, data)
-	case "DELETE":
-		// DELETE 请求
-		paramsByte, _ := json.Marshal(params)
-		data := bytes.NewReader(paramsByte)
-		req, _ = http.NewRequest("DELETE", uri, data)
-	default:
-		return errResponse
+		req, _ = http.NewRequest(strings.ToUpper(method), uri, data)
 	}
 
 	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")

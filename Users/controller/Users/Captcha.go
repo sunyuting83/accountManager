@@ -3,6 +3,7 @@ package controller
 import (
 	"bytes"
 	BadgerDB "colaAPI/Users/badger"
+	"colaAPI/Users/utils"
 	"image"
 	"image/color"
 	"image/draw"
@@ -28,8 +29,9 @@ func Captcha(c *gin.Context) {
 	image := generateImage(captcha, CurrentPath)
 	var ttl int64 = 60 * 5 // ttl以秒为单位
 	// imageBase64 = strings.Join([]string{"data:image/png;base64", imageBase64}, ",")
-
-	BadgerDB.SetWithTTL([]byte(captcha), []byte(captcha), ttl)
+	// fmt.Println(captcha)
+	VCode := utils.ConvertToUpperCase(captcha)
+	BadgerDB.SetWithTTL([]byte(VCode), []byte(VCode), ttl)
 	c.Writer.Write(image)
 }
 
