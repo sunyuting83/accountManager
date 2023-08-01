@@ -6,14 +6,6 @@ export function AccountRefund(arg1) {
   return window['go']['main']['App']['AccountRefund'](arg1);
 }
 
-export function AddCart(arg1) {
-  return window['go']['main']['App']['AddCart'](arg1);
-}
-
-export function Captcha() {
-  return window['go']['main']['App']['Captcha']();
-}
-
 export function CheckAdminID() {
   return window['go']['main']['App']['CheckAdminID']();
 }
@@ -22,24 +14,12 @@ export function CheckLogin() {
   return window['go']['main']['App']['CheckLogin']();
 }
 
-export function CleanCart() {
-  return window['go']['main']['App']['CleanCart']();
-}
-
-export function DeleteCart(arg1) {
-  return window['go']['main']['App']['DeleteCart'](arg1);
-}
-
 export function FormatDateTime(arg1) {
   return window['go']['main']['App']['FormatDateTime'](arg1);
 }
 
 export function GetAdmin() {
   return window['go']['main']['App']['GetAdmin']();
-}
-
-export function GetCart() {
-  return window['go']['main']['App']['GetCart']();
 }
 
 export function GetGamesList() {
@@ -62,6 +42,10 @@ export function GetProducts(arg1) {
   return window['go']['main']['App']['GetProducts'](arg1);
 }
 
+export function GetUserWithKey(arg1) {
+  return window['go']['main']['App']['GetUserWithKey'](arg1);
+}
+
 export function Login(arg1) {
   return window['go']['main']['App']['Login'](arg1);
 }
@@ -74,20 +58,12 @@ export function OrderRefund(arg1) {
   return window['go']['main']['App']['OrderRefund'](arg1);
 }
 
-export function PostOrders(arg1) {
-  return window['go']['main']['App']['PostOrders'](arg1);
-}
-
 export function RePassword(arg1) {
   return window['go']['main']['App']['RePassword'](arg1);
 }
 
-export function Regedit(arg1) {
-  return window['go']['main']['App']['Regedit'](arg1);
-}
-
-export function SearchProducts(arg1) {
-  return window['go']['main']['App']['SearchProducts'](arg1);
+export function SendCoinToUser(arg1) {
+  return window['go']['main']['App']['SendCoinToUser'](arg1);
 }
 
 export function TransferUseWallet(arg1) {

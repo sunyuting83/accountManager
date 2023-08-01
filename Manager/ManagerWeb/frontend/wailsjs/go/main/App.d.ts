@@ -3,23 +3,13 @@
 
 export function AccountRefund(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
-export function AddCart(arg1:Array<number>):Promise<{[key: string]: any}>;
-
-export function Captcha():Promise<Array<number>>;
-
 export function CheckAdminID():Promise<string>;
 
 export function CheckLogin():Promise<{[key: string]: any}>;
 
-export function CleanCart():Promise<{[key: string]: any}>;
-
-export function DeleteCart(arg1:number):Promise<{[key: string]: any}>;
-
 export function FormatDateTime(arg1:number):Promise<string>;
 
 export function GetAdmin():Promise<{[key: string]: any}>;
-
-export function GetCart():Promise<{[key: string]: any}>;
 
 export function GetGamesList():Promise<{[key: string]: any}>;
 
@@ -31,18 +21,16 @@ export function GetOrdersList(arg1:{[key: string]: any}):Promise<{[key: string]:
 
 export function GetProducts(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
+export function GetUserWithKey(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
+
 export function Login(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
 export function Logout():Promise<{[key: string]: any}>;
 
 export function OrderRefund(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
-export function PostOrders(arg1:Array<number>):Promise<{[key: string]: any}>;
-
 export function RePassword(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
-export function Regedit(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
-
-export function SearchProducts(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
+export function SendCoinToUser(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
 export function TransferUseWallet(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
