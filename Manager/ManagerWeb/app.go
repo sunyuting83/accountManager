@@ -295,8 +295,18 @@ func (a *App) Login(params map[string]interface{}) map[string]interface{} {
 		BadgerDB.SetWithTTL([]byte("token"), []byte(token), 60*60*24*30)
 		user := Strval(data["username"])
 		BadgerDB.Set([]byte("user"), []byte(user))
+		userID := Strval(data["userid"])
+		BadgerDB.Set([]byte("userid"), []byte(userID))
 	}
 	return data
+}
+
+func (a *App) CheckAdminID() string {
+	userid, err := BadgerDB.Get([]byte("userid"))
+	if err != nil && err.Error() == "Key not found" {
+		return "0"
+	}
+	return userid
 }
 
 func (a *App) Logout() map[string]interface{} {
@@ -306,9 +316,9 @@ func (a *App) Logout() map[string]interface{} {
 	return errResponse
 }
 
-func (a *App) GetUsers() map[string]interface{} {
+func (a *App) GetAdmin() map[string]interface{} {
 	params := make(map[string]interface{})
-	data := HTTPRequest("GET", "GetUsers", params)
+	data := HTTPRequest("GET", "GetAdmin", params)
 	return data
 }
 

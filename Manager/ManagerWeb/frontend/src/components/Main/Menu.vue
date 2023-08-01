@@ -13,21 +13,9 @@
           <span>用户中心</span>
         </span>
       </a-menu-item>
-      <a-menu-item key="product">
-        <taobao-outlined />
-        <span>产品列表</span>
-      </a-menu-item>
-      <a-menu-item key="cart">
-        <shopping-cart-outlined />
-        <span>购物车</span>
-      </a-menu-item>
-      <a-menu-item key="order">
-        <barcode-outlined />
-        <span>订单管理</span>
-      </a-menu-item>
-      <a-menu-item key="ledger">
-        <account-book-outlined />
-        <span>账单</span>
+      <a-menu-item key="sendcoin" v-if="hasRouter">
+        <deployment-unit-outlined />
+        <span>发币给用户</span>
       </a-menu-item>
       <a-menu-item key="logout">
         <export-outlined />
@@ -43,12 +31,14 @@ import {
   ShoppingCartOutlined,
   AccountBookOutlined,
   ExportOutlined,
-  BarcodeOutlined
+  BarcodeOutlined,
+  DeploymentUnitOutlined
 } from '@ant-design/icons-vue';
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
 import { Logout } from '../../../wailsjs/go/main/App'
 import { useRouter } from 'vue-router'
 import type { MenuProps } from 'ant-design-vue';
+import { CheckAdminID } from '../../../wailsjs/go/main/App'
 export default defineComponent({
   props: {
     Trigger: {
@@ -63,10 +53,21 @@ export default defineComponent({
     AccountBookOutlined,
     ExportOutlined,
     BarcodeOutlined,
+    DeploymentUnitOutlined,
   },
   setup() {
-    const openKeys = ref<string[]>(['sub1']);
+    const hasRouter = ref<boolean>(false)
+    const openKeys = ref<string[]>(['sub1'])
     const router = useRouter()
+    onMounted(async() => {
+      const id = await CheckAdminID()
+      // console.log(data)
+      if (id == "1") {
+        hasRouter.value = true
+      }else{
+        hasRouter.value = false
+      }
+    })
     const handleClick: MenuProps['onClick'] = e => {
       if (e.key == "logout") {
         clickLogout()
@@ -90,7 +91,8 @@ export default defineComponent({
       selectedKeys: ref<string[]>(['user']),
       openKeys,
       clickLogout,
-      handleClick
+      handleClick,
+      hasRouter
     };
   },
 });

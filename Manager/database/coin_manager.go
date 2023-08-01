@@ -17,6 +17,14 @@ func (manager *CoinManager) Insert() (err error) {
 	return nil
 }
 
+// Check ID
+func CoinManagerCheckID(id int64) (manager *CoinManager, err error) {
+	if err = sqlDB.First(&manager, "id = ?", id).Error; err != nil {
+		return
+	}
+	return
+}
+
 func CheckAdminLogin(username, password string) (manager *CoinManager, err error) {
 	if err = sqlDB.First(&manager, "user_name = ? AND new_status = ? AND password = ?", username, "0", password).Error; err != nil {
 		return

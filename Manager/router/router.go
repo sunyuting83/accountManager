@@ -31,6 +31,7 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
 		adminapiv1.DELETE("/DelAdmin", utils.AdminVerifyMiddleware(), Admin.DeleteAdmin)
 		adminapiv1.GET("/CheckLogin", utils.AdminVerifyMiddleware(), Admin.CheckLogin)
 		adminapiv1.GET("/AdminList", utils.AdminVerifyMiddleware(), Admin.AdminList)
+		adminapiv1.GET("/GetAdmin", utils.AdminVerifyMiddleware(), Admin.GetAdmin)
 		adminapiv1.PUT("/UpStatus", utils.AdminVerifyMiddleware(), Admin.UpStatusAdmin)
 		adminapiv1.POST("/AdminLogin", Admin.Sgin)
 		adminapiv1.POST("/SendCoinToUser", utils.AdminVerifyMiddleware(), Coin.SendCoinToUser)

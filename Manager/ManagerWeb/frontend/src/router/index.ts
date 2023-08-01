@@ -2,15 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AppIndex from '../components/Index.vue'
 import Login from '../components/Auth/Login.vue'
 import Main from '../components/Main/Main.vue'
-import Users from '../components/Main/Users.vue'
-import Product from '../components/Main/Product.vue'
-import Cart from '../components/Main/Cart.vue'
-import Order from '../components/Main/Order.vue'
-import Ledger from '../components/Main/Ledger.vue'
-import OrdersDetail from '../components/Main/OrdersDetail.vue'
-
-
-const routerHistory = createWebHistory()
+import Admin from '../components/Main/Admin.vue'
+import SendCoin from '../components/Main/SendCoin.vue'
 
 const constantRoutes = [
   {
@@ -31,36 +24,17 @@ const constantRoutes = [
       {
         path: 'user',
         name: 'user',
-        component: Users,
+        component: Admin,
       },
       {
-        path: 'product',
-        name: 'product',
-        component: Product,
-      },
-      {
-        path: 'cart',
-        name: 'cart',
-        component: Cart,
-      },
-      {
-        path: 'order',
-        name: 'order',
-        component: Order,
-      },
-      {
-        path: 'OrdersDetail:order_id',
-        name: 'OrdersDetail',
-        component: OrdersDetail,
-      },
-      {
-        path: 'ledger',
-        name: 'ledger',
-        component: Ledger,
+        path: 'sendcoin',
+        name: 'sendcoin',
+        component: SendCoin,
       }
     ]
   },
 ]
+const routerHistory = createWebHistory()
 
 
 let router = createRouter({

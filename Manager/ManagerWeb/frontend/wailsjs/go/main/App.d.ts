@@ -7,6 +7,8 @@ export function AddCart(arg1:Array<number>):Promise<{[key: string]: any}>;
 
 export function Captcha():Promise<Array<number>>;
 
+export function CheckAdminID():Promise<string>;
+
 export function CheckLogin():Promise<{[key: string]: any}>;
 
 export function CleanCart():Promise<{[key: string]: any}>;
@@ -14,6 +16,8 @@ export function CleanCart():Promise<{[key: string]: any}>;
 export function DeleteCart(arg1:number):Promise<{[key: string]: any}>;
 
 export function FormatDateTime(arg1:number):Promise<string>;
+
+export function GetAdmin():Promise<{[key: string]: any}>;
 
 export function GetCart():Promise<{[key: string]: any}>;
 
@@ -26,8 +30,6 @@ export function GetOrdersDetail(arg1:{[key: string]: any}):Promise<{[key: string
 export function GetOrdersList(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
 export function GetProducts(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
-
-export function GetUsers():Promise<{[key: string]: any}>;
 
 export function Login(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 

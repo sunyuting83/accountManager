@@ -14,6 +14,10 @@ export function Captcha() {
   return window['go']['main']['App']['Captcha']();
 }
 
+export function CheckAdminID() {
+  return window['go']['main']['App']['CheckAdminID']();
+}
+
 export function CheckLogin() {
   return window['go']['main']['App']['CheckLogin']();
 }
@@ -28,6 +32,10 @@ export function DeleteCart(arg1) {
 
 export function FormatDateTime(arg1) {
   return window['go']['main']['App']['FormatDateTime'](arg1);
+}
+
+export function GetAdmin() {
+  return window['go']['main']['App']['GetAdmin']();
 }
 
 export function GetCart() {
@@ -52,10 +60,6 @@ export function GetOrdersList(arg1) {
 
 export function GetProducts(arg1) {
   return window['go']['main']['App']['GetProducts'](arg1);
-}
-
-export function GetUsers() {
-  return window['go']['main']['App']['GetUsers']();
 }
 
 export function Login(arg1) {

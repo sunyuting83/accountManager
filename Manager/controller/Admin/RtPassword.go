@@ -9,8 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type RtPassword struct {
+	Password string `form:"password" json:"password" xml:"password"  binding:"required"`
+}
+
 func ResetPassword(c *gin.Context) {
-	var form Login
+	var form RtPassword
 	if err := c.ShouldBind(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  1,
@@ -19,13 +23,6 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
-	if len(form.UserName) < 4 {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  1,
-			"message": "haven't username",
-		})
-		return
-	}
 	if len(form.Password) < 8 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status":  1,
@@ -37,7 +34,7 @@ func ResetPassword(c *gin.Context) {
 	result := utils.GetTokenUserData(c)
 
 	var admin database.CoinManager
-	user, err := database.CheckUserName(form.UserName)
+	user, err := database.CoinManagerCheckID(int64(result.UserID))
 	if err != nil && err.Error() != "record not found" {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,
@@ -45,7 +42,7 @@ func ResetPassword(c *gin.Context) {
 		})
 		return
 	}
-	if user.UserName == form.UserName {
+	if user.ID == result.UserID {
 		secret_key, _ := c.Get("secret_key")
 		SECRET_KEY := secret_key.(string)
 		PASSWD := utils.MD5(strings.Join([]string{form.Password, SECRET_KEY}, ""))
@@ -56,7 +53,7 @@ func ResetPassword(c *gin.Context) {
 		)
 		if user.ID == 1 {
 			if user.ID == result.UserID {
-				data, err = admin.ResetPassword(form.UserName)
+				data, err = admin.ResetPassword(user.UserName)
 			} else {
 				c.JSON(http.StatusOK, gin.H{
 					"status":  1,
@@ -65,7 +62,7 @@ func ResetPassword(c *gin.Context) {
 				return
 			}
 		} else {
-			data, err = admin.ResetPassword(form.UserName)
+			data, err = admin.ResetPassword(user.UserName)
 		}
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{

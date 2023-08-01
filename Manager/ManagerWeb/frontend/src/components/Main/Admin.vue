@@ -6,14 +6,7 @@
         <div class="main">
           <a-descriptions size="small" :column="2">
             <a-descriptions-item label="用户名">{{userState.users.UserName}}</a-descriptions-item>
-            <a-descriptions-item label="钱包地址">{{userState.users.WalletAddress}}</a-descriptions-item>
-            <a-descriptions-item label="E-mail">{{userState.users.Email}}</a-descriptions-item>
-            <a-descriptions-item label="电话">{{userState.users.PhoneNumber}}</a-descriptions-item>
             <a-descriptions-item label="最后登陆时间">{{foramTime(userState.users.UpdatedAt)}}</a-descriptions-item>
-            <a-descriptions-item label="最后登陆IP">{{userState.users.IPAddress}}</a-descriptions-item>
-            <a-descriptions-item label="所在地">
-              {{userState.users.LocalAddress}}
-            </a-descriptions-item>
           </a-descriptions>
         </div>
         <div class="extra">
@@ -70,7 +63,7 @@ import PageHeader from './PageHeader.vue'
 import { onMounted, ref, h, reactive, computed } from 'vue'
 import { InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons-vue'
 import { notification } from 'ant-design-vue'
-import { GetUsers, RePassword } from '../../../wailsjs/go/main/App'
+import { GetAdmin, RePassword } from '../../../wailsjs/go/main/App'
 import type { Rule } from 'ant-design-vue/es/form';
 
 import { useRouter } from 'vue-router'
@@ -84,16 +77,6 @@ const formRef = ref<any>()
 const formState = reactive<FormState>({
   password: '',
   repassword: '',
-})
-
-interface TransferState {
-  coin: number;
-  wallet: string;
-}
-const TransferRef = ref<any>()
-const TransferState = reactive<TransferState>({
-  coin: 0.0,
-  wallet: '',
 })
 
 interface PageHeaderData {
@@ -125,16 +108,10 @@ const pageHeader = ref<PageHeaderData>({
 interface Users {
   Coin: number;
   CreatedAt: number;
-  Email: string;
   ID: number;
-  IPAddress: string;
-  LocalAddress: string;
   NewStatus: number;
-  Password: string;
-  PhoneNumber: string;
   UpdatedAt: number;
   UserName: string;
-  WalletAddress: string;
 }
 
 interface User {
@@ -149,32 +126,26 @@ const userState = ref<User>({
   users: {
     Coin: 0,
     CreatedAt: 0,
-    Email: '',
     ID: 0,
-    IPAddress: '',
-    LocalAddress: '',
     NewStatus: 0,
-    Password: '',
-    PhoneNumber: '',
     UpdatedAt: 0,
     UserName: '',
-    WalletAddress: '',
   },
 });
 onMounted(async() => {
-  console.log("here")
-  // const data = await GetUsers()
-  // if (data.status == 0) {
-  //   userState.value = data as User
-  //   // console.log(userState.value)
-  // }else {
-  //   openNotification(data.message)
-  //   if (data.message == "403") {
-  //     router.push({
-  //       'name': 'login',
-  //     })
-  //   }
-  // }
+  // console.log("here")
+  const data = await GetAdmin()
+  if (data.status == 0) {
+    userState.value = data as User
+    // console.log(userState.value)
+  }else {
+    openNotification(data.message)
+    if (data.message == "403") {
+      router.push({
+        'name': 'login',
+      })
+    }
+  }
 })
 const openNotification = (text: string) => {
   notification.open({
@@ -196,13 +167,9 @@ const foramTime = (d: number) => {
 }
 const loading = ref<boolean>(false);
 const openChangePassword = ref<boolean>(false)
-const openTransfer = ref<boolean>(false)
 
 const showChangePassword = () => {
   openChangePassword.value = true;
-}
-const showTransfer = () => {
-  openTransfer.value = true;
 }
 
 const changePassword = async() => {
@@ -291,8 +258,4 @@ const sucNotification = (text: string) => {
 }
 
 </script>
-<style scoped>
-.content {
-  display: flex;
-}
-</style>
+
