@@ -40,6 +40,16 @@ func (a *App) SendCoinToUser(params map[string]interface{}) map[string]interface
 	return data
 }
 
+func (a *App) UsersList(params map[string]interface{}) map[string]interface{} {
+	data := HTTPRequest("GET", "UserList", params)
+	return data
+}
+
+func (a *App) UpStatusUser(params map[string]interface{}) map[string]interface{} {
+	data := HTTPRequest("PUT", "UpStatusUser", params)
+	return data
+}
+
 func (a *App) GetOrdersList(params map[string]interface{}) map[string]interface{} {
 	data := HTTPRequest("GET", "GetOrdersList", params)
 	return data

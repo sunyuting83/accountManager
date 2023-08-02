@@ -69,3 +69,11 @@ export function SendCoinToUser(arg1) {
 export function TransferUseWallet(arg1) {
   return window['go']['main']['App']['TransferUseWallet'](arg1);
 }
+
+export function UpStatusUser(arg1) {
+  return window['go']['main']['App']['UpStatusUser'](arg1);
+}
+
+export function UsersList(arg1) {
+  return window['go']['main']['App']['UsersList'](arg1);
+}

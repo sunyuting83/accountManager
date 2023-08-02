@@ -34,3 +34,7 @@ export function RePassword(arg1:{[key: string]: any}):Promise<{[key: string]: an
 export function SendCoinToUser(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
 
 export function TransferUseWallet(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
+
+export function UpStatusUser(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;
+
+export function UsersList(arg1:{[key: string]: any}):Promise<{[key: string]: any}>;

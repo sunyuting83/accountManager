@@ -4,6 +4,7 @@ import Login from '../components/Auth/Login.vue'
 import Main from '../components/Main/Main.vue'
 import Admin from '../components/Main/Admin.vue'
 import SendCoin from '../components/Main/SendCoin.vue'
+import Users from '../components/Main/Users.vue'
 
 const constantRoutes = [
   {
@@ -30,6 +31,11 @@ const constantRoutes = [
         path: 'sendcoin',
         name: 'sendcoin',
         component: SendCoin,
+      },
+      {
+        path: 'users',
+        name: 'users',
+        component: Users,
       }
     ]
   },

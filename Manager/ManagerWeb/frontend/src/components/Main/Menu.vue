@@ -17,6 +17,10 @@
         <deployment-unit-outlined />
         <span>发币给用户</span>
       </a-menu-item>
+      <a-menu-item key="users" v-if="hasRouter">
+        <team-outlined />
+        <span>用户管理</span>
+      </a-menu-item>
       <a-menu-item key="logout">
         <export-outlined />
         <span>退出</span>
@@ -26,14 +30,11 @@
 </template>
 <script lang="ts">
 import {
-  TaobaoOutlined,
   UserOutlined,
-  ShoppingCartOutlined,
-  AccountBookOutlined,
   ExportOutlined,
-  BarcodeOutlined,
-  DeploymentUnitOutlined
-} from '@ant-design/icons-vue';
+  DeploymentUnitOutlined,
+  TeamOutlined
+} from '@ant-design/icons-vue'
 import { defineComponent, ref, onMounted } from 'vue'
 import { Logout } from '../../../wailsjs/go/main/App'
 import { useRouter } from 'vue-router'
@@ -47,13 +48,10 @@ export default defineComponent({
       }
   },
   components: {
-    TaobaoOutlined,
     UserOutlined,
-    ShoppingCartOutlined,
-    AccountBookOutlined,
     ExportOutlined,
-    BarcodeOutlined,
     DeploymentUnitOutlined,
+    TeamOutlined
   },
   setup() {
     const hasRouter = ref<boolean>(false)
