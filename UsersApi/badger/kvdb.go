@@ -109,6 +109,25 @@ func Has(key []byte) (bool, error) {
 	return exist, err
 }
 
+func UpdateWithOutTTL(key []byte, value []byte) {
+	var existingTTL uint64
+	BadgerDB.View(func(txn *badger.Txn) error {
+		item, err := txn.Get(key)
+		if err != nil {
+			return err
+		}
+
+		existingTTL = item.ExpiresAt()
+		// fmt.Println(existingTTL)
+		return nil
+	})
+	if existingTTL > 0 {
+		// 原有键存在 TTL，将其应用于更新后的键值对
+		ttlDuration := int64(existingTTL) / 5600000
+		SetWithTTL(key, value, ttlDuration)
+	}
+}
+
 func Delete(key []byte) error {
 	err := BadgerDB.Update(func(txn *badger.Txn) error {
 		return txn.Delete(key)

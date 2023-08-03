@@ -82,6 +82,8 @@ func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64, Users_SECRET_K
 		adminApiV1HasKey.GET("/AccountDrawDateList", utils.AdminVerifyMiddleware(), Account.AccountDrawDateList)
 		adminApiV1HasKey.PUT("/PullDrawList", utils.AdminVerifyMiddleware(), Account.PullAccountDrawList)
 		adminApiV1HasKey.PUT("/PullDrawSelect", utils.AdminVerifyMiddleware(), Account.PullAccountDrawSelect)
+		adminApiV1HasKey.PUT("/SearchAccountDraw", utils.AdminVerifyMiddleware(), Account.SearchAccountDraw)
+		adminApiV1HasKey.PUT("/SetSellList", utils.AdminVerifyMiddleware(), Account.AccountSetSellList)
 		adminApiV1HasKey.GET("/GetAllDateForDrawed", utils.AdminVerifyMiddleware(), Account.GetAllDateForAccountDrawed)
 		adminApiV1HasKey.GET("/AccountDrawedDateList", utils.AdminVerifyMiddleware(), Account.AccountDrawedDateList)
 		adminApiV1HasKey.GET("/ExportDrawed", utils.AdminVerifyMiddleware(), Account.ExportAccountDrawed)

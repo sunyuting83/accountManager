@@ -25,17 +25,26 @@
               <div class="columns flex-wrap is-justify-content-space-between mt-1">
                 <div class="field ml-3">
                   <div class="buttons is-horizontal are-small has-addons">
-                    <button class="button is-warning" :class="buttonLoading ? 'is-loading' : '' " :disabled="AccountType == 'gold'?true:false" @click="pushRouter">
+                    <button class="button is-warning" :class="buttonLoading ? 'is-loading' : '' " :disabled="AccountType == 'gold'?true:false" @click="()=>{pushRouter('gold')}">
                       按金币排列
                     </button>
-                    <button class="button is-info" :class="buttonLoading ? 'is-loading' : '' " :disabled="AccountType == 'date'?true:false" @click="pushRouter">
+                    <button class="button is-info" :class="buttonLoading ? 'is-loading' : '' " :disabled="AccountType == 'date'?true:false"  @click="()=>{pushRouter('date')}">
                       按日期排列
+                    </button>
+                    <button class="button is-success" :class="buttonLoading ? 'is-loading' : '' " :disabled="AccountType == 'search'?true:false" @click="()=>{pushRouter('search')}">
+                      按条件搜索
                     </button>
                   </div>
                 </div>
                 <div class="field mr-3">
                   <div class="buttons is-horizontal are-small has-addons">
                     <span v-if="total !== 0" class="is-size-7 mr-3">帐号总数 <span class="has-text-danger ml-1">{{total}}</span></span>
+                    <button 
+                      class="button is-warning"
+                      :class="buttonLoading ? 'is-loading' : '' "
+                      @click="sellData" :disabled="checkTemp.length <= 0">
+                      出售选中
+                    </button>
                     <button 
                       class="button is-success"
                       :class="buttonLoading ? 'is-loading' : '' "
@@ -56,7 +65,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              金币大于
+                              金币&gt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -77,7 +86,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              金币小于
+                              金币&lt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -98,7 +107,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              炮台大于
+                              炮台&gt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -119,7 +128,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              钻石大于
+                              {{tablename[0]}}&gt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -135,7 +144,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              狂暴大于
+                              {{tablename[1]}}&gt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -151,7 +160,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              冰冻大于
+                              {{tablename[2]}}&gt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -167,7 +176,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              瞄准大于
+                              {{tablename[3]}}&gt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -177,12 +186,24 @@
                       </div>
                     </div>
                   </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="Filter.ignore">
+                      忽略出售中
+                    </label>
+                  </div>
                   <div class="field ml-3">
+                    <div class="buttons">
+                    <PopoButton
+                      message="按条件搜索" 
+                      color="is-info" 
+                      :callBack="SearchSelectData" v-if="AccountType == 'search'"></PopoButton>
                     <PopoButton
                       message="按条件提取" 
                       color="is-primary" 
                       :callBack="pullSelectData" 
-                      v-if="data.length > 0 && Filter.mingold > 0" ></PopoButton>
+                      v-if="data.length > 0 && Filter.mingold > 0 && AccountType !== 'search'" ></PopoButton>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -212,11 +233,24 @@
                       <td>今日金币</td>
                       <td>昨日金币</td>
                       <td>炮台</td>
-                      <td>钻石</td>
-                      <td>狂暴</td>
-                      <td>冰冻</td>
-                      <td>瞄准</td>
-                      <td v-if="data[0].Price.length > 0">价格</td>
+                      <td>
+                        <div v-if="ShowInput[0]"><input class="input is-small w-8" v-model="tablename[0]" v-on:blur="() => {changeTableName(0)}" /></div>
+                        <div @dblclick="() => {showInput(0)}" v-else>{{tablename[0]}}</div>
+                      </td>
+                      <td>
+                        <div v-if="ShowInput[1]"><input class="input is-small w-8" v-model="tablename[1]" v-on:blur="() => {changeTableName(1)}" /></div>
+                        <div @dblclick="() => {showInput(1)}" v-else>{{tablename[1]}}</div>
+                      </td>
+                      <td>
+                        <div v-if="ShowInput[2]"><input class="input is-small w-8" v-model="tablename[2]" v-on:blur="() => {changeTableName(2)}" /></div>
+                        <div @dblclick="() => {showInput(2)}" v-else>{{tablename[2]}}</div>
+                      </td>
+                      <td>
+                        <div v-if="ShowInput[3]"><input class="input is-small w-8" v-model="tablename[3]" v-on:blur="() => {changeTableName(3)}" /></div>
+                        <div @dblclick="() => {showInput(3)}" v-else>{{tablename[3]}}</div>
+                      </td>
+                      <td>价格</td>
+                      <td>出售中</td>
                       <td>过期时间</td>
                       <td>更新时间</td>
                     </tr>
@@ -238,7 +272,8 @@
                       <td>{{item.Crazy}}</td>
                       <td>{{item.Cold}}</td>
                       <td>{{item.Precise}}</td>
-                      <td v-if="item.Price.length > 0">{{item.Price}}</td>
+                      <td><PriceCalc :Price="item.TodayGold" :Calc="games" /></td>
+                      <td>{{showSellStatus(item.SellStatus)}}</td>
                       <td><ExpTime :DateTime="item.Exptime" /></td>
                       <td class="potd">
                         <FormaTime :DateTime="item.UpdatedAt" />
@@ -279,6 +314,7 @@ import FormaNumber from '@/components/Other/FormaNumber'
 import ExpTime from '@/components/Other/ExpTime'
 import RenewalCard from '@/components/Other/Renewal'
 import PopoButton from '@/components/Other/PopoButton'
+import PriceCalc from '@/components/Other/PriceCalc'
 
 
 import Fetch from '@/helper/fetch'
@@ -287,7 +323,7 @@ import Config from '@/helper/config'
 import setStorage from '@/helper/setStorage'
 export default defineComponent({
   name: 'AccountList',
-  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime, RenewalCard, PopoButton },
+  components: { ManageHeader, LoadIng, EmptyEd, NotIfication, PaginAtion, FormaTime, FormaNumber, ExpTime, RenewalCard, PopoButton, PriceCalc },
   setup() {
     let states = reactive({
       AccountKey: "",
@@ -301,6 +337,7 @@ export default defineComponent({
       data: [],
       total: 0,
       username: "",
+      games: {},
       buttonLoading: false,
       openerr: {
         active: false,
@@ -323,8 +360,11 @@ export default defineComponent({
         crazy: 0,
         cold: 0,
         precise: 0,
+        ignore: true
       },
-      IMGUri: Config.IMGUri
+      IMGUri: Config.IMGUri,
+      tablename: ["钻石", "狂暴", "冰冻", "瞄准"],
+      ShowInput: [false, false, false, false]
     })
     const Reload = inject('reload')
     const router = useRouter()
@@ -335,6 +375,12 @@ export default defineComponent({
       if (data == 0) {
         states.AccountKey = router.currentRoute._value.params.key
         states.AccountType = router.currentRoute._value.params.type
+        const tablename = localStorage.getItem(`${states.AccountKey}_tablename`)
+        if (tablename !== null) { 
+          if (tablename.indexOf("|") !== -1) {
+            states.tablename = tablename.split("|")
+          }
+        }
         const username = localStorage.getItem('user')
         states.username = username
         if (states.AccountType == 'date') {
@@ -346,7 +392,7 @@ export default defineComponent({
           }else {
             states.loading = false
           }
-        }else {
+        }else if  (states.AccountType == 'gold') {
           GetGoldData()
         }
       }else{
@@ -400,6 +446,7 @@ export default defineComponent({
         states.data = d.data
         states.temp = d.data
         states.total = d.total
+        states.games = d.games
         states.projects = d.projects
         states.pageLoading = true
         states.loading = false
@@ -431,6 +478,7 @@ export default defineComponent({
         states.data = d.data
         states.temp = d.data
         states.total = d.total
+        states.games = d.games
         states.projects = d.projects
         states.pageLoading = true
         states.loading = false
@@ -459,16 +507,11 @@ export default defineComponent({
       router.push("/project")
     }
 
-    const pushRouter = () => {
-      const accounType = states.AccountType
+    const pushRouter = (AccountType) => {
       const AccountKey = states.AccountKey
-      if (accounType === 'gold') {
-        states.AccountType = 'date'
-      }else {
-        states.AccountType = 'gold'
-      }
+      states.AccountType = AccountType
       CleanData()
-      router.push(`/accountDraw/${AccountKey}/${states.AccountType}`)
+      router.push(`/accountDraw/${AccountKey}/${AccountType}`)
       Reload()
     }
 
@@ -583,6 +626,39 @@ export default defineComponent({
       }
     }
 
+    const sellData = async() => {
+      const list = states.checkTemp
+      const AccountType = states.AccountType
+      const e = {
+        active: true,
+        message: "设置失败",
+        color: "is-danger",
+        newtime: 0,
+      }
+      if (list.length > 0 ) {
+        const token = localStorage.getItem("token")
+        const data = {
+          list: states.checkTemp
+        }
+        const url = `${Config.RootUrl}${states.AccountKey}/SetSellList`
+        states.buttonLoading = true
+        states.pageLoading = false
+        states.loading = true
+        const d = await Fetch(url, data, 'PUT', token)
+        if (d.status == 0) {
+          pushRouter(AccountType)
+        }else{
+          states.checkTemp = []
+          states.loading = false
+          states.buttonLoading = false
+          ShowMessage(e)
+        }
+      }else{
+        states.loading = false
+        ShowMessage(e)
+      }
+    }
+
     const pullSelectData = async() => {
       const Filter = states.Filter
       const e = {
@@ -623,9 +699,87 @@ export default defineComponent({
       }
     }
 
+    const SearchSelectData = async() => {
+      const Filter = states.Filter
+      const e = {
+        active: true,
+        message: "检索失败",
+        color: "is-danger",
+        newtime: 0,
+      }
+      const token = localStorage.getItem("token")
+      const data = {
+        mingold: Filter.mingold * 100000000,
+        maxgold: Filter.maxgold * 100000000,
+        multiple: Filter.multiple * 10000,
+        diamond: Filter.diamond,
+        crazy: Filter.crazy,
+        cold: Filter.cold,
+        precise: Filter.precise,
+        ignore_sell: Filter.ignore
+      }
+      const url = `${Config.RootUrl}${states.AccountKey}/SearchAccountDraw`
+      states.buttonLoading = true
+      states.pageLoading = false
+      states.loading = true
+      const d = await Fetch(url, data, 'PUT', token)
+      // console.log(d)
+      if (d.status == 0) {
+        states.data = d.data
+        states.temp = d.data
+        states.total = d.data.length
+        states.projects = d.projects
+        states.games = d.games
+        states.loading = false
+        states.buttonLoading = false
+      }else{
+        e.message = d.message
+        states.data = []
+        states.temp = []
+        states.total = 0
+        states.checkTemp = []
+        states.loading = false
+        states.buttonLoading = false
+        ShowMessage(e)
+      }
+    }
+
     const pushRouterToDrawed = () => {
       const AccountKey = router.currentRoute._value.params.key
       router.push(`/accountDrawed/${AccountKey}`)
+    }
+    const showSellStatus = (status) => {
+      let message = "未出售"
+      switch (status) {
+        case 1:
+          message = "出售中"
+          break
+        case 2:
+          message = "已出售"
+          break
+        default:
+          break
+      }
+      return message
+    }
+    const showInput = (i) => {
+      states.ShowInput = states.ShowInput.map((e, index) => {
+        if (index == i) {
+          e = !e
+        }
+        return e
+      })
+    }
+
+    const changeTableName = (i) => {
+      states.ShowInput = states.ShowInput.map((e, index) => {
+        if (index == i) {
+          e = !e
+        }
+        return e
+      })
+      const tableName = states.tablename.join("|")
+      localStorage.setItem(`${states.AccountKey}_tablename`, tableName)
     }
 
     return {
@@ -639,9 +793,14 @@ export default defineComponent({
       checkall,
       pullData,
       pullSelectData,
+      SearchSelectData,
       pushRouterToDrawed,
       closeModal,
-      ShowMessage
+      ShowMessage,
+      showSellStatus,
+      sellData,
+      showInput,
+      changeTableName
     }
   },
 })

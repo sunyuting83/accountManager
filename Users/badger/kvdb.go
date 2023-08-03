@@ -75,7 +75,7 @@ func UpdateWithOutTTL(key []byte, value []byte) {
 
 	if existingTTL > 0 {
 		// 原有键存在 TTL，将其应用于更新后的键值对
-		ttlDuration := int64(existingTTL) / time.Second.Nanoseconds()
+		ttlDuration := int64(existingTTL) / 5600000
 		SetWithTTL(key, value, ttlDuration)
 	}
 }

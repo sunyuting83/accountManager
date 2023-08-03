@@ -12,6 +12,7 @@ import AccountFiled from '@/components/AccountFiled/FiledList'
 import DrawLogs from '@/components/DrawedLog/DrawedLog'
 import DraweData from '@/components/DrawedLog/DraweData'
 import AllDraw from '@/components/AllDraw/AllDraw'
+import AccountInfo from '@/components/AllDraw/AccountInfo'
 
 const routerHistory = createWebHistory()
 
@@ -80,6 +81,11 @@ const constantRoutes = [
     path: '/AllDraw',
     name: 'AllDraw',
     component: AllDraw
+  },
+  {
+    path :'/AccountInfo',
+    name: 'AccountInfo',
+    component: AccountInfo
   }
 ]
 

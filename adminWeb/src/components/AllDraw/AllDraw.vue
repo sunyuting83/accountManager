@@ -1,22 +1,6 @@
 <template>
   <div>
     <ManageHeader></ManageHeader>
-    <nav class="level is-mobile pt-3" v-if="GamesList.length !== 0">
-      <div class="level-item has-text-centered" v-for="item in GamesList" :key="item.ID" :class="item.Count != 0 ? '' : 'hiddenit'">
-        <div>
-          <p class="heading">{{item.GameName}}</p>
-          <p class="title">{{item.Count}}</p>
-        </div>
-      </div>
-    </nav>
-    <nav class="level is-mobile pt-3" v-if="GamesList.length !== 0">
-      <div class="level-item has-text-centered" v-for="item in GamesList" :key="item.ID" >
-        <div>
-          <p class="heading">{{item.GameName}}日活号</p>
-          <p class="title">{{item.AliveCount}}</p>
-        </div>
-      </div>
-    </nav>
     <div class="container.is-fullhd">
       <div class="card events-card">
         <div class="card-content">
@@ -371,9 +355,9 @@ export default defineComponent({
     const GetDateList = async() => {
       const token = localStorage.getItem("token")
       states.loading = true
-      const d = await Fetch(Config.Api.AllCount, {}, 'GET', token)
+      const d = await Fetch(Config.Api.GamesAllList, {}, 'GET', token)
       if (d.status == 0) {
-        states.GamesList = d.gamslist
+        states.GamesList = d.data
         states.pageLoading = true
         states.loading = false
       }else{

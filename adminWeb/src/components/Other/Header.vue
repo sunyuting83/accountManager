@@ -29,6 +29,9 @@
         <router-link class="navbar-item" v-if="userid === '1'" :class="path === 'AllDraw'?'is-active':''" to="/AllDraw">
           题号管理
         </router-link>
+        <router-link class="navbar-item" v-if="userid === '1'" :class="path === 'AccountInfo'?'is-active':''" to="/AccountInfo">
+          帐号信息
+        </router-link>
         <a class="navbar-item" v-if="path === 'account'" :class="path === 'account' ? 'is-active' : ''">
         帐号管理
         </a>

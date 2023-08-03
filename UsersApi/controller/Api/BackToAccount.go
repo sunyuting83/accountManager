@@ -1,6 +1,7 @@
 package controller
 
 import (
+	BadgerDB "colaAPI/UsersApi/badger"
 	"colaAPI/UsersApi/database"
 	"encoding/json"
 	"net/http"
@@ -61,8 +62,24 @@ func BackToAccount(c *gin.Context) {
 		return
 	}
 
-	projectsID, _ := GetProjectsID(c)
+	var person Person
+	c.ShouldBindUri(&person)
+	Key := person.Key
+	getnumber, _ := BadgerDB.Get([]byte(Key + ".getnumber"))
+	getnumberInt, _ := strconv.Atoi(getnumber)
+	if getnumberInt >= 3 {
+		if IsJson == "1" {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "block",
+			})
+			return
+		}
+		c.String(200, "没有了")
+		return
+	}
 
+	projectsID, _ := GetProjectsID(c)
 	Projects, err := database.ProjectsCheckID(projectsID)
 	if err != nil {
 		if IsJson == "1" {

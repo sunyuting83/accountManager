@@ -66,10 +66,10 @@
                       <td>今日金币</td>
                       <td>昨日金币</td>
                       <td>炮台</td>
-                      <td>钻石</td>
-                      <td>狂暴</td>
-                      <td>冰冻</td>
-                      <td>瞄准</td>
+                      <td>{{tablename[0]}}</td>
+                      <td>{{tablename[1]}}</td>
+                      <td>{{tablename[2]}}</td>
+                      <td>{{tablename[3]}}</td>
                       <td v-if="data[0].Remarks.length > 0">其他</td>
                       <td>过期时间</td>
                       <td>更新时间</td>
@@ -158,7 +158,8 @@ export default defineComponent({
         color: ""
       },
       pageLoading: false,
-      limit: Config.Limit
+      limit: Config.Limit,
+      tablename: ["钻石", "狂暴", "冰冻", "瞄准"]
     })
     const router = useRouter()
     onMounted(async() => {
@@ -167,6 +168,12 @@ export default defineComponent({
       states.AccountKey = router.currentRoute._value.params.key
       states.RootUrl = Config.RootUrl
       if (data == 0) {
+        const tablename = localStorage.getItem(`${states.AccountKey}_tablename`)
+        if (tablename !== null) { 
+          if (tablename.indexOf("|") !== -1) {
+            states.tablename = tablename.split("|")
+          }
+        }
         const username = localStorage.getItem('user')
         states.username = username
         GetData(1,true)

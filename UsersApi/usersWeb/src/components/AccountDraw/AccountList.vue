@@ -65,7 +65,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              金币大于
+                              金币&gt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -86,7 +86,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              金币小于
+                              金币&lt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -107,7 +107,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              炮台大于
+                              炮台&gt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -128,7 +128,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              钻石大于
+                              {{tablename[0]}}&gt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -144,7 +144,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              狂暴大于
+                              {{tablename[1]}}&gt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -160,7 +160,7 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              冰冻大于
+                              {{tablename[2]}}&gt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
@@ -176,12 +176,35 @@
                         <div class="field has-addons">
                           <p class="control">
                             <a class="button  is-small is-static">
-                              瞄准大于
+                              {{tablename[3]}}&gt;=
                             </a>
                           </p>
                           <p class="control is-expanded">
                             <input class="input is-small w165" min="0" type="number" placeholder="300" v-model="Filter.precise">
                           </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field is-horizontal ml-3 mr-2">
+                    <div class="field-body">
+                      <div class="field is-expanded">
+                        <div class="field has-addons">
+                          <p class="control">
+                            <a class="button  is-small is-static">
+                              排序条件
+                            </a>
+                          </p>
+                          <div class="control is-expanded select is-small">
+                            <select v-model="Filter.order">
+                              <option value="0">金币</option>
+                              <option value="1">炮台</option>
+                              <option value="2">{{tablename[0]}}</option>
+                              <option value="3">{{tablename[1]}}</option>
+                              <option value="4">{{tablename[2]}}</option>
+                              <option value="5">{{tablename[3]}}</option>
+                            </select>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -233,10 +256,22 @@
                       <td>今日金币</td>
                       <td>昨日金币</td>
                       <td>炮台</td>
-                      <td>钻石</td>
-                      <td>狂暴</td>
-                      <td>冰冻</td>
-                      <td>瞄准</td>
+                      <td>
+                        <div v-if="ShowInput[0]"><input class="input is-small w-8" v-model="tablename[0]" v-on:blur="() => {changeTableName(0)}" /></div>
+                        <div @dblclick="() => {showInput(0)}" v-else>{{tablename[0]}}</div>
+                      </td>
+                      <td>
+                        <div v-if="ShowInput[1]"><input class="input is-small w-8" v-model="tablename[1]" v-on:blur="() => {changeTableName(1)}" /></div>
+                        <div @dblclick="() => {showInput(1)}" v-else>{{tablename[1]}}</div>
+                      </td>
+                      <td>
+                        <div v-if="ShowInput[2]"><input class="input is-small w-8" v-model="tablename[2]" v-on:blur="() => {changeTableName(2)}" /></div>
+                        <div @dblclick="() => {showInput(2)}" v-else>{{tablename[2]}}</div>
+                      </td>
+                      <td>
+                        <div v-if="ShowInput[3]"><input class="input is-small w-8" v-model="tablename[3]" v-on:blur="() => {changeTableName(3)}" /></div>
+                        <div @dblclick="() => {showInput(3)}" v-else>{{tablename[3]}}</div>
+                      </td>
                       <td>价格</td>
                       <td>出售中</td>
                       <td>过期时间</td>
@@ -348,19 +383,27 @@ export default defineComponent({
         crazy: 0,
         cold: 0,
         precise: 0,
-        ignore: true
+        ignore: true,
+        order: 0
       },
-      IMGUri: Config.IMGUri
+      IMGUri: Config.IMGUri,
+      tablename: ["钻石", "狂暴", "冰冻", "瞄准"],
+      ShowInput: [false, false, false, false]
     })
     const Reload = inject('reload')
     const router = useRouter()
     onMounted(async() => {
-      document.title = `${Config.GlobalTitle}-帐号管理`
-      
+      document.title = `${Config.GlobalTitle}-提号管理`
       const data = await CheckLogin()
       if (data == 0) {
         states.AccountKey = router.currentRoute._value.params.key
         states.AccountType = router.currentRoute._value.params.type
+        const tablename = localStorage.getItem(`${states.AccountKey}_tablename`)
+        if (tablename !== null) { 
+          if (tablename.indexOf("|") !== -1) {
+            states.tablename = tablename.split("|")
+          }
+        }
         const username = localStorage.getItem('user')
         states.username = username
         if (states.AccountType == 'date') {
@@ -704,6 +747,9 @@ export default defineComponent({
         states.buttonLoading = false
       }else{
         e.message = d.message
+        states.data = []
+        states.temp = []
+        states.total = 0
         states.checkTemp = []
         states.loading = false
         states.buttonLoading = false
@@ -731,6 +777,26 @@ export default defineComponent({
       return message
     }
 
+    const showInput = (i) => {
+      states.ShowInput = states.ShowInput.map((e, index) => {
+        if (index == i) {
+          e = !e
+        }
+        return e
+      })
+    }
+
+    const changeTableName = (i) => {
+      states.ShowInput = states.ShowInput.map((e, index) => {
+        if (index == i) {
+          e = !e
+        }
+        return e
+      })
+      const tableName = states.tablename.join("|")
+      localStorage.setItem(`${states.AccountKey}_tablename`, tableName)
+    }
+
     return {
       ...toRefs(states),
       GetGoldData,
@@ -747,7 +813,9 @@ export default defineComponent({
       closeModal,
       ShowMessage,
       showSellStatus,
-      sellData
+      sellData,
+      changeTableName,
+      showInput
     }
   },
 })
@@ -757,6 +825,9 @@ export default defineComponent({
   margin-left: -1px;
 }
 
+.w-8 {
+  width: 80px;
+}
 .hasimg .potd .poimg {
   position: absolute;
   right: 0;
