@@ -19,6 +19,7 @@ Users:
   port: "13006"
   SECRET_KEY: akPpqaMuDoH5HYId3vf4EGtQtwdYxOk8
 Redis:
-  Host: 192.168.1.128:6379
+  Host: 192.168.1.128:6579
   Password: zH05aXvMzFpy8vDY
   DB: 1
+IMGServer: http://localhost:13005/image/

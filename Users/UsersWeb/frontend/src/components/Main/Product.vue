@@ -47,7 +47,7 @@
     <div :style="{ padding: '24px'}">
       <div class="content">
         <a-row :style="{'margin-bottom': '1rem'}">
-          <a-col :span="12" v-if="gameState.status == 0">
+          <a-col :span="24" v-if="gameState.status == 0">
             <a-space>
               <span>
                 <a-button type="link" :disabled="gameID == 0 ? true : false " @click="()=>{changeGame(0)}">所有游戏</a-button>
@@ -58,7 +58,7 @@
               <a-button type="primary" :disabled="open ? true : false " @click="showDrawer">筛选</a-button>
             </a-space>
           </a-col>
-          <a-col :span="12" :style="{'text-align': 'right'}">
+          <a-col :span="24" :style="{'text-align': 'right'}">
             <a-space v-if="state.selectedRowKeys.length > 0">
               总价：{{state.total}} 
               <a-button type="primary" :disabled="state.selectedRowKeys.length > 0 ? false : true " @click="pushCart">加入购物车</a-button>
@@ -292,6 +292,7 @@ onMounted(() => {
 const changeGame = (id:number) => {
   gameID.value = id
   state.value.search = false
+  current.value = 1
   getProducts("1","20",String(id))
 }
 

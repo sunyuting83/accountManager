@@ -2,6 +2,7 @@ package database
 
 import (
 	"colaAPI/utils"
+	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -365,11 +366,18 @@ func (account *Accounts) GetDateInCount(projectsID string, statusList []string, 
 	return
 }
 
-func GetDateInData(projectsID string, statusList []string, starTime, endTime int64, page, Limit int) (accounts []*Accounts, err error) {
+func Orders(order string) func(db *gorm.DB) *gorm.DB {
+	od := GetOrderString(order)
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Order(strings.Join([]string{od, "desc"}, " "))
+	}
+}
+
+func GetDateInData(projectsID string, statusList []string, starTime, endTime int64, page, Limit int, order string) (accounts []*Accounts, err error) {
 	p := makePage(page, Limit)
 	if err = sqlDB.
 		Where("projects_id = ? AND new_status IN ? AND updated_at >= ? AND updated_at <= ?", projectsID, statusList, starTime, endTime).
-		Order("today_gold desc").
+		Scopes(Orders(order)).
 		Limit(Limit).Offset(p).
 		Find(&accounts).Error; err != nil {
 		return
@@ -508,4 +516,24 @@ func RawQueryParseToMap(db *gorm.DB, query, date string) ([]string, error) {
 		}
 	}
 	return l, nil
+}
+
+func GetOrderString(order string) (od string) {
+	switch order {
+	case "0":
+		od = "today_gold"
+	case "1":
+		od = "multiple"
+	case "2":
+		od = "diamond"
+	case "3":
+		od = "crazy"
+	case "4":
+		od = "cold"
+	case "5":
+		od = "precise"
+	default:
+		od = "today_gold"
+	}
+	return
 }

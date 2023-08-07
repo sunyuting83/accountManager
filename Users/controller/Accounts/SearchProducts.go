@@ -33,6 +33,10 @@ func SearchProducts(c *gin.Context) {
 		})
 		return
 	}
+
+	IMGServer, _ := c.Get("img_server")
+	imgUri := IMGServer.(string)
+
 	pageInt, _ := strconv.Atoi(page)
 	LimitInt, _ := strconv.Atoi(Limit)
 	GameID64, _ := strconv.Atoi(gameid)
@@ -70,7 +74,7 @@ func SearchProducts(c *gin.Context) {
 		return
 	}
 
-	DataList := MakeDataList(rows)
+	DataList := MakeDataList(rows, imgUri)
 	Data := gin.H{
 		"status": 0,
 		"data":   DataList,

@@ -33,6 +33,7 @@ type Config struct {
 	ManagerApi ManagerApi  `yaml:"ManagerApi"`
 	Users      Users       `yaml:"Users"`
 	Redis      RedisConfig `yaml:"Redis"`
+	IMGServer  string      `yaml:"IMGServer"`
 }
 type UsersApi struct {
 	Port       string `yaml:"port"`
@@ -270,6 +271,11 @@ func CheckConfig(OS, CurrentPath string) (conf *Config, err error) {
 		config, _ := yaml.Marshal(&confYaml)
 		os.WriteFile(ConfigFile, config, 0644)
 	}
+	if len(confYaml.IMGServer) <= 0 {
+		confYaml.IMGServer = "http://localhost:13005/image/"
+		config, _ := yaml.Marshal(&confYaml)
+		os.WriteFile(ConfigFile, config, 0644)
+	}
 	return confYaml, nil
 }
 
@@ -294,11 +300,12 @@ func CORSMiddleware() gin.HandlerFunc {
 }
 
 // SetConfigMiddleWare set config
-func SetConfigMiddleWare(SECRET_KEY, CurrentPath, Users_SECRET_KEY string) gin.HandlerFunc {
+func SetConfigMiddleWare(SECRET_KEY, CurrentPath, Users_SECRET_KEY, IMGServer string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("secret_key", SECRET_KEY)
 		c.Set("users_secret_key", Users_SECRET_KEY)
 		c.Set("current_path", CurrentPath)
+		c.Set("img_server", IMGServer)
 		c.Writer.Status()
 	}
 }

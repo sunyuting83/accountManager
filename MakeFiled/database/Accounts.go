@@ -7,13 +7,16 @@ import (
 type Accounts struct {
 	ID            uint `gorm:"primaryKey"`
 	ProjectsID    uint
+	GameID        uint
 	ComputID      uint
+	OrderID       uint
 	PhoneNumber   string
 	PhonePassword string
 	UserName      string
 	Password      string
 	Cover         string
 	NewStatus     int `gorm:"index"`
+	SellStatus    int `gorm:"index;default:0"`
 	TodayGold     int64
 	YesterdayGold int64
 	Multiple      int64

@@ -9,7 +9,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -28,7 +27,7 @@ type CacheToken struct {
 const (
 	cachePrefix = "ip_counter_"
 	ttl         = 1
-	maxRequests = 20
+	maxRequests = 100
 	banCacheKey = "ip_banned"
 	banCacheTTL = 24 * 60 * 60
 )
@@ -266,7 +265,6 @@ func IncrementCounter(ip string) (int, error) {
 	}
 	count, _ = strconv.Atoi(item)
 	count++
-	fmt.Println(count)
 	BadgerDB.UpdateWithOutTTL(key, []byte(strconv.Itoa(count)))
 
 	return count, nil

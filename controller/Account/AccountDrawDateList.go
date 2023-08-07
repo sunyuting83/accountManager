@@ -14,6 +14,7 @@ func AccountDrawDateList(c *gin.Context) {
 	var page string = c.DefaultQuery("page", "0")
 	var date string = c.Query("date")
 	var Limit string = c.DefaultQuery("limit", "100")
+	var order string = c.DefaultQuery("order", "0")
 	pageInt, _ := strconv.Atoi(page)
 	LimitInt, _ := strconv.Atoi(Limit)
 
@@ -58,7 +59,7 @@ func AccountDrawDateList(c *gin.Context) {
 		return
 	}
 
-	dataList, err := database.GetDateInData(projectsID, hasStatus, startTime, endTime, pageInt, LimitInt)
+	dataList, err := database.GetDateInData(projectsID, hasStatus, startTime, endTime, pageInt, LimitInt, order)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  1,

@@ -27,6 +27,7 @@ type Config struct {
 	ManagerApi ManagerApi  `yaml:"ManagerApi"`
 	Users      Users       `yaml:"Users"`
 	Redis      RedisConfig `yaml:"Redis"`
+	IMGServer  string      `yaml:"IMGServer"`
 }
 
 type UsersApi struct {
@@ -151,6 +152,11 @@ func CheckConfig(OS, CurrentPath string) (conf *Config, err error) {
 	if len(confYaml.Users.SECRET_KEY) <= 0 {
 		secret_key := randSeq(32)
 		confYaml.Users.SECRET_KEY = secret_key
+		config, _ := yaml.Marshal(&confYaml)
+		os.WriteFile(ConfigFile, config, 0644)
+	}
+	if len(confYaml.IMGServer) <= 0 {
+		confYaml.IMGServer = "http://localhost:13005/image/"
 		config, _ := yaml.Marshal(&confYaml)
 		os.WriteFile(ConfigFile, config, 0644)
 	}

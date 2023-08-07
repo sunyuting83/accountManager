@@ -1,26 +1,28 @@
 <template>
   <div>
     <ManageHeader></ManageHeader>
-    <div class="com__box" v-if="loading" :style="loading? 'margin-top:5rem':''">
-      <LoadIng></LoadIng>
-    </div>
-    <div v-else>
-      <nav class="columns flex-wrap is-flex-wrap-wrap is-justify-content-center pt-3" v-if="GamesList.length !== 0">
-        <div class="column is-3 has-text-centered" v-for="item in GamesList" :key="item.ID">
-          <div class="is-full">
-            <p class="heading">{{item.GameName}}</p>
-            <p class="title">{{item.Count}}</p>
+    <div class="content has-text-centered	min-heights" style="min-height: 11.3rem">
+      <div class="com__box" v-if="loading" :style="loading? 'margin-top:5rem':''">
+        <LoadIng></LoadIng>
+      </div>
+      <div v-else>
+        <nav class="columns flex-wrap is-flex-wrap-wrap is-justify-content-center pt-3" v-if="GamesList.length !== 0">
+          <div class="column is-3 has-text-centered" v-for="item in GamesList" :key="item.ID">
+            <div class="is-full">
+              <p class="heading">{{item.GameName}}</p>
+              <p class="title">{{item.Count}}</p>
+            </div>
           </div>
-        </div>
-      </nav>
-      <nav class="columns flex-wrap is-flex-wrap-wrap is-justify-content-center pt-3" v-if="GamesList.length !== 0">
-        <div class="column is-3 has-text-centered" v-for="item in GamesList" :key="item.ID" >
-          <div class="is-full">
-            <p class="heading">{{item.GameName}}日活号</p>
-            <p class="title">{{item.AliveCount}}</p>
+        </nav>
+        <nav class="columns flex-wrap is-flex-wrap-wrap is-justify-content-center pt-3" v-if="GamesList.length !== 0">
+          <div class="column is-3 has-text-centered" v-for="item in GamesList" :key="item.ID" >
+            <div class="is-full">
+              <p class="heading">{{item.GameName}}日活号</p>
+              <p class="title">{{item.AliveCount}}</p>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </div>
     </div>
   </div>
 </template>

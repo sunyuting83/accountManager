@@ -5,6 +5,7 @@ import (
 	"colaAPI/Users/utils"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +18,9 @@ func GetAccountsList(c *gin.Context) {
 	LimitInt, _ := strconv.Atoi(Limit)
 	GameID64, _ := strconv.Atoi(gameid)
 	GameID := uint(GameID64)
+
+	IMGServer, _ := c.Get("img_server")
+	imgUri := IMGServer.(string)
 
 	var account *database.Accounts
 	count, err := account.GetCountWithSellStatus(GameID)
@@ -35,7 +39,7 @@ func GetAccountsList(c *gin.Context) {
 		})
 		return
 	}
-	DataList := MakeDataList(dataList)
+	DataList := MakeDataList(dataList, imgUri)
 	Data := gin.H{
 		"status": 0,
 		"data":   DataList,
@@ -63,7 +67,7 @@ type ResponseDatas struct {
 	SellStatus int
 }
 
-func MakeDataList(dataList *[]database.Accounts) []*ResponseDatas {
+func MakeDataList(dataList *[]database.Accounts, imgUri string) []*ResponseDatas {
 	// fmt.Println(len(*dataList))
 	DataList := make([]*ResponseDatas, len(*dataList))
 	for i, item := range *dataList {
@@ -75,7 +79,7 @@ func MakeDataList(dataList *[]database.Accounts) []*ResponseDatas {
 			GameID:     item.GameID,
 			GameName:   item.Games.GameName,
 			Account:    utils.ReplaceFromThirdChar(item.UserName, 2),
-			Cover:      item.Cover,
+			Cover:      strings.Join([]string{imgUri, item.Cover}, ""),
 			Gold:       utils.ConvertNumber(item.TodayGold),
 			Multiple:   item.Multiple,
 			Diamond:    item.Diamond,

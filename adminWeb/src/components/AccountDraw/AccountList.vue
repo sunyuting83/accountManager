@@ -186,6 +186,29 @@
                       </div>
                     </div>
                   </div>
+                  <div class="field is-horizontal ml-3 mr-2" v-if="AccountType == 'date'">
+                    <div class="field-body">
+                      <div class="field is-expanded">
+                        <div class="field has-addons">
+                          <p class="control">
+                            <a class="button  is-small is-static">
+                              排序条件
+                            </a>
+                          </p>
+                          <div class="control is-expanded select is-small">
+                            <select v-model="Filter.order" @change="handleChange">
+                              <option value="0">金币</option>
+                              <option value="1">炮台</option>
+                              <option value="2">{{tablename[0]}}</option>
+                              <option value="3">{{tablename[1]}}</option>
+                              <option value="4">{{tablename[2]}}</option>
+                              <option value="5">{{tablename[3]}}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <div class="field is-horizontal ml-3 mr-2">
                     <label class="checkbox">
                       <input type="checkbox" v-model="Filter.ignore">
@@ -360,7 +383,8 @@ export default defineComponent({
         crazy: 0,
         cold: 0,
         precise: 0,
-        ignore: true
+        ignore: true,
+        order: 0
       },
       IMGUri: Config.IMGUri,
       tablename: ["钻石", "狂暴", "冰冻", "瞄准"],
@@ -782,6 +806,12 @@ export default defineComponent({
       localStorage.setItem(`${states.AccountKey}_tablename`, tableName)
     }
 
+    const handleChange = () => {
+      states.pageLoading = true
+      GetDateList()
+      states.pageLoading = false
+    }
+
     return {
       ...toRefs(states),
       GetGoldData,
@@ -800,7 +830,8 @@ export default defineComponent({
       showSellStatus,
       sellData,
       showInput,
-      changeTableName
+      changeTableName,
+      handleChange
     }
   },
 })

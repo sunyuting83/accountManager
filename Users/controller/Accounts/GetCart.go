@@ -20,6 +20,9 @@ func GetCart(c *gin.Context) {
 		})
 		return
 	}
+	IMGServer, _ := c.Get("img_server")
+	imgUri := IMGServer.(string)
+
 	tempList := RemoveRepeatedList(form.Cart)
 	if len(tempList) != 0 {
 		cartData, err := database.GetCartWithIn(tempList)
@@ -30,7 +33,7 @@ func GetCart(c *gin.Context) {
 			})
 			return
 		}
-		DataList := MakeDataList(cartData)
+		DataList := MakeDataList(cartData, imgUri)
 		Data := gin.H{
 			"status": 0,
 			"data":   DataList,

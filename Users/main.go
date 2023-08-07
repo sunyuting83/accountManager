@@ -39,7 +39,7 @@ func main() {
 	defer orm.Eloquent.Close()
 	defer BadgerDB.BadgerDB.Close()
 	defer Redis.MyRedis.Close()
-	app := router.InitRouter(confYaml.Users.SECRET_KEY, CurrentPath, confYaml.FormMemory)
+	app := router.InitRouter(confYaml.Users.SECRET_KEY, CurrentPath, confYaml.IMGServer, confYaml.FormMemory)
 
 	// app.Run(strings.Join([]string{":", confYaml.Users.Port}, ""))
 	srv := &http.Server{

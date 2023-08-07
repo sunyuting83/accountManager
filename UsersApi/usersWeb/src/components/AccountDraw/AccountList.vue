@@ -195,8 +195,8 @@
                               排序条件
                             </a>
                           </p>
-                          <div class="control is-expanded select is-small">
-                            <select v-model="Filter.order">
+                          <div class="control is-expanded select is-small"  v-if="AccountType == 'date'">
+                            <select v-model="Filter.order" @change="handleChange">
                               <option value="0">金币</option>
                               <option value="1">炮台</option>
                               <option value="2">{{tablename[0]}}</option>
@@ -460,7 +460,8 @@ export default defineComponent({
       const data = {
         page:page, 
         limit: states.limit,
-        date: states.CurrentDate
+        date: states.CurrentDate,
+        order: states.Filter.order
       }
       const url = `${Config.RootUrl}${states.AccountKey}/AccountDrawDateList`
       states.loading = true
@@ -797,6 +798,12 @@ export default defineComponent({
       localStorage.setItem(`${states.AccountKey}_tablename`, tableName)
     }
 
+    const handleChange = () => {
+      states.pageLoading = true
+      GetDateList()
+      states.pageLoading = false
+    }
+
     return {
       ...toRefs(states),
       GetGoldData,
@@ -815,7 +822,8 @@ export default defineComponent({
       showSellStatus,
       sellData,
       changeTableName,
-      showInput
+      showInput,
+      handleChange
     }
   },
 })

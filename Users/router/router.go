@@ -12,12 +12,12 @@ import (
 )
 
 // InitRouter make router
-func InitRouter(SECRET_KEY, CurrentPath string, FormMemory int64) *gin.Engine {
+func InitRouter(SECRET_KEY, CurrentPath, IMGServer string, FormMemory int64) *gin.Engine {
 	router := gin.Default()
 	router.MaxMultipartMemory = FormMemory << 20
 	router.Use(utilsUser.CORSMiddleware(), utilsUser.ThrottleMiddleware())
 	userApiV1 := router.Group("/api/v1")
-	userApiV1.Use(utilsUser.SetConfigMiddleWare(SECRET_KEY, CurrentPath, SECRET_KEY))
+	userApiV1.Use(utilsUser.SetConfigMiddleWare(SECRET_KEY, CurrentPath, SECRET_KEY, IMGServer))
 	{
 		router.GET("/", controller.Index)
 		userApiV1.POST("/Regedit", Users.Regedit)
