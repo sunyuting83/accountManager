@@ -43,6 +43,7 @@ func InitDB(pwd string, confYaml *utils.Config) {
 		&Bill{},
 		&Users{},
 		&Games{},
+		&Others{},
 		&Projects{},
 		&DrawLogs{},
 		&Comput{},
