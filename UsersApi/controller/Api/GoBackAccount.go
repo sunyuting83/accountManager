@@ -13,8 +13,9 @@ import (
 
 func GoBackAccount(c *gin.Context) {
 	var (
-		status string = c.Query("status")
-		IsJson string = c.DefaultQuery("json", "0")
+		status  string = c.Query("status")
+		IsJson  string = c.DefaultQuery("json", "0")
+		windows string = c.DefaultQuery("windows", "0")
 	)
 	Path := c.Request.URL.Path
 	PathList := strings.Split(Path, "/")
@@ -96,7 +97,7 @@ func GoBackAccount(c *gin.Context) {
 	}
 	backToStatusInt, _ := strconv.Atoi(backToStatus)
 	var account *database.Accounts
-	account.BackTo(projectsID, status, backToStatusInt)
+	account.BackTo(projectsID, status, backToStatusInt, windows)
 	if IsJson == "1" {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  0,

@@ -28,6 +28,7 @@ func GetOneAccount(c *gin.Context) {
 		to       string = c.Query("to")
 		gameid   string = c.Query("gameid")
 		IsJson   string = c.DefaultQuery("json", "0")
+		windows  string = c.DefaultQuery("windows", "0")
 		splitStr string = c.DefaultQuery("splitStr", "----")
 	)
 	Path := c.Request.URL.Path
@@ -143,7 +144,7 @@ func GetOneAccount(c *gin.Context) {
 		}
 	}
 
-	account, err := database.GetOneAccount(projectsID, status)
+	account, err := database.GetOneAccount(projectsID, status, windows)
 	if err != nil {
 		getnumber, err := BadgerDB.Get([]byte(Key + ".getnumber"))
 		if err != nil && err.Error() == "Key not found" {

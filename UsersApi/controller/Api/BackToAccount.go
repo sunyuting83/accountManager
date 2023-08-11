@@ -28,6 +28,7 @@ func BackToAccount(c *gin.Context) {
 		computid string = c.Query("computid")
 		gameid   string = c.Query("gameid")
 		status   string = c.Query("status")
+		windows  string = c.DefaultQuery("windows", "0")
 		IsJson   string = c.DefaultQuery("json", "0")
 	)
 	if len(computid) == 0 {
@@ -138,7 +139,7 @@ func BackToAccount(c *gin.Context) {
 
 	backToStatusInt, _ := strconv.Atoi(backToStatus)
 	var account *database.Accounts
-	account.BackToAcc(projectsID, status, backToStatusInt, computs.ID)
+	account.BackToAcc(projectsID, status, backToStatusInt, computs.ID, windows)
 	if IsJson == "1" {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  0,

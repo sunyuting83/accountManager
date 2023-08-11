@@ -137,10 +137,11 @@ func (account *Accounts) AccountUpComput(comput uint) {
 }
 
 // Reset Password
-func (account *Accounts) BackTo(projectsID, status string, backToStatus int) {
+func (account *Accounts) BackTo(projectsID, status string, backToStatus int, win string) {
 	sqlDB.Model(&account).
 		Select("comput_id", "new_status", "updated_at").
 		Where("projects_id = ? and new_status = ?", projectsID, status).
+		Scopes(HasCold(win)).
 		Updates(Accounts{ComputID: uint(0), NewStatus: backToStatus})
 }
 
@@ -152,9 +153,10 @@ func (account *Accounts) UpdataOneAccount(projectsID, username string, accounts 
 }
 
 // Reset Password
-func (account *Accounts) BackToAcc(projectsID, status string, backToStatus int, comput uint) {
+func (account *Accounts) BackToAcc(projectsID, status string, backToStatus int, comput uint, win string) {
 	sqlDB.Model(&account).
 		Where("projects_id = ? and new_status = ? and comput_id = ?", projectsID, status, comput).
+		Scopes(HasCold(win)).
 		Update("new_status", backToStatus)
 }
 
@@ -260,6 +262,15 @@ func IngoreSell(Ignore bool) func(db *gorm.DB) *gorm.DB {
 		}
 	}
 	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("")
+	}
+}
+
+func HasCold(Cold string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if Cold != "0" {
+			return db.Where("cold = ?", Cold)
+		}
 		return db.Where("")
 	}
 }
@@ -397,10 +408,11 @@ func GetDateTimeDataDraw(projectsID, GeType string) (re []string, err error) {
 	return
 }
 
-func GetOneAccount(ProjectsID, status string) (accounts *Accounts, err error) {
+func GetOneAccount(ProjectsID, status, win string) (accounts *Accounts, err error) {
 	// fmt.Println(status)
 	if err = sqlDB.
 		Where("projects_id = ? and new_status = ?", ProjectsID, status).
+		Scopes(HasCold(win)).
 		First(&accounts).Error; err != nil {
 		return
 	}
