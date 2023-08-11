@@ -68,7 +68,7 @@ func GetOneAccount(c *gin.Context) {
 	Key := person.Key
 	getnumber, _ := BadgerDB.Get([]byte(Key + ".getnumber"))
 	getnumberInt, _ := strconv.Atoi(getnumber)
-	if getnumberInt >= 3 {
+	if getnumberInt >= 30 {
 		if IsJson == "1" {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  1,
@@ -151,7 +151,7 @@ func GetOneAccount(c *gin.Context) {
 			BadgerDB.SetWithTTL([]byte(Key+".getnumber"), []byte("1"), 60*5)
 		}
 		getnumberInt, _ := strconv.Atoi(getnumber)
-		if getnumberInt <= 3 {
+		if getnumberInt <= 30 {
 			newNumber := getnumberInt + 1
 			newNumberStr := strconv.Itoa(newNumber)
 			BadgerDB.UpdateWithOutTTL([]byte(Key+".getnumber"), []byte(newNumberStr))

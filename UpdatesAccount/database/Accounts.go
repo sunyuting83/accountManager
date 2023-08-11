@@ -32,7 +32,7 @@ func UpdateAccountGamesID() (err error) {
 	var account []Accounts
 	if err := sqlDB.
 		Model(&Accounts{}).
-		Where("new_status != 8 AND new_status != 9 AND new_status != 10").
+		Where("new_status IN (0,1,3,4,5,6,7)").
 		Preload("Projects.Games").
 		Find(&account).Error; err != nil {
 		return err
