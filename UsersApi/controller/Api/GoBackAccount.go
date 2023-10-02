@@ -39,7 +39,7 @@ func GoBackAccount(c *gin.Context) {
 	Key := person.Key
 	getnumber, _ := BadgerDB.Get([]byte(Key + ".getnumber"))
 	getnumberInt, _ := strconv.Atoi(getnumber)
-	if getnumberInt >= 30 {
+	if getnumberInt >= 300 {
 		if IsJson == "1" {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  1,

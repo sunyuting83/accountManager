@@ -92,7 +92,7 @@ export default defineComponent ({
   },
   setup(props){
     const _this = props
-    console.log(_this.showData.data.GameID)
+    // console.log(_this.showData.data.GameID)
     let _data = reactive({
       loading: false,
       form:{

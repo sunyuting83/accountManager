@@ -45,6 +45,11 @@ type StatusJSON struct {
 	Ignore   bool   `json:"ignore"`
 }
 
+type ProjectsStatus struct {
+	Master *[]StatusJSON `json:"master"`
+	Slive  *[]StatusJSON `json:"slive"`
+}
+
 func AddProjects(c *gin.Context) {
 	var form Projects
 	if err := c.ShouldBind(&form); err != nil {
@@ -179,10 +184,10 @@ func MakeKey(a string) string {
 }
 
 func MakeStatusJSON(JSON string) (statusJSON string) {
-	var Sjsons []byte
+	var projectsStatus *ProjectsStatus
 	statusJSON = JSON
 	if len(JSON) == 0 {
-		Sjson := &[]StatusJSON{
+		Mjson := &[]StatusJSON{
 			{
 				Status:   "0",
 				Title:    "未注册状态",
@@ -251,7 +256,7 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 			},
 			{
 				Status:   "6",
-				Title:    "旧帐号状态",
+				Title:    "成号状态",
 				Delete:   false,
 				CallBack: false,
 				BackTo:   "",
@@ -271,6 +276,19 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				Pull:     false,
 				Ignore:   false,
 			},
+			{
+				Status:   "108",
+				Title:    "提取状态",
+				Delete:   false,
+				CallBack: false,
+				BackTo:   "",
+				Export:   true,
+				Import:   false,
+				Pull:     false,
+				Ignore:   true,
+			},
+		}
+		Sjson := &[]StatusJSON{
 			{
 				Status:   "8",
 				Title:    "未使用身份证",
@@ -301,20 +319,13 @@ func MakeStatusJSON(JSON string) (statusJSON string) {
 				Import:   false,
 				Ignore:   true,
 			},
-			{
-				Status:   "108",
-				Title:    "提取状态",
-				Delete:   false,
-				CallBack: false,
-				BackTo:   "",
-				Export:   true,
-				Import:   false,
-				Pull:     false,
-				Ignore:   true,
-			},
 		}
-		Sjsons, _ = json.Marshal(&Sjson)
-		statusJSON = string(Sjsons)
+		projectsStatus = &ProjectsStatus{
+			Master: Mjson,
+			Slive:  Sjson,
+		}
+		Pjsons, _ := json.Marshal(&projectsStatus)
+		statusJSON = string(Pjsons)
 	}
 	return
 }

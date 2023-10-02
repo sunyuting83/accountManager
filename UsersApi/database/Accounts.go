@@ -2,7 +2,9 @@ package database
 
 import (
 	"colaAPI/UsersApi/utils"
+	"errors"
 	"strings"
+	"sync"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -41,8 +43,19 @@ func (accounts *Accounts) GetCount(ProjectsID, Status string) (count int64, err 
 	}
 	return
 }
+
+var mutex = &sync.Mutex{}
+
 func (accounts *Accounts) AddAccount() {
-	sqlDB.Create(&accounts)
+	// mutex.Lock()
+	// defer mutex.Unlock()
+	// sqlDB.Create(&accounts)
+	mutex.Lock()
+	result := sqlDB.First(&accounts, "user_name = ? ", accounts.UserName)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		sqlDB.Create(&accounts)
+	}
+	defer mutex.Unlock()
 }
 
 func (account *Accounts) GetInCount(ProjectsID string, statusList []string) (count int64, err error) {
@@ -125,10 +138,14 @@ func (accounts *Accounts) DeleteOne(projectid string, account string) {
 	sqlDB.Where("projects_id = ? and user_name = ? and new_status != ?", projectid, account, "108").Delete(&accounts)
 }
 
-// Reset Password
+// update status of account
 func (account *Accounts) AccountUpStatus(status string) {
-	// fmt.Println(status)
 	sqlDB.Model(&account).Update("new_status", status)
+}
+
+// update all data of account
+func (account *Accounts) AccountUpAll(updatas map[string]interface{}) {
+	sqlDB.Model(&account).Omit("created_at").Updates(updatas)
 }
 
 // Reset Password

@@ -129,12 +129,14 @@ func PostSetAccount(c *gin.Context) {
 	updata["Multiple"] = Multiple
 	updata["Diamond"] = Diamond
 	updata["Crazy"] = Crazy
-	updata["Cold"] = Cold
 	updata["Precise"] = Precise
 	updata["Exptime"] = ExpTimeInt
 	updata["Price"] = Price
 	if account.GameID == nil {
 		updata["GameID"] = project.GamesID
+	}
+	if Cold != 0 {
+		updata["Cold"] = Cold
 	}
 
 	timeobj := time.Unix(account.UpdatedAt/1000, 0)

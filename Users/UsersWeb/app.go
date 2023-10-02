@@ -23,6 +23,7 @@ func NewApp() *App {
 	return &App{}
 }
 
+// const RootURL = "http://114.115.183.208:19196/api/v1/"
 const RootURL = "http://localhost:13006/api/v1/"
 
 // startup is called when the app starts. The context is saved
