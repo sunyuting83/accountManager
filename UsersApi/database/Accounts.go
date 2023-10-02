@@ -51,7 +51,7 @@ func (accounts *Accounts) AddAccount() {
 	// defer mutex.Unlock()
 	// sqlDB.Create(&accounts)
 	mutex.Lock()
-	result := sqlDB.First(&accounts, "user_name = ? ", accounts.UserName)
+	result := sqlDB.First(&accounts, "user_name = ?  AND projects_id = ?", accounts.UserName, accounts.ProjectsID)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		sqlDB.Create(&accounts)
 	}
