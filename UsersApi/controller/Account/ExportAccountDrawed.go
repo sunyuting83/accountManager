@@ -77,6 +77,8 @@ func ExportAccountDrawed(c *gin.Context) {
 	if excel == "true" {
 		Excel = true
 	}
+	fmt.Println(excel)
+	fmt.Println(Excel)
 	projectsID := GetProjectsID(c)
 	startTime, endTime := utils.GetSqlDateTime(date)
 
@@ -325,6 +327,7 @@ func MakeGoldString(gold int64, Excel bool) (goldStr string) {
 		if !Excel {
 			goldStr = strings.Join([]string{goldStr, "亿"}, "")
 		}
+		return
 	}
 	if gold >= 10000 {
 		gold = gold / 10000

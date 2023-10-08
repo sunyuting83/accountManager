@@ -40,13 +40,10 @@ export default defineComponent({
     let Data = _this.Data
     const ext = _this.ext
     const ExportAccount = async() => {
-      let d
-      if (ext === ".txt"){
-        d = await Fetch(url, Data, 'GET', token, true)
-      }else {
-        Data.excel = true
-        d = await Fetch(url, Data, 'GET', token, true, true)
-      }
+      let excel = true
+      if (ext == ".txt") excel = false
+      console.log(excel)
+      let d = await Fetch(url, Data, 'GET', token, true, excel)
       download(d)
     }
 

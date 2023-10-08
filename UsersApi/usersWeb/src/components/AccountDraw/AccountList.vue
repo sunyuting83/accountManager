@@ -301,7 +301,7 @@
                       <td class="potd">
                         <FormaTime :DateTime="item.UpdatedAt" />
                         <div v-if="item.Cover.length > 0" class="poimg">
-                          <img :src="IMGUri+item.Cover" />
+                          <img :data-src="IMGUri+item.Cover" :src="IMGUri+item.Cover" />
                         </div>
                       </td>
                     </tr>
