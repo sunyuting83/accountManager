@@ -319,18 +319,20 @@ func PostAccount(c *gin.Context) {
 	}
 	account = RemoveRepeatedSingle(account, hasPhone)
 	if Repeated {
-		var (
-			hasStatus []string
-		)
-		for _, item := range statusJson {
-			if item.Pull {
-				hasStatus = append(hasStatus, item.Status)
-			}
-		}
-		if !in(form.Status, hasStatus) {
-			hasStatus = append(hasStatus, form.Status)
-		}
-		accList, err := database.GetAccountListUseIn(projectsID, hasStatus)
+		// var (
+		// 	hasStatus []string
+		// )
+
+		// for _, item := range statusJson {
+		// 	if item.Pull {
+		// 		hasStatus = append(hasStatus, item.Status)
+		// 	}
+		// }
+		// if !in(form.Status, hasStatus) {
+		// 	hasStatus = append(hasStatus, form.Status)
+		// }
+		// accList, err := database.GetAccountListUseIn(projectsID, hasStatus)
+		accList, err := database.GetAccountListUseIn(projectsID)
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  1,
