@@ -77,8 +77,8 @@ func ExportAccountDrawed(c *gin.Context) {
 	if excel == "true" {
 		Excel = true
 	}
-	fmt.Println(excel)
-	fmt.Println(Excel)
+	// fmt.Println(excel)
+	// fmt.Println(Excel)
 	projectsID := GetProjectsID(c)
 	startTime, endTime := utils.GetSqlDateTime(date)
 

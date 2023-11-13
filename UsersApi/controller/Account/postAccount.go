@@ -281,7 +281,7 @@ func PostAccount(c *gin.Context) {
 					Precise, _ = strconv.Atoi(itemS[6])
 					Cold, _ = strconv.Atoi(itemS[7])
 					if len(itemS) > 8 {
-						for i := 7; i < len(itemS); i++ {
+						for i := 8; i < len(itemS); i++ {
 							Remarks += strings.Join([]string{itemS[i], itemSplit}, "")
 						}
 					}
