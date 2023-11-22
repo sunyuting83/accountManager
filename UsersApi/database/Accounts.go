@@ -46,6 +46,14 @@ func (accounts *Accounts) GetCount(ProjectsID, Status string) (count int64, err 
 
 var mutex = &sync.Mutex{}
 
+// Get Count
+func GetWindowCount(ProjectsID, window string) (count int64, err error) {
+	if err = sqlDB.Model(&Accounts{}).Where("projects_id = ? and cold = ?", ProjectsID, window).Count(&count).Error; err != nil {
+		return
+	}
+	return
+}
+
 func (accounts *Accounts) AddAccount() {
 	// mutex.Lock()
 	// defer mutex.Unlock()
