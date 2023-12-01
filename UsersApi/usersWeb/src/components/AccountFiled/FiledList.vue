@@ -41,7 +41,7 @@
                     <tr>
                       <td>序号</td>
                       <td>帐号</td>
-                      <td v-if="data[0].PhoneNumber.length > 0">手机号</td>
+                      <!-- <td v-if="data[0].PhoneNumber.length > 0">手机号</td> -->
                       <td>今日金币</td>
                       <td>昨日金币</td>
                       <td>炮台</td>
@@ -58,7 +58,7 @@
                     <tr v-for="(item, index) in data" :key="item.ID" class="hasimg">
                       <td>{{index + 1}}</td>
                       <td>{{item.UserName}}</td>
-                      <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
+                      <!-- <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td> -->
                       <td><FormaNumber :Numbers="item.TodayGold" /></td>
                       <td><FormaNumber :Numbers="item.YesterdayGold" /></td>
                       <td><FormaNumber :Numbers="item.Multiple" /></td>

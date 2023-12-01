@@ -317,11 +317,10 @@ func GetDataUseScopes(filter utils.Filter, hasStatus []string, projectsID string
 	}
 	return
 }
-func GetDataUseScopesB(filter utils.Filter, hasStatus []string, projectsID string, Ignore bool) (accounts []*Accounts, err error) {
+func GetDataUseScopesB(filter utils.SearchFilter, projectsID string, Ignore bool) (accounts []*Accounts, err error) {
 	if err = sqlDB.
-		Where("projects_id = ?", projectsID).
+		Where("projects_id = ? and new_status != ?", projectsID, "108").
 		Scopes(IngoreSell(Ignore)).
-		Scopes(HasStatus(hasStatus)).
 		Scopes(MinGold(filter.MinGold)).
 		Scopes(MaxGold(filter.MaxGold)).
 		Scopes(Multiple(filter.Multiple)).

@@ -252,7 +252,7 @@
                       </td>
                       <td>序号</td>
                       <td>帐号</td>
-                      <td v-if="data[0].PhoneNumber.length > 0">手机号</td>
+                      <!-- <td v-if="data[0].PhoneNumber.length > 0">手机号</td> -->
                       <td>今日金币</td>
                       <td>昨日金币</td>
                       <td>炮台</td>
@@ -287,7 +287,7 @@
                       </td>
                       <td>{{index + 1}}</td>
                       <td>{{item.UserName}}</td>
-                      <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
+                      <!-- <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td> -->
                       <td><FormaNumber :Numbers="item.TodayGold" /></td>
                       <td><FormaNumber :Numbers="item.YesterdayGold" /></td>
                       <td><FormaNumber :Numbers="item.Multiple" /></td>
@@ -722,14 +722,28 @@ export default defineComponent({
         newtime: 0,
       }
       const token = localStorage.getItem("token")
+      let mingold = Filter.mingold
+      if (mingold === "") mingold = 0
+      let maxgold = Filter.maxgold
+      if (maxgold === "") maxgold = 0
+      let multiple = Filter.multiple
+      if (multiple === "") multiple = 0
+      let diamond = Filter.diamond
+      if (diamond === "") diamond = 0
+      let crazy = Filter.crazy
+      if (crazy === "") crazy = 0
+      let cold = Filter.cold
+      if (cold === "") cold = 0
+      let precise = Filter.precise
+      if (precise === "") precise = 0
       const data = {
-        mingold: Filter.mingold * 100000000,
-        maxgold: Filter.maxgold * 100000000,
-        multiple: Filter.multiple * 10000,
-        diamond: Filter.diamond,
-        crazy: Filter.crazy,
-        cold: Filter.cold,
-        precise: Filter.precise,
+        mingold: mingold * 100000000,
+        maxgold: maxgold * 100000000,
+        multiple: multiple * 10000,
+        diamond: diamond,
+        crazy: crazy,
+        cold: cold,
+        precise: precise,
         ignore_sell: Filter.ignore
       }
       const url = `${Config.RootUrl}${states.AccountKey}/SearchAccountDraw`

@@ -67,6 +67,17 @@ type Filter struct {
 	IgnoreSell bool  `form:"ignore_sell" json:"ignore_sell"`
 }
 
+type SearchFilter struct {
+	MinGold    int64 `form:"mingold" json:"mingold" xml:"mingold"`
+	MaxGold    int64 `form:"maxgold" json:"maxgold" xml:"maxgold"`
+	Multiple   int64 `form:"multiple" json:"multiple" xml:"multiple"`
+	Diamond    int64 `form:"diamond" json:"diamond" xml:"diamond"`
+	Crazy      int64 `form:"crazy" json:"crazy" xml:"crazy"`
+	Cold       int64 `form:"cold" json:"cold" xml:"cold"`
+	Precise    int64 `form:"precise" json:"precise" xml:"precise"`
+	IgnoreSell bool  `form:"ignore_sell" json:"ignore_sell"`
+}
+
 // GetCurrentPath Get Current Path
 func GetCurrentPath() (string, error) {
 	path, err := os.Executable()
