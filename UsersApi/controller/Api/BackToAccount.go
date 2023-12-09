@@ -25,23 +25,23 @@ type StatusJSON struct {
 
 func BackToAccount(c *gin.Context) {
 	var (
-		computid string = c.Query("computid")
-		gameid   string = c.Query("gameid")
-		status   string = c.Query("status")
-		windows  string = c.DefaultQuery("windows", "0")
-		IsJson   string = c.DefaultQuery("json", "0")
+		// computid string = c.Query("computid")
+		gameid  string = c.Query("gameid")
+		status  string = c.Query("status")
+		windows string = c.DefaultQuery("windows", "0")
+		IsJson  string = c.DefaultQuery("json", "0")
 	)
-	if len(computid) == 0 {
-		if IsJson == "1" {
-			c.JSON(http.StatusOK, gin.H{
-				"status":  1,
-				"message": "haven't params found",
-			})
-			return
-		}
-		c.String(200, "参数错误")
-		return
-	}
+	// if len(computid) == 0 {
+	// 	if IsJson == "1" {
+	// 		c.JSON(http.StatusOK, gin.H{
+	// 			"status":  1,
+	// 			"message": "haven't params found",
+	// 		})
+	// 		return
+	// 	}
+	// 	c.String(200, "参数错误")
+	// 	return
+	// }
 	Path := c.Request.URL.Path
 	PathList := strings.Split(Path, "/")
 	Path = PathList[len(PathList)-1]
@@ -124,22 +124,22 @@ func BackToAccount(c *gin.Context) {
 		return
 	}
 
-	computs, err := database.GetOneComputer(computid)
-	if err != nil {
-		if IsJson == "1" {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"status":  1,
-				"message": "获取机器码失败",
-			})
-			return
-		}
-		c.String(200, "获取机器码失败")
-		return
-	}
+	// computs, err := database.GetOneComputer(computid)
+	// if err != nil {
+	// 	if IsJson == "1" {
+	// 		c.JSON(http.StatusBadRequest, gin.H{
+	// 			"status":  1,
+	// 			"message": "获取机器码失败",
+	// 		})
+	// 		return
+	// 	}
+	// 	c.String(200, "获取机器码失败")
+	// 	return
+	// }
 
 	backToStatusInt, _ := strconv.Atoi(backToStatus)
 	var account *database.Accounts
-	account.BackToAcc(projectsID, status, backToStatusInt, computs.ID, windows)
+	account.BackToAcc(projectsID, status, backToStatusInt, windows)
 	if IsJson == "1" {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  0,

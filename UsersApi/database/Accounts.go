@@ -178,9 +178,9 @@ func (account *Accounts) UpdataOneAccount(projectsID, username string, accounts 
 }
 
 // Reset Password
-func (account *Accounts) BackToAcc(projectsID, status string, backToStatus int, comput uint, win string) {
+func (account *Accounts) BackToAcc(projectsID, status string, backToStatus int, win string) {
 	sqlDB.Model(&account).
-		Where("projects_id = ? and new_status = ? and comput_id = ?", projectsID, status, comput).
+		Where("projects_id = ? and new_status = ?", projectsID, status).
 		Scopes(HasCold(win)).
 		Update("new_status", backToStatus)
 }
