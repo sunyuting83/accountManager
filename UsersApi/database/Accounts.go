@@ -48,7 +48,7 @@ var mutex = &sync.Mutex{}
 
 // Get Count
 func GetWindowCount(ProjectsID, window string) (count int64, err error) {
-	if err = sqlDB.Model(&Accounts{}).Where("projects_id = ? and cold = ?", ProjectsID, window).Count(&count).Error; err != nil {
+	if err = sqlDB.Model(&Accounts{}).Where("projects_id = ? AND new_status != ? AND cold = ?", ProjectsID, "108", window).Count(&count).Error; err != nil {
 		return
 	}
 	return

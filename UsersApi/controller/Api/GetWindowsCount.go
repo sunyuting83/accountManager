@@ -65,7 +65,7 @@ func GetWindowsCount(c *gin.Context) {
 	}
 	if IsJson == "1" {
 		c.JSON(http.StatusOK, gin.H{
-			"status":  1,
+			"status":  0,
 			"message": "获取成功",
 			"data":    Count,
 		})
