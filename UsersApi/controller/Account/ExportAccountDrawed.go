@@ -4,6 +4,7 @@ import (
 	"colaAPI/UsersApi/database"
 	"colaAPI/UsersApi/utils"
 	"fmt"
+	"math"
 	"net/http"
 	"sort"
 	"strconv"
@@ -321,17 +322,26 @@ func GetCom(currency string) (newstr string) {
 }
 
 func MakeGoldString(gold int64, Excel bool) (goldStr string) {
+	goldInt := float64(0)
+	if gold >= 10000000000000 {
+		goldInt = math.Trunc(float64(gold)/float64(10000000000000)*100) / 100
+		goldStr = strconv.FormatFloat(goldInt, 'f', -1, 64)
+		if !Excel {
+			goldStr = strings.Join([]string{goldStr, "兆"}, "")
+		}
+		return
+	}
 	if gold >= 100000000 {
-		gold = gold / 100000000
-		goldStr = strconv.FormatInt(gold, 10)
+		goldInt = math.Trunc(float64(gold)/float64(100000000)*100) / 100
+		goldStr = strconv.FormatFloat(goldInt, 'f', -1, 64)
 		if !Excel {
 			goldStr = strings.Join([]string{goldStr, "亿"}, "")
 		}
 		return
 	}
 	if gold >= 10000 {
-		gold = gold / 10000
-		goldStr = strconv.FormatInt(gold, 10)
+		goldInt = math.Trunc(float64(gold)/float64(10000)*100) / 100
+		goldStr = strconv.FormatFloat(goldInt, 'f', -1, 64)
 		if !Excel {
 			goldStr = strings.Join([]string{goldStr, "万"}, "")
 		}
