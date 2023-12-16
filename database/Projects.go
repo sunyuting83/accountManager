@@ -12,7 +12,6 @@ type Projects struct {
 	StatusJSON   string
 	NewStatus    int `gorm:"index"`
 	Accounts     []Accounts
-	Others       []Others
 	Filed        []Filed
 	Key          string
 	Remarks      string
