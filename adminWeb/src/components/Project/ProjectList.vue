@@ -88,7 +88,7 @@
           </div>
         </div>
       </div>
-      <PaginAtion v-if="data.length >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
+      <PaginAtion v-if="data.length <= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
     </div>
     <AddProject
       v-if="userLoading && GamesLoading"

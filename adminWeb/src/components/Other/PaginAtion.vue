@@ -22,6 +22,7 @@ export default defineComponent({
     GetData: Function
   },
   setup(props) {
+    // console.log(props)
     let states = reactive({
       current: 1,
       page: []

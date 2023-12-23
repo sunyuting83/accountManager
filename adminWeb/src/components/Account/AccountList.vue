@@ -60,9 +60,9 @@
                     <tr>
                       <td>序号</td>
                       <td>帐号</td>
-                      <td v-if="data[0].Password.length > 0">密码</td>
-                      <td v-if="data[0].PhoneNumber.length > 0">手机号</td>
-                      <td v-if="data[0].PhonePassword.length > 0">手机密码</td>
+                      <td>密码</td>
+                      <!-- <td v-if="data[0].PhoneNumber.length > 0">手机号</td>
+                      <td v-if="data[0].PhonePassword.length > 0">手机密码</td> -->
                       <td>今日金币</td>
                       <td>昨日金币</td>
                       <td>炮台</td>
@@ -70,8 +70,8 @@
                       <td>{{tablename[1]}}</td>
                       <td>{{tablename[2]}}</td>
                       <td>{{tablename[3]}}</td>
-                      <td v-if="data[0].Remarks.length > 0">其他</td>
-                      <td v-if="data[0].Price.length > 0">价格</td>
+                      <td>其他</td>
+                      <td>价格</td>
                       <td>过期时间</td>
                       <td>更新时间</td>
                     </tr>
@@ -80,9 +80,9 @@
                     <tr v-for="(item, index) in data" :key="item.ID">
                       <td>{{index + 1}}</td>
                       <td>{{item.UserName}}</td>
-                      <td v-if="item.Password.length > 0">{{item.Password}}</td>
-                      <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
-                      <td v-if="item.PhonePassword.length > 0">{{item.PhonePassword}}</td>
+                      <td>{{item.Password}}</td>
+                      <!-- <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
+                      <td v-if="item.PhonePassword.length > 0">{{item.PhonePassword}}</td> -->
                       <td><FormaNumber :Numbers="item.TodayGold" /></td>
                       <td><FormaNumber :Numbers="item.YesterdayGold" /></td>
                       <td><FormaNumber :Numbers="item.Multiple" /></td>
@@ -90,8 +90,8 @@
                       <td>{{item.Crazy}}</td>
                       <td>{{item.Cold}}</td>
                       <td>{{item.Precise}}</td>
-                      <td v-if="item.Remarks.length > 0" class="w165">{{item.Remarks}}</td>
-                      <td v-if="item.Price.length > 0">{{item.Price}}</td>
+                      <td class="w165">{{item.Remarks}}</td>
+                      <td>{{item.Price}}</td>
                       <td><ExpTime :DateTime="item.Exptime" /></td>
                       <td><FormaTime :DateTime="item.UpdatedAt" /></td>
                     </tr>

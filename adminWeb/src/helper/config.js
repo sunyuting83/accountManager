@@ -1,5 +1,5 @@
 const CROSUrl = 'https://crossorigin.me/'
-const RootU = 'http://localhost:13002'
+const RootU = 'http://114.115.183.208:18562'
 const IMGUri = 'http://localhost:18080/image/'
 const RootUrl = `${RootU}/admin/api/v1/`
 const IndexUrl = `${CROSUrl}${RootUrl}`

@@ -63,7 +63,7 @@
           </div>
         </div>
       </div>
-      <PaginAtion v-if="total >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetDateList"></PaginAtion>
+      <PaginAtion v-if="total >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
     </div>
   </div>
 </template>

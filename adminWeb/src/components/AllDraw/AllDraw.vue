@@ -195,7 +195,7 @@
                               </td>
                               <td>序号</td>
                               <td>帐号</td>
-                              <td v-if="project.Accounts[0].PhoneNumber.length > 0">手机号</td>
+                              <!-- <td v-if="project.Accounts[0].PhoneNumber.length > 0">手机号</td> -->
                               <td>今日金币</td>
                               <td>昨日金币</td>
                               <td>炮台</td>
@@ -203,7 +203,7 @@
                               <td>狂暴</td>
                               <td>冰冻</td>
                               <td>瞄准</td>
-                              <td v-if="project.Accounts[0].Price.length > 0">价格</td>
+                              <td>价格</td>
                               <td>过期时间</td>
                               <td>更新时间</td>
                             </tr>
@@ -217,7 +217,7 @@
                               </td>
                               <td>{{index + 1}}</td>
                               <td>{{item.UserName}}</td>
-                              <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td>
+                              <!-- <td v-if="item.PhoneNumber.length > 0">{{item.PhoneNumber}}</td> -->
                               <td><FormaNumber :Numbers="item.TodayGold" /></td>
                               <td><FormaNumber :Numbers="item.YesterdayGold" /></td>
                               <td><FormaNumber :Numbers="item.Multiple" /></td>
@@ -225,7 +225,7 @@
                               <td>{{item.Crazy}}</td>
                               <td>{{item.Cold}}</td>
                               <td>{{item.Precise}}</td>
-                              <td v-if="item.Price.length > 0">{{item.Price}}</td>
+                              <td>{{item.Price}}</td>
                               <td><ExpTime :DateTime="item.Exptime" /></td>
                               <td class="potd">
                                 <FormaTime :DateTime="item.UpdatedAt" />
