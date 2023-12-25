@@ -103,6 +103,17 @@ func GetAccountList(page, Limit int, ProjectsID, Status string) (accounts *[]Acc
 }
 
 // Account List
+func GetAccountListWithStatus(ProjectsID, Status string) (accounts *[]Accounts, err error) {
+	if err = sqlDB.
+		Where("projects_id = ? and new_status = ?", ProjectsID, Status).
+		Order("updated_at desc").
+		Find(&accounts).Error; err != nil {
+		return
+	}
+	return
+}
+
+// Account List
 func GetAccountListUseIn(ProjectsID string) (accounts []Accounts, err error) {
 	if err = sqlDB.
 		Where("projects_id = ? and new_status != ?", ProjectsID, "108").
