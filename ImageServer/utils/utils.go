@@ -65,3 +65,9 @@ func randSeq(n int) string {
 	}
 	return string(b)
 }
+
+func IsExist(path string) bool {
+	// 判断文件是否存在
+	_, err := os.Stat(path)
+	return err == nil || os.IsExist(err)
+}

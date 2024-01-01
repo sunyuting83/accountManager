@@ -3,6 +3,7 @@ package controller
 import (
 	BadgerDB "colaAPI/ImageServer/badger"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +23,7 @@ func GetImage(c *gin.Context) {
 	}
 	c.Writer.Header().Add("Content-Type", "image/jpeg")
 
-	image, _ := BadgerDB.Get([]byte(person.Path))
+	imagePath, _ := BadgerDB.Get([]byte(person.Path))
+	image, _ := os.ReadFile(string(imagePath))
 	c.Writer.Write(image)
 }
