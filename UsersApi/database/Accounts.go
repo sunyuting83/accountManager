@@ -12,12 +12,12 @@ import (
 
 type Accounts struct {
 	ID            uint `gorm:"primaryKey"`
-	ProjectsID    uint
+	ProjectsID    uint `gorm:"index"`
 	GameID        *uint
 	ComputID      uint
 	PhoneNumber   string
 	PhonePassword string
-	UserName      string
+	UserName      string `gorm:"index"`
 	Password      string
 	Cover         string
 	NewStatus     int `gorm:"index"`
@@ -162,9 +162,20 @@ func (account *Accounts) AccountUpStatus(status string) {
 	sqlDB.Model(&account).Update("new_status", status)
 }
 
+// update status of account
+func (accounts *Accounts) AccountUpStatusWithSelect(projectsid string, account string, status string) (err error) {
+	if err = sqlDB.Model(&accounts).Where("projects_id = ? and user_name = ? and new_status != ?", projectsid, account, "108").Update("new_status", status).Error; err != nil {
+		return
+	}
+	return
+}
+
 // update all data of account
-func (account *Accounts) AccountUpAll(updatas map[string]interface{}) {
-	sqlDB.Model(&account).Omit("created_at").Updates(updatas)
+func (accounts *Accounts) AccountUpAll(projectsid string, account string, updatas map[string]interface{}) (err error) {
+	if err = sqlDB.Model(&accounts).Where("projects_id = ? and user_name = ? and new_status != ?", projectsid, account, "108").Omit("created_at").Updates(updatas).Error; err != nil {
+		return
+	}
+	return
 }
 
 // Reset Password

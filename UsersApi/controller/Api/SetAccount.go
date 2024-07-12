@@ -57,7 +57,9 @@ func SetAccount(c *gin.Context) {
 		json.Unmarshal([]byte(has), &result)
 		projectsID = result.ProjectsID
 	}
-	account, err := database.CheckOneAccount(projectsID, Account)
+	// account, err := database.CheckOneAccount(projectsID, Account)
+	var account *database.Accounts
+	err := account.AccountUpStatusWithSelect(projectsID, Account, To)
 	if err != nil {
 		if IsJson == "1" {
 			c.JSON(http.StatusOK, gin.H{
@@ -69,18 +71,6 @@ func SetAccount(c *gin.Context) {
 		c.String(200, "帐号不存在")
 		return
 	}
-	if account.NewStatus == 108 {
-		if IsJson == "1" {
-			c.JSON(http.StatusOK, gin.H{
-				"status":  1,
-				"message": err.Error(),
-			})
-			return
-		}
-		c.String(200, "帐号不存在")
-		return
-	}
-	account.AccountUpStatus(To)
 	if IsJson == "1" {
 		Data := gin.H{
 			"status":  0,

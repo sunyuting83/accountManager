@@ -2,13 +2,13 @@ package database
 
 type Accounts struct {
 	ID            uint `gorm:"primaryKey"`
-	ProjectsID    uint
+	ProjectsID    uint `gorm:"index"`
 	GameID        uint
 	ComputID      uint
 	OrderID       *uint
 	PhoneNumber   string
 	PhonePassword string
-	UserName      string
+	UserName      string `gorm:"index"`
 	Password      string
 	Cover         string
 	NewStatus     int `gorm:"index"`

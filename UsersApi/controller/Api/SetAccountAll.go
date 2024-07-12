@@ -59,29 +59,7 @@ func SetAccountAll(c *gin.Context) {
 		json.Unmarshal([]byte(has), &result)
 		projectsID = result.ProjectsID
 	}
-	account, err := database.CheckOneAccount(projectsID, Account)
-	if err != nil {
-		if IsJson == "1" {
-			c.JSON(http.StatusOK, gin.H{
-				"status":  1,
-				"message": err.Error(),
-			})
-			return
-		}
-		c.String(200, "帐号不存在")
-		return
-	}
-	if account.NewStatus == 108 {
-		if IsJson == "1" {
-			c.JSON(http.StatusOK, gin.H{
-				"status":  1,
-				"message": err.Error(),
-			})
-			return
-		}
-		c.String(200, "帐号不存在")
-		return
-	}
+	// account, err := database.CheckOneAccount(projectsID, Account)
 	UpData := make(map[string]interface{}, 1)
 	if len(Status) != 0 {
 		StatusInt, _ := strconv.Atoi(Status)
@@ -125,7 +103,20 @@ func SetAccountAll(c *gin.Context) {
 		UpData["Exptime"] = ExpTimeInt
 	}
 
-	account.AccountUpAll(UpData)
+	var account *database.Accounts
+	err := account.AccountUpAll(projectsID, Account, UpData)
+
+	if err != nil {
+		if IsJson == "1" {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": err.Error(),
+			})
+			return
+		}
+		c.String(200, "帐号不存在")
+		return
+	}
 	if IsJson == "1" {
 		Data := gin.H{
 			"status":  0,
