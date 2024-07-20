@@ -3,6 +3,7 @@ package database
 import (
 	"colaAPI/UsersApi/utils"
 	"errors"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -11,8 +12,8 @@ import (
 )
 
 type Accounts struct {
-	ID            uint `gorm:"primaryKey"`
-	ProjectsID    uint `gorm:"index"`
+	ID            uint `gorm:"primaryKey;index:idx_project_status_id"`
+	ProjectsID    uint `gorm:"index:idx_project_status_id"`
 	GameID        *uint
 	ComputID      uint
 	PhoneNumber   string
@@ -20,8 +21,8 @@ type Accounts struct {
 	UserName      string `gorm:"index"`
 	Password      string
 	Cover         string
-	NewStatus     int `gorm:"index"`
-	SellStatus    int `gorm:"index;default:0"`
+	NewStatus     int `gorm:"index:idx_project_status_id"`
+	SellStatus    int
 	TodayGold     int64
 	YesterdayGold int64
 	Multiple      int64
@@ -163,19 +164,61 @@ func (account *Accounts) AccountUpStatus(status string) {
 }
 
 // update status of account
-func (accounts *Accounts) AccountUpStatusWithSelect(projectsid string, account string, status string) (err error) {
-	if err = sqlDB.Model(&accounts).Where("projects_id = ? and user_name = ? and new_status != ?", projectsid, account, "108").Update("new_status", status).Error; err != nil {
-		return
-	}
-	return
+//
+//	func (accounts *Accounts) AccountUpStatusWithSelect(projectsid string, account string, status string) (err error) {
+//		if err = sqlDB.Model(&accounts).Where("projects_id = ? and user_name = ? and new_status != ?", projectsid, account, "108").Update("new_status", status).Error; err != nil {
+//			return
+//		}
+//		return
+//	}
+func (accounts *Accounts) AccountUpStatusWithSelect(projectsid string, account string, status string) error {
+	return sqlDB.Transaction(func(tx *gorm.DB) error {
+		// 使用 accounts 指针直接查询并锁定记录
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("projects_id = ? AND user_name = ? AND new_status != ?", projectsid, account, "108").
+			First(&accounts).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return errors.New("no record found")
+			}
+			return err
+		}
+
+		// 更新状态
+		if err := tx.Model(&accounts).Omit("CreatedAt").Update("new_status", status).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 // update all data of account
-func (accounts *Accounts) AccountUpAll(projectsid string, account string, updatas map[string]interface{}) (err error) {
-	if err = sqlDB.Model(&accounts).Where("projects_id = ? and user_name = ? and new_status != ?", projectsid, account, "108").Omit("created_at").Updates(updatas).Error; err != nil {
-		return
-	}
-	return
+//
+//	func (accounts *Accounts) AccountUpAll(projectsid string, account string, updatas map[string]interface{}) (err error) {
+//		if err = sqlDB.Model(&accounts).Where("projects_id = ? and user_name = ? and new_status != ?", projectsid, account, "108").Omit("created_at").Updates(updatas).Error; err != nil {
+//			return
+//		}
+//		return
+//	}
+func (accounts *Accounts) AccountUpAll(projectsid string, account string, updatas map[string]interface{}) error {
+	return sqlDB.Transaction(func(tx *gorm.DB) error {
+		// 首先查询并锁定记录
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("projects_id = ? AND user_name = ? AND new_status != ?", projectsid, account, "108").
+			First(&accounts).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return errors.New("no record found")
+			}
+			return err
+		}
+
+		// 更新记录
+		if err := tx.Model(&accounts).Omit("created_at").Updates(updatas).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 // Reset Password
@@ -192,11 +235,27 @@ func (account *Accounts) BackTo(projectsID, status string, backToStatus int, win
 		Updates(Accounts{ComputID: uint(0), NewStatus: backToStatus})
 }
 
-func (account *Accounts) UpdataOneAccount(projectsID, username string, accounts map[string]interface{}) {
-	sqlDB.Model(&account).
-		Omit("created_at").
-		Where("projects_id = ? and user_name = ?", projectsID, username).
-		Updates(accounts)
+func (account *Accounts) UpdataOneAccount(projectsID, username string, accounts map[string]interface{}) error {
+	return sqlDB.Transaction(func(tx *gorm.DB) error {
+		// 首先查询并锁定记录
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("projects_id = ? AND user_name = ?", projectsID, username).
+			First(&account).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return errors.New("no record found")
+			}
+			return err
+		}
+
+		// 更新记录
+		if err := tx.Model(account).
+			Omit("created_at").
+			Updates(&accounts).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 // Reset Password
@@ -454,15 +513,48 @@ func GetDateTimeDataDraw(projectsID, GeType string) (re []string, err error) {
 	return
 }
 
-func GetOneAccount(ProjectsID, status, win string) (accounts *Accounts, err error) {
-	// fmt.Println(status)
-	if err = sqlDB.
-		Where("projects_id = ? and new_status = ?", ProjectsID, status).
-		Scopes(HasCold(win)).
-		First(&accounts).Error; err != nil {
-		return
+// func GetOneAccount(ProjectsID, status, win string) (accounts *Accounts, err error) {
+// 	// fmt.Println(status)
+// 	if err = sqlDB.
+// 		Where("projects_id = ? and new_status = ?", ProjectsID, status).
+// 		Scopes(HasCold(win)).
+// 		First(&accounts).Error; err != nil {
+// 		return
+// 	}
+// 	return
+// }
+
+func GetOneAccount(ProjectsID, status, to, win string) (*Accounts, error) {
+	var accounts *Accounts
+	err := sqlDB.Transaction(func(tx *gorm.DB) error {
+		// 查询并锁定记录
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("projects_id = ? and new_status = ?", ProjectsID, status).
+			Scopes(HasCold(win)).
+			Order("id").
+			First(&accounts).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return errors.New("no record found")
+			}
+			return err // 返回其他错误
+		}
+
+		// 更新 status 字段
+		statusInt, _ := strconv.Atoi(to)
+		accounts.NewStatus = statusInt
+		if err := tx.Model(&accounts).Omit("CreatedAt").Updates(&accounts).Error; err != nil {
+			return err
+		}
+
+		// 不再需要再次查询更新后的数据
+		return nil
+	})
+
+	if err != nil {
+		return &Accounts{}, err // 只返回一个错误
 	}
-	return
+
+	return accounts, nil // 返回更新后的数据
 }
 
 // makePage make page

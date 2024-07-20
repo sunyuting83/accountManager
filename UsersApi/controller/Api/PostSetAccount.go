@@ -149,7 +149,22 @@ func PostSetAccount(c *gin.Context) {
 	}
 
 	// updataMAP := structs.Map(&updata)
-	account.UpdataOneAccount(projectsID, form.Account, updata)
+	err = account.UpdataOneAccount(projectsID, form.Account, updata)
+	if err != nil {
+		if err.Error() == "no record found" {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": "帐号不存在",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status":  1,
+			"message": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  0,

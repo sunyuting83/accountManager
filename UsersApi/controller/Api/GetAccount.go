@@ -2,11 +2,9 @@ package controller
 
 import (
 	Redis "colaAPI/Redis"
-	BadgerDB "colaAPI/UsersApi/badger"
 	"colaAPI/UsersApi/database"
 	"encoding/json"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -65,112 +63,136 @@ func GetOneAccount(c *gin.Context) {
 	}
 	var person Person
 	c.ShouldBindUri(&person)
-	Key := person.Key
-	getnumber, _ := BadgerDB.Get([]byte(Key + ".getnumber"))
-	getnumberInt, _ := strconv.Atoi(getnumber)
-	if getnumberInt >= 300 {
-		if IsJson == "1" {
-			c.JSON(http.StatusOK, gin.H{
-				"status":  1,
-				"message": "block",
-			})
-			return
-		}
-		c.String(200, "没有了")
-		return
-	}
-	projectsID, ColaAPI := GetProjectsID(c)
-	var err error
-	Projects, err := database.ProjectsCheckID(projectsID)
-	var (
-		statusJson   []*StatusJSON
-		ignoreMaster bool
-	)
-	json.Unmarshal([]byte(Projects.StatusJSON), &statusJson)
+	// Key := person.Key
+	// getnumber, _ := BadgerDB.Get([]byte(Key + ".getnumber"))
+	// getnumberInt, _ := strconv.Atoi(getnumber)
+	// if getnumberInt >= 300 {
+	// 	if IsJson == "1" {
+	// 		c.JSON(http.StatusOK, gin.H{
+	// 			"status":  1,
+	// 			"message": "block",
+	// 		})
+	// 		return
+	// 	}
+	// 	c.String(200, "没有了")
+	// 	return
+	// }
+	projectsID, _ := GetProjectsID(c)
+	// var err error
+	// Projects, err := database.ProjectsCheckID(projectsID)
+	// var (
+	// 	statusJson   []*StatusJSON
+	// 	ignoreMaster bool
+	// )
+	// json.Unmarshal([]byte(Projects.StatusJSON), &statusJson)
 
-	for _, item := range statusJson {
-		if item.Status == status {
-			ignoreMaster = item.Ignore
-		}
-	}
+	// for _, item := range statusJson {
+	// 	if item.Status == status {
+	// 		ignoreMaster = item.Ignore
+	// 	}
+	// }
 
-	if ColaAPI {
-		if !ignoreMaster {
-			if err != nil {
-				if IsJson == "1" {
-					c.JSON(http.StatusBadRequest, gin.H{
-						"status":  1,
-						"message": "get projects failed",
-					})
-					return
-				}
-				c.String(200, "出错了")
-				return
-			}
+	// if ColaAPI {
+	// 	if !ignoreMaster {
+	// 		if err != nil {
+	// 			if IsJson == "1" {
+	// 				c.JSON(http.StatusBadRequest, gin.H{
+	// 					"status":  1,
+	// 					"message": "get projects failed",
+	// 				})
+	// 				return
+	// 			}
+	// 			c.String(200, "出错了")
+	// 			return
+	// 		}
 
-			var (
-				hasStatus []string
-			)
-			for _, item := range statusJson {
-				if !item.Ignore {
-					hasStatus = append(hasStatus, item.Status)
-				}
-			}
-			var acc *database.Accounts
-			count, err := acc.GetInCount(projectsID, hasStatus)
-			if err != nil {
-				if IsJson == "1" {
-					c.JSON(http.StatusOK, gin.H{
-						"status":  1,
-						"message": "get count failed",
-					})
-					return
-				}
-				c.String(200, "出错了")
-				return
-			}
-			if count <= int64(Projects.AccNumber) {
-				if IsJson == "1" {
-					c.JSON(http.StatusOK, gin.H{
-						"status":  0,
-						"message": "first",
-					})
-					return
-				}
-				// data := strings.Join([]string{"首次扫码", token}, splitStr)
-				c.String(200, "首次扫码")
-				return
-			}
-		}
-	}
+	// 		var (
+	// 			hasStatus []string
+	// 		)
+	// 		for _, item := range statusJson {
+	// 			if !item.Ignore {
+	// 				hasStatus = append(hasStatus, item.Status)
+	// 			}
+	// 		}
+	// 		var acc *database.Accounts
+	// 		count, err := acc.GetInCount(projectsID, hasStatus)
+	// 		if err != nil {
+	// 			if IsJson == "1" {
+	// 				c.JSON(http.StatusOK, gin.H{
+	// 					"status":  1,
+	// 					"message": "get count failed",
+	// 				})
+	// 				return
+	// 			}
+	// 			c.String(200, "出错了")
+	// 			return
+	// 		}
+	// 		if count <= int64(Projects.AccNumber) {
+	// 			if IsJson == "1" {
+	// 				c.JSON(http.StatusOK, gin.H{
+	// 					"status":  0,
+	// 					"message": "first",
+	// 				})
+	// 				return
+	// 			}
+	// 			// data := strings.Join([]string{"首次扫码", token}, splitStr)
+	// 			c.String(200, "首次扫码")
+	// 			return
+	// 		}
+	// 	}
+	// }
 
-	account, err := database.GetOneAccount(projectsID, status, windows)
-	if err != nil {
-		getnumber, err := BadgerDB.Get([]byte(Key + ".getnumber"))
-		if err != nil && err.Error() == "Key not found" {
-			BadgerDB.SetWithTTL([]byte(Key+".getnumber"), []byte("1"), 60*5)
-		}
-		getnumberInt, _ := strconv.Atoi(getnumber)
-		if getnumberInt <= 30 {
-			newNumber := getnumberInt + 1
-			newNumberStr := strconv.Itoa(newNumber)
-			BadgerDB.UpdateWithOutTTL([]byte(Key+".getnumber"), []byte(newNumberStr))
-		}
-		if IsJson == "1" {
-			c.JSON(http.StatusOK, gin.H{
-				"status":  1,
-				"message": "Account count is 0",
-			})
-			return
-		}
-		c.String(200, "没有了")
-		return
-	}
+	// account, err := database.GetOneAccount(projectsID, status, windows)
+	// if err != nil {
+	// 	getnumber, err := BadgerDB.Get([]byte(Key + ".getnumber"))
+	// 	if err != nil && err.Error() == "Key not found" {
+	// 		BadgerDB.SetWithTTL([]byte(Key+".getnumber"), []byte("1"), 60*5)
+	// 	}
+	// 	getnumberInt, _ := strconv.Atoi(getnumber)
+	// 	if getnumberInt <= 30 {
+	// 		newNumber := getnumberInt + 1
+	// 		newNumberStr := strconv.Itoa(newNumber)
+	// 		BadgerDB.UpdateWithOutTTL([]byte(Key+".getnumber"), []byte(newNumberStr))
+	// 	}
+	// 	if IsJson == "1" {
+	// 		c.JSON(http.StatusOK, gin.H{
+	// 			"status":  1,
+	// 			"message": "Account count is 0",
+	// 		})
+	// 		return
+	// 	}
+	// 	c.String(200, "没有了")
+	// 	return
+	// }
 
 	var (
 		comput *database.Comput
+		err    error
 	)
 	// fmt.Println(ColaAPI)
+	account, err := database.GetOneAccount(projectsID, status, to, windows)
+	if err != nil {
+		if err.Error() == "no record found" {
+			if IsJson == "1" {
+				c.JSON(http.StatusOK, gin.H{
+					"status":  1,
+					"message": "Account count is 0",
+				})
+				return
+			}
+			c.String(200, "没有了")
+			return
+		}
+		if IsJson == "1" {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  1,
+				"message": err.Error(),
+			})
+			return
+		}
+		c.String(200, "出错了")
+		return
+	}
 	if len(computid) > 28 {
 		comput, err = database.GetOneComputer(computid)
 		if err != nil {
@@ -179,9 +201,6 @@ func GetOneAccount(c *gin.Context) {
 			}
 			comput.ComputerInsert()
 		}
-	}
-	account.AccountUpStatus(to)
-	if len(computid) > 28 {
 		account.AccountUpComput(comput.ID)
 	}
 
@@ -190,14 +209,14 @@ func GetOneAccount(c *gin.Context) {
 			"status": 0,
 			"data":   account,
 		}
-		if ColaAPI {
-			token, _ := BadgerDB.Get([]byte(projectsID + ".token"))
-			Data = gin.H{
-				"status": 0,
-				"data":   account.UserName,
-				"token":  token,
-			}
-		}
+		// if ColaAPI {
+		// 	token, _ := BadgerDB.Get([]byte(projectsID + ".token"))
+		// 	Data = gin.H{
+		// 		"status": 0,
+		// 		"data":   account.UserName,
+		// 		"token":  token,
+		// 	}
+		// }
 		c.JSON(http.StatusOK, Data)
 		return
 	}

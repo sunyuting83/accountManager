@@ -61,6 +61,17 @@ func SetAccount(c *gin.Context) {
 	var account *database.Accounts
 	err := account.AccountUpStatusWithSelect(projectsID, Account, To)
 	if err != nil {
+		if err.Error() == "no record found" {
+			if IsJson == "1" {
+				c.JSON(http.StatusOK, gin.H{
+					"status":  1,
+					"message": "帐号不存在",
+				})
+				return
+			}
+			c.String(200, "帐号不存在")
+			return
+		}
 		if IsJson == "1" {
 			c.JSON(http.StatusOK, gin.H{
 				"status":  1,
@@ -68,7 +79,7 @@ func SetAccount(c *gin.Context) {
 			})
 			return
 		}
-		c.String(200, "帐号不存在")
+		c.String(200, "出错了")
 		return
 	}
 	if IsJson == "1" {
