@@ -3,6 +3,7 @@ package controller
 import (
 	"bytes"
 	"colaAPI/UsersApi/database"
+	"colaAPI/UsersApi/utils"
 	"encoding/json"
 	"io"
 	"math/rand"
@@ -81,7 +82,17 @@ func PostAccount(c *gin.Context) {
 		}
 	}
 
-	projectsID := GetProjectsID(c)
+	CurrentuserID := utils.GetCurrentUserID(c)
+	projectsID, userID := GetProjectsID(c)
+	userIDInt, _ := strconv.Atoi(userID)
+
+	if CurrentuserID != uint(userIDInt) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"status":  1,
+			"message": "Status Forbidden",
+		})
+		return
+	}
 	ProjectsID, _ := strconv.Atoi(projectsID)
 
 	Projects, err := database.ProjectsCheckID(projectsID)

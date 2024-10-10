@@ -80,7 +80,18 @@ func ExportAccountDrawed(c *gin.Context) {
 	}
 	// fmt.Println(excel)
 	// fmt.Println(Excel)
-	projectsID := GetProjectsID(c)
+	CurrentuserID := utils.GetCurrentUserID(c)
+	projectsID, userID := GetProjectsID(c)
+	userIDInt, _ := strconv.Atoi(userID)
+
+	if CurrentuserID != uint(userIDInt) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"status":  1,
+			"message": "Status Forbidden",
+		})
+		return
+	}
+
 	startTime, endTime := utils.GetSqlDateTime(date)
 
 	data, err := database.ExportAccountDrawed(projectsID, startTime, endTime)

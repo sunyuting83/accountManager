@@ -4,6 +4,7 @@ import (
 	"colaAPI/UsersApi/database"
 	"colaAPI/UsersApi/utils"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,8 +18,19 @@ func SearchAccountDraw(c *gin.Context) {
 		})
 		return
 	}
+	CurrentuserID := utils.GetCurrentUserID(c)
+	projectsID, userID := GetProjectsID(c)
+	userIDInt, _ := strconv.Atoi(userID)
 
-	projectsID, _ := GetProjects(c)
+	if CurrentuserID != uint(userIDInt) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"status":  1,
+			"message": "Status Forbidden",
+		})
+		return
+	}
+
+	// projectsID, _ := GetProjects(c)
 
 	Projects, err := database.ProjectsCheckID(projectsID)
 	if err != nil {

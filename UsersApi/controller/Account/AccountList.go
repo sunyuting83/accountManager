@@ -3,6 +3,7 @@ package controller
 import (
 	Redis "colaAPI/Redis"
 	"colaAPI/UsersApi/database"
+	"colaAPI/UsersApi/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -26,7 +27,17 @@ func AccountList(c *gin.Context) {
 	pageInt, _ := strconv.Atoi(page)
 	LimitInt, _ := strconv.Atoi(Limit)
 
-	projectsID := GetProjectsID(c)
+	CurrentuserID := utils.GetCurrentUserID(c)
+	projectsID, userID := GetProjectsID(c)
+	userIDInt, _ := strconv.Atoi(userID)
+
+	if CurrentuserID != uint(userIDInt) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"status":  1,
+			"message": "Status Forbidden",
+		})
+		return
+	}
 
 	var account *database.Accounts
 	count, err := account.GetCount(projectsID, Status)
@@ -62,7 +73,7 @@ func AccountList(c *gin.Context) {
 	c.JSON(http.StatusOK, Data)
 }
 
-func GetProjectsID(c *gin.Context) (projectsID string) {
+func GetProjectsID(c *gin.Context) (projectsID string, userID string) {
 	var person Person
 	if err := c.ShouldBindUri(&person); err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -76,6 +87,7 @@ func GetProjectsID(c *gin.Context) (projectsID string) {
 	if len(has) != 0 {
 		json.Unmarshal([]byte(has), &result)
 		projectsID = result.ProjectsID
+		userID = result.UsersID
 	}
 	return
 }

@@ -21,6 +21,18 @@ func PullAccountDrawSelect(c *gin.Context) {
 		return
 	}
 
+	CurrentuserID := utils.GetCurrentUserID(c)
+	_, userID := GetProjectsID(c)
+	userIDInt, _ := strconv.Atoi(userID)
+
+	if CurrentuserID != uint(userIDInt) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"status":  1,
+			"message": "Status Forbidden",
+		})
+		return
+	}
+
 	projectsID, ColaAPI := GetProjects(c)
 	ProjectsID, _ := strconv.ParseInt(projectsID, 10, 64)
 

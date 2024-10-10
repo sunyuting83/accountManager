@@ -2,6 +2,7 @@ package controller
 
 import (
 	"colaAPI/UsersApi/database"
+	"colaAPI/UsersApi/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -20,7 +21,17 @@ func GoBackAccount(c *gin.Context) {
 		return
 	}
 
-	projectsID := GetProjectsID(c)
+	CurrentuserID := utils.GetCurrentUserID(c)
+	projectsID, userID := GetProjectsID(c)
+	userIDInt, _ := strconv.Atoi(userID)
+
+	if CurrentuserID != uint(userIDInt) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"status":  1,
+			"message": "Status Forbidden",
+		})
+		return
+	}
 
 	Projects, err := database.ProjectsCheckID(projectsID)
 	if err != nil {
