@@ -1,9 +1,9 @@
 package database
 
 type Filed struct {
-	ID         uint `gorm:"primaryKey"`
-	ProjectsID uint
-	FiledName  string
+	ID         uint   `gorm:"primaryKey"`
+	ProjectsID uint   `gorm:"index:idx_projectid_filedname"`
+	FiledName  string `gorm:"index:idx_projectid_filedname"`
 	Data       string
 	CreatedAt  int64 `gorm:"autoUpdateTime:milli"`
 	UpdatedAt  int64 `gorm:"autoUpdateTime:milli"`

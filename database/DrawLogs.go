@@ -2,7 +2,7 @@ package database
 
 type DrawLogs struct {
 	ID         uint `gorm:"primaryKey"`
-	ProjectsID uint
+	ProjectsID uint `gorm:"index"`
 	DrawUser   string
 	LogName    string
 	Data       string

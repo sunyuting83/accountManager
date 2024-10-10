@@ -5,7 +5,7 @@ import "gorm.io/gorm/clause"
 type Projects struct {
 	ID           uint `gorm:"primaryKey"`
 	UsersID      uint
-	GamesID      uint
+	GamesID      uint `gorm:"index"`
 	ProjectsName string
 	UserName     string
 	Password     string

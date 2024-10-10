@@ -100,7 +100,7 @@ func (user *Users) UserResetPassword(username string) (users Users, err error) {
 	if err = sqlDB.First(&users, "user_name = ?", username).Error; err != nil {
 		return
 	}
-	if err = sqlDB.Model(&user).Updates(&users).Error; err != nil {
+	if err = sqlDB.Model(&users).Updates(&user).Error; err != nil {
 		return
 	}
 	return

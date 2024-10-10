@@ -67,7 +67,7 @@
         </div>
       </div>
 
-      <PaginAtion v-if="data.length >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
+      <PaginAtion v-if="total >= limit && pageLoading === true" :total="total" :number="limit" :GetData="GetData"></PaginAtion>
     </div>
     <ChangePassword
       :showData="openModal"
