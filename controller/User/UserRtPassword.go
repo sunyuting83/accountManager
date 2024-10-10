@@ -46,7 +46,7 @@ func UserResetPassword(c *gin.Context) {
 		secret_key, _ := c.Get("users_secret_key")
 		SECRET_KEY := secret_key.(string)
 		PASSWD := utils.MD5(strings.Join([]string{form.Password, SECRET_KEY}, ""))
-		user.Password = PASSWD
+		user.Password = PASSWD // 这里有错误
 		data, err := user.UserResetPassword(form.UserName)
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
