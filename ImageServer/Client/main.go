@@ -162,6 +162,8 @@ func main() {
 	status := postFile(fileName, imgName, confYaml.IMGServer)
 	if status {
 		postData(account, gold, multiple, diamond, crazy, cold, precise, exptime, imgName, confYaml.APIServer)
+	} else {
+		fmt.Println("0")
 	}
 }
 

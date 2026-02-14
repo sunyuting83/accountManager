@@ -103,9 +103,9 @@ func SetAccountAll(c *gin.Context) {
 		UpData["Exptime"] = ExpTimeInt
 	}
 
-	var account *database.Accounts
-	err := account.AccountUpAll(projectsID, Account, UpData)
-
+	// var account *database.Accounts
+	// err := account.AccountUpAll(projectsID, Account, UpData)
+	err := database.AccountUpAll(projectsID, Account, UpData)
 	if err != nil {
 		if err.Error() == "no record found" {
 			if IsJson == "1" {

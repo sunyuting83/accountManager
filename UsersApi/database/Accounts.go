@@ -200,6 +200,7 @@ func (accounts *Accounts) AccountUpStatusWithSelect(projectsid string, account s
 //		}
 //		return
 //	}
+/*旧函数
 func (accounts *Accounts) AccountUpAll(projectsid string, account string, updatas map[string]interface{}) error {
 	return sqlDB.Transaction(func(tx *gorm.DB) error {
 		// 首先查询并锁定记录
@@ -216,6 +217,49 @@ func (accounts *Accounts) AccountUpAll(projectsid string, account string, updata
 		if err := tx.Model(&accounts).Omit("created_at").Updates(updatas).Error; err != nil {
 			return err
 		}
+
+		return nil
+	})
+}
+*/
+// AccountUpAll 改为普通函数，不再挂载到结构体上
+func AccountUpAll(projectsid string, accountName string, updatas map[string]interface{}) error {
+	// 确保数据库连接已初始化
+	if sqlDB == nil {
+		return errors.New("database connection is nil")
+	}
+
+	return sqlDB.Transaction(func(tx *gorm.DB) error {
+		// 每次调用都会在栈上创建一个全新的局部变量，绝对并发安全
+		var target Accounts
+
+		// 1. 查找并加锁 (FOR UPDATE)
+		// 这里的 user_name 需对应你数据库中的字段名
+		err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("projects_id = ? AND user_name = ? AND new_status != ?", projectsid, accountName, "108").
+			First(&target).Error
+
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return errors.New("no record found")
+			}
+			return err
+		}
+
+		// 2. 执行更新
+		// Omit("created_at") 防止误改创建时间
+		result := tx.Model(&target).Omit("created_at").Updates(updatas)
+
+		if result.Error != nil {
+			return result.Error
+		}
+
+		// 3. 检查受影响行数，确保真实更新成功
+		// if result.RowsAffected == 0 {
+		// 	// 如果字段值没变，GORM 的 RowsAffected 可能是 0，
+		// 	// 如果你希望“没变也算成功”，可以删掉这个判断。
+		// 	return nil
+		// }
 
 		return nil
 	})
