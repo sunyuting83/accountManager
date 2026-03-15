@@ -12,8 +12,8 @@ import (
 )
 
 type Accounts struct {
-	ID            uint `gorm:"primaryKey"`
-	ProjectsID    uint `gorm:"index:idx_project_status"`
+	ID            uint `gorm:"primaryKey;index:idx_project_status_id"`
+	ProjectsID    uint `gorm:"index:idx_project_status_id"`
 	GameID        *uint
 	ComputID      uint
 	PhoneNumber   string
@@ -21,7 +21,7 @@ type Accounts struct {
 	UserName      string `gorm:"index"`
 	Password      string
 	Cover         string
-	NewStatus     int `gorm:"index:idx_project_status"`
+	NewStatus     int `gorm:"index:idx_project_status_id"`
 	SellStatus    int
 	TodayGold     int64
 	YesterdayGold int64
